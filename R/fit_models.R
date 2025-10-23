@@ -16,7 +16,6 @@
 #' natural cubic spline with 4 degrees of freedom.
 #'
 #' @inheritParams nomatchVE
-#'
 #' @param formula_0 Optional right hand side of the formula for model 0. By default, uses `covariates`.
 #'
 #' @param formula_1 Optional right hand side of the formula for model 1. By default, uses `covariates`
@@ -78,6 +77,7 @@ fit_model_0 <- function(data, outcome_time, outcome_status, exposure, exposure_t
 }
 
 #' @rdname fit_model_0
+#' @param tau Delay period so that events before tau are not included.
 #' @export
 fit_model_1 <- function(data, outcome_time, outcome_status, exposure, exposure_time,
                         covariates, tau, censor_time = NULL, formula_1 = NULL){

@@ -69,11 +69,11 @@ fit1 <- nomatchVE(data = simdata,
                   exposure = "V",
                   exposure_time = "D_obs", 
                   covariates = c("x1", "x2"),
-                  tau = 14,
+                  immune_lag = 14,
                   eval_times = seq(30, 180, by = 30),
                   boot_reps = 10)
 #> Bootstrapping 10 samples...
-#> Time difference of 1.452928 secs
+#> Time difference of 1.465857 secs
 
 #Print results 
 fit1        
@@ -82,7 +82,7 @@ fit1
 #> ================================================== 
 #> Call: nomatchVE(data = simdata, outcome_time = "Y", outcome_status = "event", 
 #>     exposure = "V", exposure_time = "D_obs", covariates = c("x1", 
-#>         "x2"), tau = 14, eval_times = seq(30, 180, by = 30), 
+#>         "x2"), immune_lag = 14, eval_times = seq(30, 180, by = 30), 
 #>     boot_reps = 10) 
 #> 
 #> Result:
@@ -106,7 +106,7 @@ summary(fit1)
 #> 
 #> Method:              nomatchVE (G-computation) 
 #> Evaluation times:    30, 60, 90, 120, 150, 180  
-#> Tau (delay period):  14 
+#> Immune lag (delay period):  14 
 #> Adjusted for:        x1, x2 
 #> 
 #> Bootstrap:           10 replicates
@@ -119,10 +119,10 @@ summary(fit1)
 #> N total: 10000 
 #> Number of events: 1007 
 #> 
-#> N Exposed: 4112 
-#> N Exposed at-risk <tau> days after exposure: 4045 
+#> N exposed: 4112 
+#> N exposed at-risk `immune_lag` days after exposure: 4045 
 #> 
-#> Distribution of exposure times among at-risk <tau> days after exposure:
+#> Distribution of exposure times among at-risk `immune_lag` days after exposure:
 #>  Range:  1 - 194 |  Median (IQR):  18 (11 - 32) |  Mean:  25.5
 #> 
 #> ---------------------------------------------------------------------- 
@@ -188,11 +188,11 @@ fit_matching <-matching_ve(matched_data = matched_data,
                            outcome_status = "event",
                            exposure = "V",
                            exposure_time = "D_obs", 
-                           tau = 14,
+                           immune_lag = 14,
                            eval_times = seq(30, 180, by = 30),
                            boot_reps = 10) 
 #> Bootstrapping 10 samples...
-#> Time difference of 0.80884 secs
+#> Time difference of 0.786077 secs
 
 fit_matching
 #> 
@@ -200,7 +200,7 @@ fit_matching
 #> ================================================== 
 #> Call: matching_ve(matched_data = matched_data, outcome_time = "Y", 
 #>     outcome_status = "event", exposure = "V", exposure_time = "D_obs", 
-#>     tau = 14, eval_times = seq(30, 180, by = 30), boot_reps = 10) 
+#>     immune_lag = 14, eval_times = seq(30, 180, by = 30), boot_reps = 10) 
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper

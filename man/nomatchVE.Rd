@@ -12,7 +12,7 @@ nomatchVE(
   exposure,
   exposure_time,
   covariates,
-  tau,
+  immune_lag,
   eval_times,
   effect = c("vaccine_effectiveness", "risk_ratio"),
   weights_source = c("observed", "custom"),
@@ -49,21 +49,21 @@ origin; use \code{NA} if not exposed. Time must be measured in the same units
 the hazard models. These covariates should include all known confounders of
 exposure and censoring measured at the chosen time origin.}
 
-\item{tau}{Non-negative numeric value specifying the time after exposure that
+\item{immune_lag}{Non-negative numeric value specifying the time after exposure that
 should be excluded from the risk evaluation period. This argument is
 primarily intended for vaccination exposures, where it is common to exclude
 the time after vaccination when immunity is still building. Time must be
 measured in the same units as that used for \code{outcome_time} and \code{exposure_time}
 and should reflect the biological understanding of when vaccine-induced
-immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{tau} can
+immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
 be set to 0 (no delay period).}
 
 \item{eval_times}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure. All values must be greater
-than \code{tau} and and should correspond to clinically meaningful follow-up
+than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., \code{eval_times = (tau+1):100}) can be provided if cumulative
+timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 
 \item{effect}{Character. Type of effect measure to compute and return,
@@ -133,13 +133,13 @@ An object of class \code{vefit} containing:
 \describe{
 \item{\code{cuminc_0}}{ marginal cumulative incidence under no exposure}
 \item{\code{cuminc_1}}{ marginal cumulative incidence under exposure}
-\item{\verb{<effect>}}{the selected effect measure under the same name}
+\item{\verb{<effect>}}{the selected effect measure}
 }
 Each matrix has one row per value in \code{eval_times} and columns including the
 point estimate (\code{estimate}) and, when requested, confidence limits of the form
 (\verb{\{wald/percentile\}_lower}, \verb{\{wald/percentile\}_upper}). }
 \item{weights}{List with dataframes \code{g_weights}, \code{p_weights} specifying
-the marginalizing weights used for averaging over exposure eval_times and covariates.}
+the marginalizing weights used for averaging over exposure times and covariates.}
 \item{model_0}{Fitted hazard model for the unexposed group.
 See \strong{Modeling} section for details.}
 \item{model_1}{Fitted hazard model for the exposed group.
@@ -148,7 +148,7 @@ See \strong{Modeling} section for details.}
 number of successful bootstrap replications per timepoint.}
 \item{boot_samples}{(If \code{keep_boot_samples = TRUE}) List of bootstrap draws
 (stored as matrices) for each
-returned quantity with names mirroring those in \code{estimates} (i.e. \code{cuminc_0}, \code{cuminc_1}, \verb{<effect}).
+returned quantity with names mirroring those in \code{estimates} (i.e. \code{cuminc_0}, \code{cuminc_1}, \verb{<effect>}).
 Rows index bootstrap replicates and columns index \code{eval_times}.}
 }
 
@@ -158,11 +158,12 @@ Use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}} to add simultaneou
 \description{
 \code{nomatchVE()} estimates marginal cumulative incidences under
 exposure and no exposure using a G-computation approach. The method fits two
-conditional hazard models- one for unexposed and one for the exposed- and uses
+conditional hazard models- one for each exposure group- and uses
 these models to predict time- and covariate- specific cumulative incidences.
-The predicted conditional risks are then marginalized to compute overall
+The predictions are then marginalized to compute overall
 (marginal) cumulative incidences. The resulting cumulative incidences can be
-summarized as risk ratios (RR) or 1 - RR (vaccine effectiveness).
+summarized as risk ratio (RR = 1 - risk_exposed/risk_unexposed) or
+vaccine effectiveness estimates (VE = 1 - RR).
 }
 \details{
 \strong{Modeling.} Two Cox proportional hazards models are fit to estimate
@@ -204,7 +205,7 @@ fit <- nomatchVE(
   exposure_time = "D_obs",
   covariates = c("x1", "x2"),
   eval_times = seq(30, 180, by = 30),
-  tau = 14,
+  immune_lag = 14,
   boot_reps = 5,
   n_cores = 2
 )

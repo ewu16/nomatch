@@ -25,7 +25,7 @@ matching_ve <- function(matched_data,
                         outcome_status,
                         exposure,
                         exposure_time,
-                        tau,
+                        immune_lag,
                         eval_times,
                         effect = c("vaccine_effectiveness", "risk_ratio"),
                         ci_type = c("wald", "percentile", "both"),
@@ -38,6 +38,7 @@ matching_ve <- function(matched_data,
     call <- match.call()
     effect = match.arg(effect)
     ci_type <- match.arg(ci_type)
+    tau <- immune_lag
 
 
     # Check data/inputs
@@ -124,7 +125,7 @@ matching_ve <- function(matched_data,
         outcome_status = outcome_status,
         exposure = exposure,
         exposure_time = exposure_time,
-        tau = tau,
+        immune_lag = tau,
         eval_times = eval_times,
         effect = effect,
         ci_type = ci_type,

@@ -3,9 +3,9 @@
 #' @description Computes two empirical probability distributions used to marginalize
 #' time- and covariate- specific cumulative incidences:
 #' - \eqn{g(d \mid x)}: the distribution of exposure eval_times within each covariate subgroup
-#' of exposed individuals who remain at risk `tau` days after exposure.
+#' of exposed individuals who remain at risk `immune_lag` days after exposure.
 #' - \eqn{p(x)}: the distribution of covariates among exposed individuals
-#' who remain at risk `tau` days after exposure.
+#' who remain at risk `immune_lag` days after exposure.
 #'
 #' Called internally by [nomatchVE()]. Provided as an example of the
 #' structure needed if a user passes in `custom_weights`.
@@ -24,13 +24,13 @@
 #' @export
 #' @examples
 #' weights <- get_observed_weights(simdata, "Y", "V", "D_obs",
-#'                                    c("x1", "x2"), tau = 14)
+#'                                    c("x1", "x2"), immune_lag = 14)
 #' str(weights)
 #'
 get_observed_weights <- function(data, outcome_time, exposure,
-                            exposure_time, covariates, tau){
+                            exposure_time, covariates, immune_lag){
 
-    gp_list <- get_gp(data, outcome_time, exposure, exposure_time, covariates, tau)
+    gp_list <- get_gp(data, outcome_time, exposure, exposure_time, covariates, immune_lag)
     gp_to_weights(gp_list)
 
 }

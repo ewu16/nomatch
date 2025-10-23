@@ -27,9 +27,9 @@ time should be the time to event from vaccination/matched index date}
 \item{eval_times}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure. All values must be greater
-than \code{tau} and and should correspond to clinically meaningful follow-up
+than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., \code{eval_times = (tau+1):100}) can be provided if cumulative
+timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 
 \item{keep_models}{Logical; return the two fitted hazard models used to compute

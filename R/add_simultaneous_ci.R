@@ -37,7 +37,7 @@
 #'   exposure_time = "D_obs",
 #'   covariates = c("x1", "x2"),
 #'   eval_times = seq(30, 180, by = 30),
-#'   tau = 14,
+#'   immune_lag = 14,
 #'   boot_reps = 100,
 #'   keep_boot_samples = TRUE
 #' )

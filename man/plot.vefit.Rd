@@ -2,7 +2,7 @@
 % Please edit documentation in R/vefit_methods.R
 \name{plot.vefit}
 \alias{plot.vefit}
-\title{Plot method for vefit xs}
+\title{Plot method for vefit objects}
 \usage{
 \method{plot}{vefit}(x, ci_type = NULL, color = "#0072B2", ...)
 }
@@ -10,7 +10,7 @@
 \item{x}{An x of class \code{vefit} created by \code{\link[=nomatchVE]{nomatchVE()}} or \code{\link[=matching_ve]{matching_ve()}}.}
 
 \item{ci_type}{Character string specifying the type of confidence interval bands to plot.
-One of "wald", "percentile", "simul", or "none". Must choose a \code{ci_type} whose lower
+One of \verb{"wald", "percentile", "simul"}, or \code{"none"}. Must choose a \code{ci_type} whose lower
 and upper bounds are already computed in \code{x$estimates} component of \code{x}.}
 
 \item{color}{Aesthetic value to map data values to. Default: \code{"#0072B2"} (blue)}
@@ -18,7 +18,7 @@ and upper bounds are already computed in \code{x$estimates} component of \code{x
 \item{...}{Additional arguments (currently ignored).}
 }
 \value{
-a ggpplot2 x with line plot for each term (cumulative incidence, VE)
+a ggplot2 x with line plot for each term (cumulative incidence, VE)
 }
 \description{
 Plot cumulative incidence and VE estimates across all evaluation time points.

@@ -43,19 +43,10 @@ exposure and censoring measured at the chosen time origin.}
 \item{eval_times}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure. All values must be greater
-than \code{tau} and and should correspond to clinically meaningful follow-up
+than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., \code{eval_times = (tau+1):100}) can be provided if cumulative
+timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
-
-\item{tau}{Non-negative numeric value specifying the time after exposure that
-should be excluded from the risk evaluation period. This argument is
-primarily intended for vaccination exposures, where it is common to exclude
-the time after vaccination when immunity is still building. Time must be
-measured in the same units as that used for \code{outcome_time} and \code{exposure_time}
-and should reflect the biological understanding of when vaccine-induced
-immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{tau} can
-be set to 0 (no delay period).}
 }
 \value{
 The \code{pt_estimates} component returned by \code{\link[=get_one_nomatch_ve]{get_one_nomatch_ve()}},

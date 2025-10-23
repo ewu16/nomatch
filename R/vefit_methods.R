@@ -99,7 +99,7 @@ summary.vefit <- function(object, digits = 4, ...) {
     cat("Method:             ", object$method, "\n")
     cat("Evaluation times:   ", paste(utils::head(object$eval_times), collapse = ", "),
         ifelse(length(object$eval_times) > 6, ", ...", ""), "\n")
-    cat("Tau (delay period): ", object$tau, "\n")
+    cat("Immune lag (delay period): ", object$immune_lag, "\n")
 
     if(object$method ==  "nomatchVE (G-computation)"){
         if (length(object$covariates) > 0) {
@@ -132,10 +132,10 @@ summary.vefit <- function(object, digits = 4, ...) {
         cat("Number of events:", descrip$n_events, "\n")
         cat("\n")
         cat("N exposed:", descrip$n_exposed, "\n")
-        cat("N exposed at-risk <tau> days after exposure:", descrip$n_exposed_at_tau, "\n")
+        cat("N exposed at-risk `immune_lag` days after exposure:", descrip$n_exposed_at_tau, "\n")
 
         cat("\n")
-        cat("Distribution of exposure times among at-risk <tau> days after exposure:\n")
+        cat("Distribution of exposure times among at-risk `immune_lag` days after exposure:\n")
         cat(" Range: ", paste(range(descrip$exposure_times_at_tau), collapse = " - "), "| ")
         cat(" Median (IQR): ",
             stats::median(descrip$exposure_times_at_tau),
@@ -167,7 +167,7 @@ summary.vefit <- function(object, digits = 4, ...) {
         descrip <- object$descrip
         cat("N matched:", descrip$n_matched, "\n")
         cat("N matched analysis:",  descrip$n_matched_analysis, "\n",
-            "(excludes pairs in which either individual is not at risk\n <tau> days after matching index day)\n\n")
+            "(excludes pairs in which either individual is not at risk\n `immune_lag` days after matching index day)\n\n")
         cat("Number of events in matched analysis:", descrip$n_events, "\n")
         cat("\n")
         cat("Distribution of exposure times in matched analysis:\n")

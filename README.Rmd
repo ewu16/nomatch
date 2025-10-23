@@ -57,7 +57,7 @@ covariates <- c("x1", "x2")
 
 eval_times <- seq(30, 180, by = 30)
 censor_time <- max(eval_times)
-tau <- 14
+immune_lag <- tau <-  14
 ci_type <- "wald"
 boot_reps <- 10
 alpha <- .05
@@ -81,7 +81,7 @@ fit1 <- nomatchVE(data = simdata,
                   exposure = "V",
                   exposure_time = "D_obs", 
                   covariates = c("x1", "x2"),
-                  tau = 14,
+                  immune_lag = 14,
                   eval_times = seq(30, 180, by = 30),
                   boot_reps = 10)
 
@@ -123,7 +123,7 @@ fit_matching <-matching_ve(matched_data = matched_data,
                            outcome_status = "event",
                            exposure = "V",
                            exposure_time = "D_obs", 
-                           tau = 14,
+                           immune_lag = 14,
                            eval_times = seq(30, 180, by = 30),
                            boot_reps = 10) 
 

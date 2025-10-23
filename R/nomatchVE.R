@@ -27,20 +27,20 @@
 #'@param covariates Character vector of covariates to adjust for when fitting
 #'  the hazard models. These covariates should include all known confounders of
 #'  exposure and censoring measured at the chosen time origin.
-#'@param tau Non-negative numeric value specifying the time after exposure that
+#'@param immune_lag Non-negative numeric value specifying the time after exposure that
 #'  should be excluded from the risk evaluation period. This argument is
 #'  primarily intended for vaccination exposures, where it is common to exclude
 #'  the time after vaccination when immunity is still building. Time must be
 #'  measured in the same units as that used for `outcome_time` and `exposure_time`
 #'  and should reflect the biological understanding of when vaccine-induced
-#'  immunity develops (usually 1-2 weeks). For non-vaccine exposures, `tau` can
+#'  immunity develops (usually 1-2 weeks). For non-vaccine exposures, ` immune_lag` can
 #'  be set to 0 (no delay period).
 #'@param eval_times Numeric vector specifying the timepoints at which to compute
 #'  cumulative incidence and the derived effect measures. The timepoints should
 #'  be expressed in terms of time since exposure. All values must be greater
-#'  than `tau` and and should correspond to clinically meaningful follow-up
+#'  than ` immune_lag` and and should correspond to clinically meaningful follow-up
 #'  durations, such as 30, 60, or 90 days after exposure. A fine grid of
-#'  timepoints (e.g., `eval_times = (tau+1):100`) can be provided if cumulative
+#'  timepoints (e.g., `eval_times = (immune_lag + 1):100`) can be provided if cumulative
 #'  incidence curves over time are desired.
 #'@param effect Character. Type of effect measure to compute and return,
 #'  based on the estimated cumulative incidences. Either
@@ -160,7 +160,7 @@
 #'   exposure_time = "D_obs",
 #'   covariates = c("x1", "x2"),
 #'   eval_times = seq(30, 180, by = 30),
-#'   tau = 14,
+#'   immune_lag = 14,
 #'   boot_reps = 5,
 #'   n_cores = 2
 #' )
@@ -174,7 +174,7 @@ nomatchVE <- function(data,
                   exposure,
                   exposure_time,
                   covariates,
-                  tau,
+                  immune_lag,
                   eval_times,
                   effect = c("vaccine_effectiveness", "risk_ratio"),
                   weights_source = c("observed", "custom"),
@@ -197,6 +197,7 @@ nomatchVE <- function(data,
     effect <- match.arg(effect)
     weights_source      <- match.arg(weights_source)
     ci_type   <- match.arg(ci_type)
+    tau <- immune_lag
 
     # Validate inputs
     validate_ve_inputs(
@@ -314,7 +315,7 @@ nomatchVE <- function(data,
          exposure = exposure,
          exposure_time = exposure_time,
          covariates = covariates,
-         tau = tau,
+         immune_lag = tau,
          eval_times = eval_times,
          effect = effect,
          ci_type = ci_type,

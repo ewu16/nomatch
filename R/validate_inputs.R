@@ -18,18 +18,18 @@ validate_ve_inputs <- function(data, outcome_time, outcome_status, exposure, exp
 
     # Check time relationships
     if(tau < 0){
-        stop("Tau must be non-negative (>= 0)")
+        stop("immune_lag must be non-negative (>= 0)")
     }
     if(tau > 28) {
         warning(
-            "tau = ", tau, " days is unusually long for an immune build-up period.\n",
+            "immune_lag = ", tau, " days is unusually long for an immune build-up period.\n",
             "Resulting estimates may require strong assumptions for causal interpretation.\n",
             "Please verify this is intentional."
         )
     }
 
     if(any(eval_times <= tau)) {
-        stop("All evaluation eval_times 'eval_times' must be greater than tau (", tau, " days)")
+        stop("All evaluation eval_times 'eval_times' must be greater than immune_lag (", tau, " days)")
     }
 
 }

@@ -54,14 +54,7 @@ exposure and censoring measured at the chosen time origin.}
 
 \item{formula_0}{Optional right hand side of the formula for model 0. By default, uses \code{covariates}.}
 
-\item{tau}{Non-negative numeric value specifying the time after exposure that
-should be excluded from the risk evaluation period. This argument is
-primarily intended for vaccination exposures, where it is common to exclude
-the time after vaccination when immunity is still building. Time must be
-measured in the same units as that used for \code{outcome_time} and \code{exposure_time}
-and should reflect the biological understanding of when vaccine-induced
-immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{tau} can
-be set to 0 (no delay period).}
+\item{tau}{Delay period so that events before tau are not included.}
 
 \item{censor_time}{Time after exposure at which exposed
 individuals are censored during model fitting to prevent extrapolation. By default,

@@ -10,7 +10,7 @@ get_observed_weights(
   exposure,
   exposure_time,
   covariates,
-  tau
+  immune_lag
 )
 }
 \arguments{
@@ -34,13 +34,13 @@ origin; use \code{NA} if not exposed. Time must be measured in the same units
 the hazard models. These covariates should include all known confounders of
 exposure and censoring measured at the chosen time origin.}
 
-\item{tau}{Non-negative numeric value specifying the time after exposure that
+\item{immune_lag}{Non-negative numeric value specifying the time after exposure that
 should be excluded from the risk evaluation period. This argument is
 primarily intended for vaccination exposures, where it is common to exclude
 the time after vaccination when immunity is still building. Time must be
 measured in the same units as that used for \code{outcome_time} and \code{exposure_time}
 and should reflect the biological understanding of when vaccine-induced
-immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{tau} can
+immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
 be set to 0 (no delay period).}
 }
 \value{
@@ -59,9 +59,9 @@ Computes two empirical probability distributions used to marginalize
 time- and covariate- specific cumulative incidences:
 \itemize{
 \item \eqn{g(d \mid x)}: the distribution of exposure eval_times within each covariate subgroup
-of exposed individuals who remain at risk \code{tau} days after exposure.
+of exposed individuals who remain at risk \code{immune_lag} days after exposure.
 \item \eqn{p(x)}: the distribution of covariates among exposed individuals
-who remain at risk \code{tau} days after exposure.
+who remain at risk \code{immune_lag} days after exposure.
 }
 
 Called internally by \code{\link[=nomatchVE]{nomatchVE()}}. Provided as an example of the
@@ -69,7 +69,7 @@ structure needed if a user passes in \code{custom_weights}.
 }
 \examples{
 weights <- get_observed_weights(simdata, "Y", "V", "D_obs",
-                                   c("x1", "x2"), tau = 14)
+                                   c("x1", "x2"), immune_lag = 14)
 str(weights)
 
 }
