@@ -105,7 +105,7 @@ compute_wald_ci <- function(x, boot_x,  alpha = .05, transform, z_star = NULL){
     lower <- back_trans$lower(eta_x, col_sd, z)
     upper <- back_trans$upper(eta_x, col_sd, z)
 
-    cbind(wald_lower = lower, wald_upper = upper, wald_n = boot_n)
+    cbind(wald_lower = lower, wald_upper = upper, wald_se = col_sd, wald_n = boot_n)
 
 }
 

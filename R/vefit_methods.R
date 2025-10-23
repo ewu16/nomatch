@@ -36,7 +36,8 @@ print.vefit <- function(x, digits = 3, ...) {
 
     display_cols <- c("t0", "estimate",
                       grep("lower$", names(effect_df), value = TRUE),
-                      grep("upper$", names(effect_df), value = TRUE))
+                      grep("upper$", names(effect_df), value = TRUE),
+                      grep("pval$", names(effect_df), value = TRUE))
 
     ci_level <- (1-x$alpha)*100
     name_map <- c(
@@ -44,8 +45,10 @@ print.vefit <- function(x, digits = 3, ...) {
         estimate          = "Estimate",
         wald_lower        = paste0(ci_level, "% Wald CI: Lower"),
         wald_upper        = paste0(ci_level, "% Wald CI: Upper"),
+        wald_pval         = "Wald p-value",
         percentile_lower  = paste0(ci_level, "% Percentile CI: Lower"),
-        percentile_upper  = paste0(ci_level, "% Percentile CI: Upper")
+        percentile_upper  = paste0(ci_level, "% Percentile CI: Upper"),
+        percentile_pval   = "Percentile p-value"
     )
 
     display_labels <- name_map[display_cols]

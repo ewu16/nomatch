@@ -3,17 +3,20 @@
 #'
 #'@description `nomatchVE()` estimates marginal cumulative incidences under
 #'  exposure and no exposure using a G-computation approach. The method fits two
-#'  conditional hazard models- one for each exposure group- and uses
-#'  these models to predict time- and covariate- specific cumulative incidences.
-#'  The predictions are then marginalized to compute overall
-#'  (marginal) cumulative incidences. The resulting cumulative incidences can be
-#'   summarized as risk ratio (RR = 1 - risk_exposed/risk_unexposed) or
-#'   vaccine effectiveness estimates (VE = 1 - RR).
+#'  conditional hazard models- one for each exposure type- and uses
+#'  these models to predict time- and covariate-specific cumulative incidences.
+#'  The conditional cumulative incidences are then marginalized to compute overall
+#'  (marginal) cumulative incidences. By default, the cumulative incidences
+#'  are marginalized over the observed distribution of exposure times and covariates
+#'  among the exposed. The resulting cumulative incidences can be
+#'   summarized as risk ratios (RR = 1 - risk_exposed/risk_unexposed) or
+#'   vaccine effectiveness  (VE = 1 - RR).
 #'
 #'@param data A data frame with one row per individual containing the columns
-#'  named in `outcome_time`, `outcome_status`, `exposure`, `exposure_time`, and any
-#'  variables listed in `covariates`.
-#'@param outcome_time Name of the time-to-event/censoring variable. Time should
+#'  named in `outcome_time`, `outcome_status`, `exposure`, `exposure_time`, and
+#'  `covariates`.
+#'@param outcome_time Name of the follow-up time for the outcome of interest, i.e.
+#'  time to either the event or right-censoring, whichever occurs first. Time should
 #'  be measured from a given time origin (e.g. study start, enrollment, or age)
 #'  for all individuals.
 #'@param outcome_status Name of the event indicator. The underlying column should be
@@ -21,13 +24,13 @@
 #'@param exposure Name of the exposure indicator. The underlying column should
 #'  be numeric (`1` = exposed during follow-up, `0` = never exposed during
 #'  follow-up).
-#'@param exposure_time Name of the time to exposure, measured from the chosen time
-#'  origin; use `NA` if not exposed. Time must be measured in the same units
-#'  (e.g. days) as that used for  `outcome_time`.
+#'@param exposure_time Name of the time to exposure, measured on the same time scale
+#'  as that used for `outcome time`. Set `exposure_time` of all unexposed
+#'  individuals to `NA`.
 #'@param covariates Character vector of covariates to adjust for when fitting
-#'  the hazard models. These covariates should include all known confounders of
-#'  exposure and censoring measured at the chosen time origin.
-#'@param immune_lag Non-negative numeric value specifying the time after exposure that
+#'  the hazard models; should include all known confounders of
+#'  exposure and censoring.  Covariates must be measured or defined at the chosen time origin.
+#'@param immune_lag Non-negative numeric value specifying the time after exposure (tau) that
 #'  should be excluded from the risk evaluation period. This argument is
 #'  primarily intended for vaccination exposures, where it is common to exclude
 #'  the time after vaccination when immunity is still building. Time must be
@@ -42,8 +45,8 @@
 #'  durations, such as 30, 60, or 90 days after exposure. A fine grid of
 #'  timepoints (e.g., `eval_times = (immune_lag + 1):100`) can be provided if cumulative
 #'  incidence curves over time are desired.
-#'@param effect Character. Type of effect measure to compute and return,
-#'  based on the estimated cumulative incidences. Either
+#'@param effect Character. Type of effect measure to return (a contrast of
+#'  the marginal cumulative incidences). Either
 #'  `"vaccine_effectiveness"` (default) or `"risk_ratio"`.
 #'@param weights_source Character string specifying the type of marginalizing weights
 #'  to use. Either:
@@ -250,39 +253,53 @@ nomatchVE <- function(data,
                             )
 
      original <- do.call(get_one_nomatch_ve, estimation_args)
-     pt_est <- original$pt_estimates
 
     # --------------------------------------------------------------------------
-    # 2 - Get bootstrap CI
+    # 2 - Add bootstrap confidence intervals to point estimates
     # --------------------------------------------------------------------------
     # Helper returns NULL if boot_reps = 0
-     boot_inference <- estimate_bootstrap_ci(
+     boot <- estimate_bootstrap_ci(
          one_boot_function  = one_boot_nomatch,
          one_boot_args      = estimation_args,
          ci_type            = ci_type,
          boot_reps          = boot_reps,
-         pt_est             = pt_est,
+         pt_est             = original$pt_estimates,
          alpha              = alpha,
          keep_boot_samples  = keep_boot_samples,
          n_cores            = n_cores
      )
 
-     ci_est <-boot_inference$ci_estimates
+     ci_est <-boot$ci_estimates
+     boot_samples <- boot$boot_samples
 
      # --------------------------------------------------------------------------
-     # 3 - Combine estimates with bootstrap CI
+     # 3 - Add p-values and format
      # --------------------------------------------------------------------------
-     terms_keep <- c("cuminc_0", "cuminc_1", effect)
+     terms_keep <- names(ci_est)
 
-     add_ci_columns <- function(term, pt_est, ci_est){
-         x <- cbind(estimate = pt_est[, term], ci_est[[term]])
-         rownames(x) <- rownames(pt_est)
-         x
-     }
-     estimates <- stats::setNames(
-         lapply(terms_keep, \(term) add_ci_columns(term, pt_est, ci_est)),
-         terms_keep
-         )
+     est <- lapply(names(ci_est), \(term){
+         #Add p-values
+         wald <- ci_type %in% c("wald", "both")
+         percentile <- ci_type %in% c("percentile", "both")
+
+         wald_pval <-       if(wald) compute_wald_pval(term, ci_est[[term]]) else NULL
+         percentile_pval <- if(percentile) compute_percentile_pval(term, boot_samples[[term]]) else NULL
+
+         x <- cbind(ci_est[[term]],
+                    wald_pval = wald_pval,
+                    percentile_pval = percentile_pval)
+
+         #Format column order
+         col_order <- c("estimate",
+                        paste0("wald_", c("lower", "upper", "se", "pval", "n")),
+                        paste0("percentile_", c("lower", "upper", "pval", "n")))
+
+         x[, intersect(col_order, colnames(x)), drop = FALSE]
+
+         })
+     names(est) <- terms_keep
+
+
 
      # --------------------------------------------------------------------------
      # 4 - Return
@@ -298,16 +315,16 @@ nomatchVE <- function(data,
     # Build return object
      out <- list(
          # Core output
-         estimates = estimates,
+         estimates = est,
          model_0 = original$model_0,
          model_1 = original$model_1,
          weights = weights,
 
          # Bootstrap information if available
-         n_success_boot   = boot_inference$n_success_boot,
-         boot_errors  = boot_inference$boot_errors,
-         boot_nas     = boot_inference$boot_nas,
-         boot_samples     = if (keep_boot_samples) boot_inference$boot_samples[terms_keep] else NULL,
+         n_success_boot   = boot$n_success_boot,
+         boot_errors  = boot$boot_errors,
+         boot_nas     = boot$boot_nas,
+         boot_samples     = if (keep_boot_samples) boot_samples[terms_keep] else NULL,
 
          # User-provided or default specifications
          outcome_time = outcome_time,

@@ -65,7 +65,7 @@ matching_ve <- function(matched_data,
                             eval_times = eval_times)
 
     original <- do.call(get_one_matching_ve, estimation_args)
-    pt_est <- original$pt_estimates
+
     descrip <- get_basic_descriptives_matching(
         matched_data,
         original$matched_adata,
@@ -78,31 +78,46 @@ matching_ve <- function(matched_data,
     # --------------------------------------------------------------------------
 
     # Helper returns NULL if boot_reps = 0
-    boot_inference <- estimate_bootstrap_ci(
+    boot <- estimate_bootstrap_ci(
         one_boot_function  = one_boot_matching,
         one_boot_args      = estimation_args,
         ci_type            = ci_type,
         boot_reps          = boot_reps,
-        pt_est             = pt_est,
+        pt_est             = original$pt_estimates,
         alpha              = alpha,
         keep_boot_samples  = keep_boot_samples,
         n_cores            = n_cores
     )
-    ci_est <- boot_inference$ci_estimates
-
+    ci_est <- boot$ci_estimates
+    boot_samples <- boot$boot_samples
 
     # --------------------------------------------------------------------------
-    # 3 - Combine estimates with bootstrap CI
+    # 3 - Add p-values and format
     # --------------------------------------------------------------------------
-    terms_keep <- c("cuminc_0", "cuminc_1", effect)
+    terms_keep <- names(ci_est)
 
-    add_ci_columns <- function(term, pt_est, ci_est){
-        cbind(estimate = pt_est[, term], ci_est[[term]])
-    }
-    estimates <- stats::setNames(
-        lapply(terms_keep, \(term) add_ci_columns(term, pt_est, ci_est)),
-        terms_keep
-    )
+    est <- lapply(names(ci_est), \(term){
+        #Add p-values
+        wald <- ci_type %in% c("wald", "both")
+        percentile <- ci_type %in% c("percentile", "both")
+
+        wald_pval <-       if(wald) compute_wald_pval(term, ci_est[[term]]) else NULL
+        percentile_pval <- if(percentile) compute_percentile_pval(term, boot_samples[[term]]) else NULL
+
+        x <- cbind(ci_est[[term]],
+                   wald_pval = wald_pval,
+                   percentile_pval = percentile_pval)
+
+        #Format column order
+        col_order <- c("estimate",
+                       paste0("wald_", c("lower", "upper", "se", "pval", "n")),
+                       paste0("percentile_", c("lower", "upper", "pval", "n")))
+
+        x[, intersect(col_order, colnames(x)), drop = FALSE]
+
+    })
+    names(est) <- terms_keep
+
 
     # --------------------------------------------------------------------------
     # 4 - Return
@@ -111,14 +126,14 @@ matching_ve <- function(matched_data,
     # Build return object
     out <- list(
         # Core output
-        estimates = estimates,
+        estimates = est,
         models = original$models,
 
         # Bootstrap information if available
-        n_success_boot   = boot_inference$n_success_boot,
-        boot_errors  = boot_inference$boot_errors,
-        boot_nas     = boot_inference$boot_nas,
-        boot_samples     = if (keep_boot_samples) boot_inference$boot_samples[terms_keep] else NULL,
+        n_success_boot   = boot$n_success_boot,
+        boot_errors  = boot$boot_errors,
+        boot_nas     = boot$boot_nas,
+        boot_samples     = if (keep_boot_samples) boot_samples[terms_keep] else NULL,
 
         # User-provided or default specifications
         outcome_time = outcome_time,

@@ -130,11 +130,13 @@ estimate_bootstrap_ci <- function(one_boot_function,
 
 
     ci_estimates <- lapply(names(boot_samples_clean), \(term){
-        compute_boot_ci(x = pt_est[, term],
-                        boot_x = boot_samples_clean[[term]],
-                        ci_type = ci_type,
-                        alpha = alpha,
-                        transform = tr_map[term])
+        ci <- compute_boot_ci(x = pt_est[, term],
+                              boot_x = boot_samples_clean[[term]],
+                              ci_type = ci_type,
+                              alpha = alpha,
+                              transform = tr_map[term])
+
+        cbind(estimate = pt_est[, term], ci)
     })
     names(ci_estimates) <- names(boot_samples_clean)
 
