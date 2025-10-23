@@ -55,54 +55,10 @@ compute_psi_dx_t0 <- function(fit_0, fit_1, exposure_time, t0, tau, newdata){
 #'  -  `predict_from_model_0()`: `surv_0_d_plus_tau`, `surv_0_d_plus_t0`, and `psi_0_dx`
 #'  -  `predict_from_model_1()`: `surv_1_tau`, `surv_1_t0`, and `psi_1_dx`
 #'
-
 #' @keywords internal
 #' @export
 #'
-#' @examples
-#' # Fit hazard model under no vaccine
-#' fit_0 <- fit_model_0(
-#'   data = simdata,
-#'   outcome_time = "Y",
-#'   outcome_status = "event",
-#'   exposure = "V",
-#'   exposure_time = "D_obs",
-#'   covariates = c("x1", "x2")
-#'  )
-#'
-#' # Fit hazard model under vaccine
-#' fit_1 <- fit_model_1(
-#'   data = simdata,
-#'   outcome_time = "Y",
-#'   outcome_status = "event",
-#'   exposure = "V",
-#'   exposure_time = "D_obs",
-#'   covariates = c("x1", "x2"),
-#'   tau = 14
-#'  )
-#'
-#'
-#' # Define dataset for prediction,
-#' # e.g. vaccinated indiviudals at risk tau days after vaccination
-#' newdata <- simdata[simdata$V == 1 & (simdata$Y - simdata$D_obs) > 14,]
-#'
-#' # Predict from hazard model under no vaccine
-#' pred_0 <- predict_from_model_0(
-#'     fit_0,
-#'     exposure_time = "D_obs",
-#'     t0 = 90,
-#'     tau = 14,
-#'     newdata = newdata
-#' )
-#'
-#' # Predict from hazard model under vaccine
-#' pred_1 <- predict_from_model_1(
-#'   fit_1,
-#'   exposure_time = "D_obs",
-#'   t0 = 90,
-#'   tau = 14,
-#'   newdata = newdata
-#' )
+
 
 predict_from_model_0 <- function(fit_0, exposure_time, t0, tau, newdata){
     surv_vars <- all.vars(stats::formula(fit_0)[[2]])
