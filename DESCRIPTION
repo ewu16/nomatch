@@ -1,4 +1,4 @@
-Package: nomatchVE
+Package: nomatch
 Title: Estimate Causal Vaccine Effectiveness in Observational Studies
     Without Matching
 Version: 0.0.0.9000
@@ -8,8 +8,8 @@ Authors@R:
 Description: Implements estimators for a proposed causal estimand of
     vaccine effectiveness using observational data.
 License: MIT + file LICENSE
-URL: https://ewu16.github.io/nomatchVE/, https://github.com/ewu16/nomatchVE
-BugReports: https://github.com/ewu16/nomatchVE/issues
+URL: https://ewu16.github.io/nomatch/, https://github.com/ewu16/nomatch
+BugReports: https://github.com/ewu16/nomatch/issues
 Depends: 
     R (>= 2.10)
 Imports: 

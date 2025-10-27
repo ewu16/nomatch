@@ -7,7 +7,7 @@
 #' at multiple timepoints without refitting.
 #'
 #' @inheritParams compute_psi_bar_t0
-#' @inheritParams nomatchVE
+#' @inheritParams nomatch
 #'
 #' @return A matrix of estimates where the columns are the terms `cuminc_0` and `cuminc_1`,
 #' and the rows are the time points of interest.

@@ -1,10 +1,10 @@
 #' Validate inputs to main functions
 #'
 #' @description
-#' Internal validation function to check that all inputs to `nomatchVE()/matching_ve()` are
+#' Internal validation function to check that all inputs to `nomatch()/matching()` are
 #' properly formatted and logically consistent.
 #'
-#' @inheritParams nomatchVE
+#' @inheritParams nomatch
 #'
 #' @return Invisibly returns `NULL` if all checks pass. Throws an error with
 #'   descriptive message if any validation fails.
@@ -54,7 +54,7 @@ validate_match_rolling_cohort_inputs <- function(data, outcome_time, exposure, e
     invisible(NULL)
 }
 
-validate_matching_ve_inputs <- function(data, outcome_time, outcome_status, exposure, exposure_time,  immune_lag, eval_times) {
+validate_matching_inputs <- function(data, outcome_time, outcome_status, exposure, exposure_time,  immune_lag, eval_times) {
     validate_data(data)
     required_args <- list(
         outcome_time = outcome_time,

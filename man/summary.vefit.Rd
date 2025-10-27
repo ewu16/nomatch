@@ -4,10 +4,10 @@
 \alias{summary.vefit}
 \title{Summary method for vaccine effectiveness fits}
 \usage{
-\method{summary}{vefit}(object, digits = 4, ...)
+\method{summary}{vefit}(object, digits = 4, show_models = FALSE, ...)
 }
 \arguments{
-\item{object}{An object of class \code{vefit} created by \code{\link[=nomatchVE]{nomatchVE()}} or \code{\link[=matching_ve]{matching_ve()}}.}
+\item{object}{An object of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
 
 \item{digits}{Integer indicating the number of decimal places to display. Default is 4.}
 

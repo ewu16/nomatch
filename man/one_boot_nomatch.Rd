@@ -18,10 +18,11 @@ one_boot_nomatch(
 }
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
-named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and any
-variables listed in \code{covariates}.}
+named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
+\code{covariates}.}
 
-\item{outcome_time}{Name of the time-to-event/censoring variable. Time should
+\item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
+time to either the event or right-censoring, whichever occurs first. Time should
 be measured from a given time origin (e.g. study start, enrollment, or age)
 for all individuals.}
 
@@ -32,13 +33,13 @@ numeric (\code{1} = event, \code{0} = censored).}
 be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
-\item{exposure_time}{Name of the time to exposure, measured from the chosen time
-origin; use \code{NA} if not exposed. Time must be measured in the same units
-(e.g. days) as that used for  \code{outcome_time}.}
+\item{exposure_time}{Name of the time to exposure, measured on the same time scale
+as that used for \verb{outcome time}. Set \code{exposure_time} of all unexposed
+individuals to \code{NA}.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
-the hazard models. These covariates should include all known confounders of
-exposure and censoring measured at the chosen time origin.}
+the hazard models; should include all known confounders of
+exposure and censoring.  Covariates must be measured or defined at the chosen time origin.}
 
 \item{eval_times}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
@@ -49,7 +50,7 @@ timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if c
 incidence curves over time are desired.}
 }
 \value{
-The \code{pt_estimates} component returned by \code{\link[=get_one_nomatch_ve]{get_one_nomatch_ve()}},
+The \code{pt_estimates} component returned by \code{\link[=get_one_nomatch]{get_one_nomatch()}},
 for a bootstrap sample.
 }
 \description{

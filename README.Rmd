@@ -11,71 +11,66 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+
+library(tibble)
 ```
 
-# R/`nomatchVE`
+# R/`nomatch`
 
-> A matching alternative for more efficiently evaluating vaccine effectiveness using observational data
+> A matching alternative for more efficiently evaluating effectiveness of interventions using observational data
 
 
 ## Description
 
-The `nomatchVE` package uses a G-computation style estimator to compute vaccine effectiveness from observational vaccine studies. The proposed estimator tends to produce similar point estimates as matching-based estimators but can be more efficient.
+The `nomatch` package uses a G-computation style estimator to compute effectiveness of binary interventions from observational cohort studies following the target trial emulation framework. The proposed estimator tends to produce similar point estimates as matching-based estimators but can be more efficient.
 
 ## Installation
 
-You can install the development version of `nomatchVE` with:
+You can install the development version of `nomatch` with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("ewu16/nomatchVE")
+devtools::install_github("ewu16/nomatch")
 ```
 
 ## Example
 
-This minimal example shows how to use `nomatchVE` to obtain cumulative incidence and vaccine effectiveness estimates in a simple simulated data set.
+This minimal example shows how to use `nomatch` to obtain cumulative incidences and 
+their related effect measures such as risk ratios, risk differences, and  vaccine effectiveness.
+
+We use a simple simulated dataset mimicking data from an observational vaccine study,
+although the methods are agnostic to the disease setting. 
 
 ```{r example, fig.width = 8, fig.height = 4}
+
 #Load package
-library(nomatchVE)
+library(nomatch)
 
 # Example data
+simdata <- as_tibble(simdata) #for prettier printing 
 head(simdata)
-summary(simdata)
 ```
 
-```{r, include = FALSE}
-# ------------------------------------------------------------------------------
-# Set input parameters
-data <- simdata 
-outcome_time <- "Y"
-outcome_status <- "event"
-exposure <- "V"
-exposure_time <- "D_obs"
-covariates <- c("x1", "x2")
- weights_source <- "observed"
+Note that the dataset contains the following:
 
-eval_times <- seq(30, 180, by = 30)
-censor_time <- max(eval_times)
-immune_lag <- tau <-  14
-ci_type <- "wald"
-boot_reps <- 10
-alpha <- .05
+-  one row per individual (`ID`)
 
-n_cores <- 1
-keep_models = TRUE
-keep_boot_samples = TRUE
+-  a set of baseline covariates (`x1`, `x2`)
 
-id_name <- "ID"
-matching_vars <- covariates
-effect <- "risk_ratio"
+-  exposure status (`V`) with values `1 = vaccinated, 0 = unvaccinated`. (Note: its currently
+assumed that the unexposed group does not receive an active comparator) 
 
-```
+-  time to vaccination (`D_obs`); for unvaccinated individuals this is left as `NA`. 
+
+- right censored survival data `(Y, event)` 
+   - `Y` represents follow-up time for an outcome such as infection, hospitalization or death (`Y`)
+   - `event` indicates whether individual experienced the event or censoring `1 = event, 0 = censored`
+
 
 ```{r}
 
-# Compute cumulative incidence 
-fit1 <- nomatchVE(data = simdata,
+# Compute cumulative incidence and effect measures 
+fit <- nomatch(data = simdata,
                   outcome_time = "Y",
                   outcome_status = "event",
                   exposure = "V",
@@ -85,77 +80,40 @@ fit1 <- nomatchVE(data = simdata,
                   eval_times = seq(30, 180, by = 30),
                   boot_reps = 10)
 
-#Print results 
+# Print main results - Note by default only the chosen effect measure is printed
+# but all effect measures are computed and stored in the fitted object 
 fit1        
 
-#Summary 
-summary(fit1)
+# View additional details about the analytic approach 
+summary(fit)
 
-#Plot pointwise intervals 
-plot(fit1) 
-
-#Compute simultaneous CI
-fit1_with_simul <- add_simultaneous_ci(fit1, seed = 1234)
-
-#Plot simultaneous confidence bands 
-plot(fit1_with_simul , ci_type = "simul") 
+# Plot cumulative incidence and effect measures over time 
+plot(fit) 
 ```
 
-```{r}
-# ------------------------------------------------------------------------------
-# 3. Compare results with matching estimator
-
-
-
-matched_cohort <- match_rolling_cohort(data = simdata,
-                                       outcome_time = "Y",
-                                       exposure = "V",
-                                       exposure_time = "D_obs", 
-                                       matching_vars = c("x1", "x2"),
-                                       id_name = "ID",
-                                       seed = 5678)
-
-matched_data <- matched_cohort[[1]]
-
-
-fit_matching <-matching_ve(matched_data = matched_data,
-                           outcome_time = "Y",
-                           outcome_status = "event",
-                           exposure = "V",
-                           exposure_time = "D_obs", 
-                           immune_lag = 14,
-                           eval_times = seq(30, 180, by = 30),
-                           boot_reps = 10) 
-
-fit_matching
-
-## Plot matching vs proposed estimator - nomatch tends to have similar point estimates but narrower
-# confidence intervals
-compare_ve_fits(fit_matching, fit1, labels = c("Matching", "nomatch (G-computation)"))
-```
 
 ## Issues
 
-If you encounter any bugs or have any specific feature requests, please [file an issue](https://github.com/ewu16/nomatchVE/issues).
+If you encounter any bugs or have any specific feature requests, please [file an issue](https://github.com/ewu16/nomatch/issues).
 
 ## Citation
 
-If you use the `nomatchVE` package in your work, please cite the following:
+If you use the `nomatch` package in your work, please cite the following:
 
 ```{r, include = FALSE}
-c <- citation("nomatchVE")
+c <- citation("nomatch")
 toBibtex(c)
 ```
 
 ```
  @Manual{,
-   title = {nomatchVE: Estimate Causal Vaccine Effectiveness in Observational Studies
+   title = {nomatch: Estimate Causal Vaccine Effectiveness in Observational Studies
              Without Matching},
    author = {Emily Wu},
    year = {2025},
    note = {R package version 0.0.0.9000, 
-   https://github.com/ewu16/nomatchVE},
-   url = {https://ewu16.github.io/nomatchVE/},
+   https://github.com/ewu16/nomatch},
+   url = {https://ewu16.github.io/nomatch/},
  }
  ```
  

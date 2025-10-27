@@ -4,8 +4,8 @@
 #' Plot cumulative incidence and VE estimates for two
 #' different methods using colors to distinguish methods
 #'
-#' @param fit1 A vefit object (typically from \code{\link{matching_ve}})
-#' @param fit2 A vefit object (typically from \code{\link{nomatchVE}})
+#' @param fit1 A vefit object (typically from \code{\link{matching}})
+#' @param fit2 A vefit object (typically from \code{\link{nomatch}})
 #' @param labels Character vector of length 2 providing labels for the two methods.
 #'  Default is \code{c("Method 1", "Method 2")}.
 #' @param ci_type Character string specifying the type of confidence interval to plot.
@@ -30,8 +30,8 @@
 #' @examples
 #' \dontrun{
 #' # Fit both methods
-#' fit_nomatch <- nomatchVE(data = simdata, ...)
-#' fit_match <- matching_ve(matched_data = matched_data, ...)
+#' fit_nomatch <- nomatch(data = simdata, ...)
+#' fit_match <- matching(matched_data = matched_data, ...)
 #' # Compare with custom labels
 #' compare_ve_fits(
 #'   fit_match,

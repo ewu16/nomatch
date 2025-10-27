@@ -7,7 +7,7 @@
 add_simultaneous_ci(object, seed = NULL)
 }
 \arguments{
-\item{object}{An object of class \code{vefit} created by \code{\link[=nomatchVE]{nomatchVE()}} or \code{\link[=matching_ve]{matching_ve()}}. Must
+\item{object}{An object of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}. Must
 \itemize{
 \item contain evaluations at multiple timepoints (\code{length(object$eval_times)  > 0}),
 \item contain bootstrap samples (\code{keep_boot_samples = TRUE} when fitting).
@@ -38,7 +38,7 @@ is excluded from the simultaneous band and a warning is issued.
 }
 \examples{
 # Fit model with bootstrap samples
-fit <- nomatchVE(
+fit <- nomatch(
   data = simdata,
   outcome_time = "Y",
   outcome_status = "event",

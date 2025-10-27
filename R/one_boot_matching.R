@@ -1,6 +1,6 @@
 #'  Compute one bootstrap replicate of matching-based VE point estimate
 #'
-#' @inheritParams get_one_matching_ve
+#' @inheritParams get_one_matching
 #'
 #' @return  A matrix of bootstrapped estimates where the the columns of the matrix are the cumulative
 #'  incidence/VE terms and the rows are the requested time points for evaluation.
@@ -70,7 +70,7 @@ one_boot_matching <- function(matched_data,
     # --------------------------------------------------------------------------
     # 2. Compute VE for bootstrapped data
     # --------------------------------------------------------------------------
-    boot_matching_ve <- get_one_matching_ve(matched_data = boot_matched_data,
+    boot_matching <- get_one_matching(matched_data = boot_matched_data,
                                             outcome_time = outcome_time,
                                             outcome_status = outcome_status,
                                             exposure = exposure,
@@ -81,7 +81,7 @@ one_boot_matching <- function(matched_data,
                                             keep_adata = FALSE)
 
 
-    boot_matching_ve$pt_estimates
+    boot_matching$pt_estimates
 }
 
 

@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(nomatchVE)
+library(nomatch)
 
-test_check("nomatchVE")
+test_check("nomatch")

@@ -28,49 +28,4 @@ by calling \code{predict(fit_0, newdata, type = "survival")} at eval_times
 \code{predict_from_model_1()} computes \eqn{\psi_1(t_0; d, x) = 1 - S_1(t_0 \mid d, x)/S_1(\tau \mid d, x)}
 \verb{by calling }predict(fit_1, newdata, type = "survival")\verb{at eval_times}t0\code{and}tau`.
 }
-\examples{
-# Fit hazard model under no vaccine
-fit_0 <- fit_model_0(
-  data = simdata,
-  outcome_time = "Y",
-  outcome_status = "event",
-  exposure = "V",
-  exposure_time = "D_obs",
-  covariates = c("x1", "x2")
- )
-
-# Fit hazard model under vaccine
-fit_1 <- fit_model_1(
-  data = simdata,
-  outcome_time = "Y",
-  outcome_status = "event",
-  exposure = "V",
-  exposure_time = "D_obs",
-  covariates = c("x1", "x2"),
-  tau = 14
- )
-
-
-# Define dataset for prediction,
-# e.g. vaccinated indiviudals at risk tau days after vaccination
-newdata <- simdata[simdata$V == 1 & (simdata$Y - simdata$D_obs) > 14,]
-
-# Predict from hazard model under no vaccine
-pred_0 <- predict_from_model_0(
-    fit_0,
-    exposure_time = "D_obs",
-    t0 = 90,
-    tau = 14,
-    newdata = newdata
-)
-
-# Predict from hazard model under vaccine
-pred_1 <- predict_from_model_1(
-  fit_1,
-  exposure_time = "D_obs",
-  t0 = 90,
-  tau = 14,
-  newdata = newdata
-)
-}
 \keyword{internal}

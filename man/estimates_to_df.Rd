@@ -2,26 +2,32 @@
 % Please edit documentation in R/utils.R
 \name{estimates_to_df}
 \alias{estimates_to_df}
-\title{Convert estimates to tidy long-format data frame}
+\title{Convert estimates from a fitted object into a tidy data frame}
 \usage{
-estimates_to_df(estimates)
+estimates_to_df(x, collapse = TRUE)
 }
 \arguments{
-\item{estimates}{A list of matrices, typically from \code{fit$estimates} in a \code{vefit}
-object. Each matrix (e.g., \code{cuminc_0}, \code{cuminc_1}, \code{vaccine_effectiveness}/\code{risk_ratio})
-contains estimates, confidence intervals, and related statistics evaluated
-at different timepoints.}
+\item{collapse}{Logical; if \code{TRUE} (default), returns a single long-format
+data frame. If \code{FALSE}, returns a list of data frames (one per term).}
 }
 \value{
-A long-format data frame with:
+Either:
 \itemize{
-\item \code{t0}: the timepoint
-\item \code{term}: what was estimated (\code{cuminc_0}, \code{cuminc_1}, or \code{vaccine_effectiveness}/\code{risk_ratio})
-\item Remaining columns from the original matrices (estimates, confidence intervals, ad related statistics.)
+\item A long-format data frame (if \code{collapse = TRUE}), or
+\item A list of term-specific data frames (if \code{collapse = FALSE}).
+The data frame(s) have columns:
+\itemize{
+\item \code{t0}: evaluation timepoint
+\item \code{term}: estimated quantity
+\item other columns from the original matrices (e.g. estimate, confidence intervals)
+}
 }
 }
 \description{
-Converts the \code{estimates} component of a \code{vefit} object into a
-long-format data frame for easy plotting and analysis.
-Each row represents one term (cumulative incidence or derived effect measure) at a specific timepoint.
+A convenience function for extracting estimates from a
+\code{\link{vefit}} object (or its \code{estimates} component) into a tidy data frame
+for plotting and summary tables.
+
+@param x A fitted \code{\link{vefit}} object or its \code{estimates} component (a named list
+of matrices).
 }

@@ -15,10 +15,11 @@ get_observed_weights(
 }
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
-named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and any
-variables listed in \code{covariates}.}
+named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
+\code{covariates}.}
 
-\item{outcome_time}{Name of the time-to-event/censoring variable. Time should
+\item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
+time to either the event or right-censoring, whichever occurs first. Time should
 be measured from a given time origin (e.g. study start, enrollment, or age)
 for all individuals.}
 
@@ -26,15 +27,15 @@ for all individuals.}
 be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
-\item{exposure_time}{Name of the time to exposure, measured from the chosen time
-origin; use \code{NA} if not exposed. Time must be measured in the same units
-(e.g. days) as that used for  \code{outcome_time}.}
+\item{exposure_time}{Name of the time to exposure, measured on the same time scale
+as that used for \verb{outcome time}. Set \code{exposure_time} of all unexposed
+individuals to \code{NA}.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
-the hazard models. These covariates should include all known confounders of
-exposure and censoring measured at the chosen time origin.}
+the hazard models; should include all known confounders of
+exposure and censoring.  Covariates must be measured or defined at the chosen time origin.}
 
-\item{immune_lag}{Non-negative numeric value specifying the time after exposure that
+\item{immune_lag}{Non-negative numeric value specifying the time after exposure (tau) that
 should be excluded from the risk evaluation period. This argument is
 primarily intended for vaccination exposures, where it is common to exclude
 the time after vaccination when immunity is still building. Time must be
@@ -64,7 +65,7 @@ of exposed individuals who remain at risk \code{immune_lag} days after exposure.
 who remain at risk \code{immune_lag} days after exposure.
 }
 
-Called internally by \code{\link[=nomatchVE]{nomatchVE()}}. Provided as an example of the
+Called internally by \code{\link[=nomatch]{nomatch()}}. Provided as an example of the
 structure needed if a user passes in \code{custom_weights}.
 }
 \examples{

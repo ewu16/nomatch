@@ -3,7 +3,7 @@
 #' @description
 #' Prints a concise summary of vaccine effectiveness estimates from a fitted model.
 #'
-#' @param x An x of class `vefit` created by [nomatchVE()] or [matching_ve()].
+#' @param x An x of class `vefit` created by [nomatch()] or [matching()].
 #' @param digits Integer indicating the number of decimal places to display. Default is 3.
 #' @param ... Additional arguments (currently ignored).
 #'
@@ -79,7 +79,7 @@ print.vefit <- function(x, digits = 3, effect = NULL,...) {
 #' Summarizes how vaccine effectiveness estimates were obtained and displays
 #' cumulative incidence and VE across all evaluation time points.
 #'
-#' @param object An object of class `vefit` created by [nomatchVE()] or [matching_ve()].
+#' @param object An object of class `vefit` created by [nomatch()] or [matching()].
 #' @param digits Integer indicating the number of decimal places to display. Default is 4.
 #' @param ... Additional arguments (currently ignored).
 #'
@@ -108,7 +108,7 @@ summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
         ifelse(length(object$eval_times) > 6, ", ...", ""), "\n")
     cat("Immune lag:         ", object$immune_lag, "\n")
 
-    if(object$method ==  "nomatchVE (G-computation)"){
+    if(object$method ==  "nomatch (G-computation)"){
         if (length(object$covariates) > 0) {
             cat("Adjusted for:       ", paste(object$covariates, collapse = ", "), "\n")
         }
@@ -128,7 +128,7 @@ summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
     }
 
 
-    if(object$method ==  "nomatchVE (G-computation)"){
+    if(object$method ==  "nomatch (G-computation)"){
         cat("\n")
         cat(strrep("-", 70), "\n")
         cat("Sample:\n")
@@ -219,7 +219,7 @@ summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
 #' Plot cumulative incidence and VE estimates across all evaluation time points.
 #'
 #'
-#' @param x An x of class `vefit` created by [nomatchVE()] or [matching_ve()].
+#' @param x An x of class `vefit` created by [nomatch()] or [matching()].
 #' @param ci_type Character string specifying the type of confidence interval bands to plot.
 #'   One of `"wald", "percentile", "simul"`, or `"none"`. Must choose a `ci_type` whose lower
 #'   and upper bounds are already computed in `x$estimates` component of `x`.

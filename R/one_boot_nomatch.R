@@ -3,9 +3,9 @@
 #' @description This function computes the point estimate for
 #' a bootstrap replicate.
 #'
-#' @inheritParams get_one_nomatch_ve
+#' @inheritParams get_one_nomatch
 #'
-#' @return  The `pt_estimates` component returned by [get_one_nomatch_ve()],
+#' @return  The `pt_estimates` component returned by [get_one_nomatch()],
 #'   for a bootstrap sample.
 #'
 #' @keywords internal
@@ -26,7 +26,7 @@ one_boot_nomatch <- function(data,
     # --------------------------------------------------------------------------
     # 2. Compute VE for bootstrapped data
     # --------------------------------------------------------------------------
-    boot_ve <- get_one_nomatch_ve(data = boot_data,
+    boot_ve <- get_one_nomatch(data = boot_data,
                           outcome_time = outcome_time,
                           outcome_status = outcome_status,
                           exposure = exposure,

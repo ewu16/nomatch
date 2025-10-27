@@ -1,11 +1,11 @@
-url: https://ewu16.github.io/nomatchVE/
+url: https://ewu16.github.io/nomatch/
 template:
   bootstrap: 5 # visual framework of pkgdown website
 reference:
 - title: Main functions
   desc: Primary user-facing functions
   contents:
-  - nomatchVE
+  - nomatch
   - add_simultaneous_ci
   - plot.vefit
   - compare_ve_fits
@@ -14,7 +14,7 @@ reference:
   desc: Functions for matching cohort design and estimation
   contents:
   - match_rolling_cohort
-  - matching_ve
+  - matching
 
 - title: Proposed method estimation
   desc: Core estimation functions for the g-computation approach

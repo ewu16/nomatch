@@ -4,10 +4,10 @@
 \alias{plot.vefit}
 \title{Plot method for vefit objects}
 \usage{
-\method{plot}{vefit}(x, ci_type = NULL, color = "#0072B2", ...)
+\method{plot}{vefit}(x, effect = NULL, ci_type = NULL, color = "#0072B2", ...)
 }
 \arguments{
-\item{x}{An x of class \code{vefit} created by \code{\link[=nomatchVE]{nomatchVE()}} or \code{\link[=matching_ve]{matching_ve()}}.}
+\item{x}{An x of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
 
 \item{ci_type}{Character string specifying the type of confidence interval bands to plot.
 One of \verb{"wald", "percentile", "simul"}, or \code{"none"}. Must choose a \code{ci_type} whose lower

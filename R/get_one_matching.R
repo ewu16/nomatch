@@ -4,12 +4,12 @@
 #' First, creates the analysis matched data set based on `matched_data`.
 #' Then computes Kaplan Meier estimates of cumulative incidence  on the analysis data set.
 #'
-#' @inheritParams matching_ve
+#' @inheritParams matching
 #'
 #' @return The object returned by [compute_km_ve()]
 #' @keywords internal
 #'
-get_one_matching_ve <- function(matched_data,
+get_one_matching <- function(matched_data,
                                 outcome_time,
                                 outcome_status,
                                 exposure,
@@ -47,7 +47,7 @@ get_one_matching_ve <- function(matched_data,
 #' Get the marginal cumulative incidence in the treated and untreated
 #' groups based on Kaplan Meier estimation.
 #'
-#' @inheritParams matching_ve
+#' @inheritParams matching
 #' @param adata A data frame that represents the analysis data set of a clinical trial.
 #' @param adata_outcome_name Character string specifying the time to event variable in `adata`. The
 #' time should be the time to event from vaccination/matched index date

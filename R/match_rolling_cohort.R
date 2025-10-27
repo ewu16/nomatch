@@ -11,7 +11,7 @@
 #' as a control (when they are not yet vaccinated) and as a case.
 #'
 #'
-#' @inheritParams nomatchVE
+#' @inheritParams nomatch
 #' @param data Data frame with study population
 #' @param id_name Name of unique identifier variable of individuals
 #' @param matching_vars Character vector of variables to match on exactly

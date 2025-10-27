@@ -43,7 +43,7 @@ We examine the use of `nomatch` to produce estimates of effectiveness for a
 binary exposure (intervention). The package can be loaded as follows: 
 
 ```{r setup}
-library(nomatchVE)
+library(nomatch)
 ```
 
 We will illustrate the use of the package using the simple simulated dataset `simdata` 
@@ -109,7 +109,7 @@ but `boot_reps = 1000` is recommended to construct reliable confidence intervals
 ```{r}
 
 # Compute cumulative incidence 
-fit1 <- nomatchVE(data = simdata,
+fit1 <- nomatch(data = simdata,
                   outcome_time = "Y",
                   outcome_status = "event",
                   exposure = "V",
@@ -255,7 +255,7 @@ matched_cohort <- match_rolling_cohort(data = simdata,
 matched_data <- matched_cohort[[1]]
 
 
-fit_matching <-matching_ve(matched_data = matched_data,
+fit_matching <-matching(matched_data = matched_data,
                            outcome_time = "Y",
                            outcome_status = "event",
                            exposure = "V",

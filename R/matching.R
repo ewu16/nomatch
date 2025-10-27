@@ -3,7 +3,7 @@
 #' @description This function is the main function for computing a matching-based estimator
 #' based on Kaplan Meier estimation.
 #'
-#' @inheritParams nomatchVE
+#' @inheritParams nomatch
 #' @inheritParams clean_matched_data
 #' @param matched_data A data frame for the matched cohort
 
@@ -20,7 +20,7 @@
 #' }
 #' @export
 #'
-matching_ve <- function(matched_data,
+matching <- function(matched_data,
                         outcome_time,
                         outcome_status,
                         exposure,
@@ -42,7 +42,7 @@ matching_ve <- function(matched_data,
 
 
     # Check data/inputs
-    validate_matching_ve_inputs(
+    validate_matching_inputs(
         data = matched_data,
         outcome_time = outcome_time,
         outcome_status = outcome_status,
@@ -63,7 +63,7 @@ matching_ve <- function(matched_data,
                             tau = tau,
                             eval_times = eval_times)
 
-    original <- do.call(get_one_matching_ve, estimation_args)
+    original <- do.call(get_one_matching, estimation_args)
 
     descrip <- get_basic_descriptives_matching(
         matched_data,

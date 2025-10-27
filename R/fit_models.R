@@ -15,7 +15,7 @@
 #' `<covariates>`, included as simple linear terms, and exposure time is included as a
 #' natural cubic spline with 4 degrees of freedom.
 #'
-#' @inheritParams nomatchVE
+#' @inheritParams nomatch
 #' @param formula_0 Optional right hand side of the formula for model 0. By default, uses `covariates`.
 #'
 #' @param formula_1 Optional right hand side of the formula for model 1. By default, uses `covariates`

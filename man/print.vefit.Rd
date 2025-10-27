@@ -4,10 +4,10 @@
 \alias{print.vefit}
 \title{Print method for vaccine effectiveness fits}
 \usage{
-\method{print}{vefit}(x, digits = 3, ...)
+\method{print}{vefit}(x, digits = 3, effect = NULL, ...)
 }
 \arguments{
-\item{x}{An x of class \code{vefit} created by \code{\link[=nomatchVE]{nomatchVE()}} or \code{\link[=matching_ve]{matching_ve()}}.}
+\item{x}{An x of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
 
 \item{digits}{Integer indicating the number of decimal places to display. Default is 3.}
 

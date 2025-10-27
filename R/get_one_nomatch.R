@@ -2,17 +2,17 @@
 #'
 #' @description This is an internal function that performs the actual estimation
 #' of cumulative incidences and derived effect measures
-#' using the G-computation style approach. It is called by [nomatchVE()] and [one_boot_nomatch()].
+#' using the G-computation style approach. It is called by [nomatch()] and [one_boot_nomatch()].
 #' Users should typically call these functions rather than calling this function directly.
 #' For historical reasons, this function handles more complex inputs than
-#' exposed in the `nomatchVE()` interface. In particular, it includes
+#' exposed in the `nomatch()` interface. In particular, it includes
 #' an options to
 #' - set censor time in hazard model for the exposed
 #' - weight by the weights from a matched dataset and
 #' - provide hazard model formulas or prefit objects
 #'
 #'
-#' @inheritParams nomatchVE
+#' @inheritParams nomatch
 #'
 #' @param censor_time Time after exposure at which exposed
 #'   individuals are administratively censored during model fitting. Default:
@@ -40,7 +40,7 @@
 #' @keywords internal
 #' @export
 
-get_one_nomatch_ve <- function(data,
+get_one_nomatch <- function(data,
                        outcome_time,
                        outcome_status,
                        exposure,

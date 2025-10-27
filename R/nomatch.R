@@ -1,7 +1,7 @@
 #'Main function to estimate marginal cumulative incidences and derived effect
 #'measures without matching
 #'
-#'@description `nomatchVE()` estimates marginal cumulative incidences under
+#'@description `nomatch()` estimates marginal cumulative incidences under
 #'  exposure and no exposure using a G-computation approach. The method fits two
 #'  conditional hazard models- one for each exposure type- and uses
 #'  these models to predict time- and covariate-specific cumulative incidences.
@@ -138,7 +138,7 @@
 #'are the empirical distributions of exposure eval_times and covariates among the
 #'exposed who remain at-risk `tau` days after exposure. These weights are
 #'returned in the `vefit` object under `gp_list`. They can also be obtained
-#'prior to the call to `nomatchVE()` by calling `get_observed_weights()`.
+#'prior to the call to `nomatch()` by calling `get_observed_weights()`.
 #'
 #'
 #' **Confidence intervals.** Wald CIs are constructed on transformed scales:
@@ -155,7 +155,7 @@
 #' # Fit vaccine effectiveness model using simulated data
 #' data(simdata)
 #'
-#' fit <- nomatchVE(
+#' fit <- nomatch(
 #'   data = simdata,
 #'   outcome_time = "Y",
 #'   outcome_status = "event",
@@ -171,7 +171,7 @@
 #' # View basic results
 #' fit$estimates
 
-nomatchVE <- function(data,
+nomatch <- function(data,
                   outcome_time,
                   outcome_status,
                   exposure,
@@ -252,7 +252,7 @@ nomatchVE <- function(data,
                              custom_gp_list = custom_gp_list
                             )
 
-     original <- do.call(get_one_nomatch_ve, estimation_args)
+     original <- do.call(get_one_nomatch, estimation_args)
 
     # --------------------------------------------------------------------------
     # 2 - Add bootstrap confidence intervals to point estimates
@@ -345,7 +345,7 @@ nomatchVE <- function(data,
          # Meta information
          call = call,
          descrip = descrip,
-         method =  "nomatchVE (G-computation)"
+         method =  "nomatch (G-computation)"
          )
 
      class(out) <- "vefit"

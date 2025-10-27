@@ -5,7 +5,7 @@
 #' level across all evaluation timepoints jointly. This is
 #' useful for making inferences about the entire VE curve.
 #'
-#' @param object An object of class `vefit` created by [nomatchVE()] or [matching_ve()]. Must
+#' @param object An object of class `vefit` created by [nomatch()] or [matching()]. Must
 #'   * contain evaluations at multiple timepoints (`length(object$eval_times)  > 0`),
 #'   * contain bootstrap samples (`keep_boot_samples = TRUE` when fitting).
 #' @param seed Integer seed for random number generation to ensure reproducible
@@ -29,7 +29,7 @@
 #'
 #' @examples
 #' # Fit model with bootstrap samples
-#' fit <- nomatchVE(
+#' fit <- nomatch(
 #'   data = simdata,
 #'   outcome_time = "Y",
 #'   outcome_status = "event",

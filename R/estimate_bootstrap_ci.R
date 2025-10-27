@@ -3,7 +3,7 @@
 #' @description This function computes Wald and percentile bootstrapped
 #'   confidence intervals.
 #'
-#' @inheritParams nomatchVE
+#' @inheritParams nomatch
 #' @param one_boot_function Function that computes one bootstrap iteration and
 #'   returns the bootstrap estimates
 #' @param one_boot_args List of arguments to pass to `one_boot_function`

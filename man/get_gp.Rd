@@ -12,7 +12,8 @@ get_gp(df, outcome_time, exposure, exposure_time, covariates, tau)
 \item typically, population involves the "analysis-eligible" subset of a given data source
 }}
 
-\item{outcome_time}{Name of the time-to-event/censoring variable. Time should
+\item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
+time to either the event or right-censoring, whichever occurs first. Time should
 be measured from a given time origin (e.g. study start, enrollment, or age)
 for all individuals.}
 
@@ -20,13 +21,13 @@ for all individuals.}
 be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
-\item{exposure_time}{Name of the time to exposure, measured from the chosen time
-origin; use \code{NA} if not exposed. Time must be measured in the same units
-(e.g. days) as that used for  \code{outcome_time}.}
+\item{exposure_time}{Name of the time to exposure, measured on the same time scale
+as that used for \verb{outcome time}. Set \code{exposure_time} of all unexposed
+individuals to \code{NA}.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
-the hazard models. These covariates should include all known confounders of
-exposure and censoring measured at the chosen time origin.}
+the hazard models; should include all known confounders of
+exposure and censoring.  Covariates must be measured or defined at the chosen time origin.}
 
 \item{tau}{Numeric. Only vaccinated who are at-risk tau days after vaccination are included.}
 }

@@ -7,10 +7,10 @@
 #' - \eqn{p(x)}: the distribution of covariates among exposed individuals
 #' who remain at risk `immune_lag` days after exposure.
 #'
-#' Called internally by [nomatchVE()]. Provided as an example of the
+#' Called internally by [nomatch()]. Provided as an example of the
 #' structure needed if a user passes in `custom_weights`.
 #'
-#' @inheritParams  nomatchVE
+#' @inheritParams  nomatch
 #'
 #' @return A list with two data frames:
 #' - `g_weights`: covariate-conditional exposure time  probabilities (\eqn{g(d \mid x)})
@@ -77,7 +77,7 @@ get_observed_gp <- function(data, outcome_time, exposure,
 
 #' Get empirical probability distributions g(d|x) and p(x) based on input data
 #'
-#' @inheritParams  nomatchVE
+#' @inheritParams  nomatch
 #' @param df A data frame representing the target population for the estimated distributions
 #' * typically, population involves the "analysis-eligible" subset of a given data source
 #' @param tau Numeric. Only vaccinated who are at-risk tau days after vaccination are included.

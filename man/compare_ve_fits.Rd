@@ -13,9 +13,9 @@ compare_ve_fits(
 )
 }
 \arguments{
-\item{fit1}{A vefit object (typically from \code{\link{matching_ve}})}
+\item{fit1}{A vefit object (typically from \code{\link{matching}})}
 
-\item{fit2}{A vefit object (typically from \code{\link{nomatchVE}})}
+\item{fit2}{A vefit object (typically from \code{\link{nomatch}})}
 
 \item{labels}{Character vector of length 2 providing labels for the two methods.
 Default is \code{c("Method 1", "Method 2")}.}
@@ -46,8 +46,8 @@ facilitate comparison. The VE panel uses free y-axis scaling.
 \examples{
 \dontrun{
 # Fit both methods
-fit_nomatch <- nomatchVE(data = simdata, ...)
-fit_match <- matching_ve(matched_data = matched_data, ...)
+fit_nomatch <- nomatch(data = simdata, ...)
+fit_match <- matching(matched_data = matched_data, ...)
 # Compare with custom labels
 compare_ve_fits(
   fit_match,
