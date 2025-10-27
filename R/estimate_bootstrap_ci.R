@@ -123,22 +123,25 @@ estimate_bootstrap_ci <- function(one_boot_function,
     # --------------------------------------------------------------------------
     # 2. Compute confidence intervals
     # --------------------------------------------------------------------------
-    tr_map <- c(cuminc_0 = "logit",
-                cuminc_1 = "logit",
-                risk_ratio = "log_rr",
-                vaccine_effectiveness = "log_ve")
 
+    transform_list <- vector(mode = "list", length = length(boot_samples_clean))
+    names(transform_list) <- names(boot_samples_clean)
 
     ci_estimates <- lapply(names(boot_samples_clean), \(term){
         ci <- compute_boot_ci(x = pt_est[, term],
                               boot_x = boot_samples_clean[[term]],
                               ci_type = ci_type,
                               alpha = alpha,
-                              transform = tr_map[term])
+                              transform = .term_transformations[[term]])
 
-        cbind(estimate = pt_est[, term], ci)
+        transform_list[[term]] <<- ci$transform$eta_boot
+
+        cbind(estimate = pt_est[, term], ci$ci)
     })
     names(ci_estimates) <- names(boot_samples_clean)
+
+    boot_sample_return <- list(original = boot_samples_clean,
+                               transformed = if(length(transform_list) != 0) transform_list else NULL)
 
     # --------------------------------------------------------------------------
     # 3. Return confidence intervals and additional bootstrap information
@@ -148,7 +151,7 @@ estimate_bootstrap_ci <- function(one_boot_function,
                 n_success_boot = n_success_boot,
                 boot_errors = errors ,
                 boot_nas = nas,
-                boot_samples = if(keep_boot_samples) boot_samples_clean else NULL
+                boot_samples = if(keep_boot_samples) boot_sample_return else NULL
                 )
 
     return(out)

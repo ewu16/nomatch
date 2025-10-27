@@ -73,17 +73,17 @@ add_simultaneous_ci <- function(object, seed = NULL){
   #Extract key info from fitted object
   alpha <- object$alpha
   estimates <- object$estimates
-  boot_samples <- object$boot_samples
+  boot_samples <- object$boot_samples$original
+  transformed_boot_samples <- object$boot_samples$transformed
 
+  if(is.null(transformed_boot_samples)){
+    transformed_boot_samples <- lapply(names(boot_samples), \(term){
+      transform <- .term_transformations[[term]]
+      transform$fwd(boot_samples[[term]])
+    })
+    names(transformed_boot_samples) <- names(boot_samples)
+  }
 
-  #Transform bootstrap estimates
-  transformed_boot_samples <- lapply(names(boot_samples), \(term){
-       tr_name <- .term_transform_map[term]
-       tf <- .forward_transformations[[tr_name]]
-       tf(boot_samples[[term]])
-  })
-
-  names(transformed_boot_samples) <- names(boot_samples)
 
   # Compute z_star for each term
   z_star_results <- lapply(transformed_boot_samples, \(mat) get_z_star(mat, alpha = alpha, seed = seed))
@@ -94,8 +94,8 @@ add_simultaneous_ci <- function(object, seed = NULL){
    simul_est <- lapply(names(boot_samples), \(term){
        simul <- compute_wald_ci(x = estimates[[term]][, "estimate"],
                        boot_x = boot_samples[[term]],
-                       transform = .term_transform_map[term] ,
-                       z_star = z_star[term])
+                       transform = .term_transformations[[term]] ,
+                       z_star = z_star[term])$ci
        #Rename columns
        colnames(simul) <- gsub("wald", "simul", colnames(simul))
        # Remove excluded times

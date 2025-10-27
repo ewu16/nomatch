@@ -25,60 +25,59 @@
 #' @noRd
 #'
 compute_boot_ci <- function(x, boot_x, ci_type, alpha = .05, transform = NULL, z_star = NULL){
-    if(ci_type == "wald"){
-        ci_out <- compute_wald_ci(x, boot_x, alpha, transform, z_star)
+    if(ci_type == "wald" | ci_type == "both"){
+         wald <- compute_wald_ci(x, boot_x, alpha, transform, z_star)
+         percentile <- NULL
+    }
+    if(ci_type == "percentile" | ci_type == "both"){
+        percentile <- compute_percentile_ci(boot_x, alpha)
+        wald <- if(ci_type == "percentile") NULL else wald
 
-    }else if(ci_type == "percentile"){
-        ci_out <- compute_percentile_ci(boot_x, alpha)
-
-    }else if(ci_type == "both"){
-        ci_wald <- compute_wald_ci(x, boot_x, alpha, transform, z_star)
-        ci_percentile <- compute_percentile_ci(boot_x, alpha)
-        ci_out <- cbind(ci_wald, ci_percentile)
     }
 
-    ci_out
+    list(ci = cbind(wald$ci, percentile),
+         transform = wald$transform)
 }
 
-#' Internal map of term → transformation type
-#' @keywords internal
-.term_transform_map <- c(
-    cuminc_0              = "logit",
-    cuminc_1              = "logit",
-    risk_ratio            = "log_rr",
-    vaccine_effectiveness = "log_ve"
-)
 
-#' Internal forward transformations
+#' Internal transformations
 #'
 #' These define how estimates are transformed before applying
 #' the Wald CI (e.g., taking log or logit).
-#' @keywords internal
-.forward_transformations <- list(
-    "logit" =  stats::qlogis,
-    "log_ve" = function(y) log(1-y),
-    "log_rr" =  log
-)
-
-#' Internal backward (inverse) transformations
-#'
 #' These define how to back-transform point estimates
 #' Functions take arguments `(eta, sd, z)` and return values
 #' on the original scale.
 #' @keywords internal
-.backward_transformations <- list(
+.transformations <- list(
     "logit" = list(
+        fwd = stats::qlogis,
         lower = function(eta, sd, z) stats::plogis(eta - z * sd),
         upper = function(eta, sd, z) stats::plogis(eta + z * sd)
     ),
     "log_ve" = list(
+        fwd = function(y) log(1-y),
         lower = function(eta, sd, z) 1 - exp(eta + z * sd),
         upper = function(eta, sd, z) 1 - exp(eta - z * sd)
     ),
     "log_rr" = list(
+        fwd = log,
         lower = function(eta, sd, z) exp(eta - z * sd),
         upper = function(eta, sd, z) exp(eta + z * sd)
+    ),
+    "identity" = list(fwd = identity,
+                  lower = function(eta, sd, z) eta - z * sd,
+                  upper = function(eta, sd, z) eta + z * sd
     )
+)
+
+#' Internal map of term → transformation type
+#' @keywords internal
+.term_transformations <- list(
+    cuminc_0              = .transformations[["logit"]],
+    cuminc_1              = .transformations[["logit"]],
+    risk_difference       = .transformations[["identity"]],
+    risk_ratio            = .transformations[["log_rr"]],
+    vaccine_effectiveness = .transformations[["log_ve"]]
 )
 
 
@@ -90,23 +89,24 @@ compute_wald_ci <- function(x, boot_x,  alpha = .05, transform, z_star = NULL){
 
     z <- if (!is.null(z_star)) z_star else stats::qnorm(1 - alpha/2)
 
-    fwd_trans  <- .forward_transformations[[transform]]
-    back_trans <- .backward_transformations[[transform]]
-
     # transform
-    eta_x    <-  fwd_trans(x)
-    eta_boot <-  fwd_trans(boot_x)
+    eta_x    <-  transform$fwd(x)
+    eta_boot <-  transform$fwd(boot_x)
 
     # bootstrap SDs/counts ignoring non-finite draws
     col_sd  <- apply(eta_boot, 2, function(col) stats::sd(col[is.finite(col)], na.rm = TRUE))
     boot_n  <- apply(eta_boot, 2, function(col) sum(is.finite(col)))
 
     # back-transform CI limits
-    lower <- back_trans$lower(eta_x, col_sd, z)
-    upper <- back_trans$upper(eta_x, col_sd, z)
+    lower <- transform$lower(eta_x, col_sd, z)
+    upper <- transform$upper(eta_x, col_sd, z)
 
-    cbind(wald_lower = lower, wald_upper = upper, wald_se = col_sd, wald_n = boot_n)
+    transform$eta_boot <- eta_boot
 
+    ci_out <- cbind(wald_lower = lower, wald_upper = upper, wald_se = col_sd, wald_n = boot_n)
+
+    list(ci =  ci_out,
+         transform = transform)
 }
 
 
