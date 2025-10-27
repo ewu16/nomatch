@@ -14,14 +14,19 @@
 #'
 #'
 #' @export
-print.vefit <- function(x, digits = 3, ...) {
-    if(x$effect == "vaccine_effectiveness"){
-        title <- "Vaccine Effectiveness Estimates"
-        effect_term <- "vaccine_effectiveness"
+print.vefit <- function(x, digits = 3, effect = NULL,...) {
+    if(is.null(effect)){
+        effect <- x$effect
+    }
+
+    if(x$effect == "risk_difference"){
+        title <- "Risk Difference Estimates"
     }else if(x$effect == "risk_ratio"){
         title <- "Risk Ratio Estimates"
-        effect_term <- "risk_ratio"
+    }else if(x$effect == "vaccine_effectiveness"){
+        title <- "Vaccine Effectiveness Estimates"
     }
+
     cat("\n", title, "\n")
     cat(strrep("=", 50), "\n")
 
@@ -31,13 +36,8 @@ print.vefit <- function(x, digits = 3, ...) {
 
     # The main result
     cat("\nResult:\n")
-    effect <- stats::setNames(list(x$estimates[[effect_term]]), effect_term)
+    effect <- stats::setNames(list(x$estimates[[effect]]), effect)
     effect_df <- estimates_to_df(effect)
-
-    display_cols <- c("t0", "estimate",
-                      grep("lower$", names(effect_df), value = TRUE),
-                      grep("upper$", names(effect_df), value = TRUE),
-                      grep("pval$", names(effect_df), value = TRUE))
 
     ci_level <- (1-x$alpha)*100
     name_map <- c(
@@ -48,8 +48,12 @@ print.vefit <- function(x, digits = 3, ...) {
         wald_pval         = "Wald p-value",
         percentile_lower  = paste0(ci_level, "% Percentile CI: Lower"),
         percentile_upper  = paste0(ci_level, "% Percentile CI: Upper"),
-        percentile_pval   = "Percentile p-value"
+        percentile_pval   = "Percentile p-value",
+        simul_lower  = paste0(ci_level, "% Simul CI: Lower"),
+        simul_upper  = paste0(ci_level, "% Simul CI: Upper")
     )
+
+    display_cols <- intersect(names(effect_df), names(name_map))
 
     display_labels <- name_map[display_cols]
     names(effect_df)[names(effect_df) %in% display_cols] <- display_labels
@@ -84,13 +88,13 @@ print.vefit <- function(x, digits = 3, ...) {
 #' of printing a detailed summary to the console.
 #'
 #' @export
-summary.vefit <- function(object, digits = 4, ...) {
-    if(object$effect == "vaccine_effectiveness"){
-        title <- "Vaccine Effectiveness"
-        effect_term <- "vaccine_effectiveness"
+summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
+    if(object$effect == "risk_difference"){
+        title <- "Risk Difference"
     }else if(object$effect == "risk_ratio"){
         title <- "Risk Ratio"
-        effect_term <- "risk_ratio"
+    }else if(object$effect == "vaccine_effectiveness"){
+        title <- "Vaccine Effectiveness"
     }
 
     cat("\n")
@@ -102,7 +106,7 @@ summary.vefit <- function(object, digits = 4, ...) {
     cat("Method:             ", object$method, "\n")
     cat("Evaluation times:   ", paste(utils::head(object$eval_times), collapse = ", "),
         ifelse(length(object$eval_times) > 6, ", ...", ""), "\n")
-    cat("Immune lag (delay period): ", object$immune_lag, "\n")
+    cat("Immune lag:         ", object$immune_lag, "\n")
 
     if(object$method ==  "nomatchVE (G-computation)"){
         if (length(object$covariates) > 0) {
@@ -135,10 +139,10 @@ summary.vefit <- function(object, digits = 4, ...) {
         cat("Number of events:", descrip$n_events, "\n")
         cat("\n")
         cat("N exposed:", descrip$n_exposed, "\n")
-        cat("N exposed at-risk `immune_lag` days after exposure:", descrip$n_exposed_at_tau, "\n")
+        cat("N exposed at-risk <immune_lag> days after exposure:", descrip$n_exposed_at_tau, "\n")
 
         cat("\n")
-        cat("Distribution of exposure times among at-risk `immune_lag` days after exposure:\n")
+        cat("Distribution of exposure times among at-risk <immune_lag> days after exposure:\n")
         cat(" Range: ", paste(range(descrip$exposure_times_at_tau), collapse = " - "), "| ")
         cat(" Median (IQR): ",
             stats::median(descrip$exposure_times_at_tau),
@@ -147,19 +151,31 @@ summary.vefit <- function(object, digits = 4, ...) {
         cat(" Mean: ",  round(mean(descrip$exposure_times_at_tau), 1))
 
         # ---- Main Results ----
-        cat("\n\n")
-        cat(strrep("-", 70), "\n")
-        cat("Model for unexposed:\n")
-        cat(strrep("-", 70), "\n")
-        cat("N =", object$model_0$n, "| Number of events =", object$model_0$nevent, "\n\n")
-        print(round(stats::coef(summary(object$model_0)), 3))
+        if(!is.null(object$model_0) & !is.null(object$model_1)){
+            cat("\n\n")
+            cat(strrep("-", 70), "\n")
+            cat("Model for unexposed:\n")
+            cat(strrep("-", 70), "\n")
+            cat("N =", object$model_0$n, "| Number of events =", object$model_0$nevent, "\n\n")
+            if(show_models){
+                print(round(stats::coef(summary(object$model_0)), 3))
+            }else{
+                cat("Use '$model_0' to see model details.\n")
+            }
 
-        cat("\n")
-        cat(strrep("-", 70), "\n")
-        cat("Model for exposed:\n")
-        cat(strrep("-", 70), "\n")
-        cat("N =", object$model_1$n, "| Number of events =", object$model_1$nevent, "\n\n")
-        print(round(stats::coef(summary(object$model_1)), 3))
+            cat("\n")
+            cat(strrep("-", 70), "\n")
+            cat("Model for exposed:\n")
+            cat(strrep("-", 70), "\n")
+            cat("N =", object$model_1$n, "| Number of events =", object$model_1$nevent, "\n\n")
+            if(show_models){
+                print(round(stats::coef(summary(object$model_1)), 3))
+
+            }else{
+                cat("Use '$model_1' to see model details.\n")
+            }
+
+        }
 
     }else{
         cat("\n")
@@ -185,6 +201,7 @@ summary.vefit <- function(object, digits = 4, ...) {
         cat(strrep("-", 70), "\n")
         cat("Kaplan Meier for matched analysis:\n")
         cat(strrep("-", 70), "\n\n")
+        object$models$call <- NULL
         print(object$models)
 
     }
@@ -216,13 +233,25 @@ summary.vefit <- function(object, digits = 4, ...) {
 #'
 #' @importFrom rlang .data
 #' @export
-plot.vefit <- function(x, ci_type = NULL, color = "#0072B2", ...) {
+plot.vefit <- function(x, effect = NULL, ci_type = NULL, color = "#0072B2", ...) {
+
+    if(is.null(effect)){
+        effect <- x$effect
+    }
+
+    if(length(x$eval_times) < 2){
+        message("Only one evaluation time supplied; returning point estimate(s) instead of a plot")
+        est_df <- estimates_to_df(x$estimates)
+        print(est_df)
+        return(invisible(est_df))
+    }
 
     ci_type <- validate_confint_type(x, ci_type)
     plot_data <- estimates_to_df(x$estimates)
     plot_data$method <- "dummy"
     alpha <- x$alpha
     plot_ve_panel(plot_data, ci_type, alpha, colors = color,
+                  effect = effect,
                   trt_0_label = paste(x$exposure, "= 0"),
                   trt_1_label = paste(x$exposure, "= 1"))
 }

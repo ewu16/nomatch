@@ -79,6 +79,7 @@ compare_ve_fits <- function(fit1,
         plot_data = plot_data,
         ci_type = ci_type,
         alpha = alpha1,
+        effect = fit1$effect,
         colors = colors
     )
 }

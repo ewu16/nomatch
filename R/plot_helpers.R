@@ -31,85 +31,90 @@
 plot_ve_panel <- function(plot_data,
                            ci_type,
                            alpha,
+                           effect,
                            trt_0_label = "Unexposed",
                            trt_1_label = "Exposed",
                            colors = NULL) {
 
   n_methods <- length(unique(plot_data$method))
-
-  # Check if plotting CIs
   has_ci <- (ci_type != "none")
+  terms <- c("cuminc_0", "cuminc_1", effect)
+  plot_data <- plot_data[plot_data$term %in% terms,]
 
-  if (has_ci) {
+  #Validate inputs
+  if(!has_ci){
+    lower <- "estimate"
+    upper <- "estimate"
+  }else{
     lower <- paste0(ci_type, "_lower")
     upper <- paste0(ci_type, "_upper")
 
-    # These should exist if we got here (validation happened upstream)
-    stopifnot(c(lower, upper) %in% names(plot_data))
-
-    ci_level <- paste0((1 - alpha) * 100, "%")
-    ci_label <- switch(ci_type,
-                       "wald" = "pointwise Wald",
-                       "percentile" = "pointwise percentile",
-                       "simul" = "simultaneous")
-    caption_text <- paste("\nShaded areas represent", ci_level, ci_label,
-                          "confidence intervals.")
-  } else {
-    lower <- "estimate"
-    upper <- "estimate"
-    caption_text <- "\nPoint estimates only (no confidence intervals computed/requested)."
+    if(!all(c(lower, upper) %in% names(plot_data))){
+      stop(paste0("Confidence intervals for ci_type = ", ci_type,
+                  "were not found in plot_data"))
+    }
   }
 
+
+
+  #Set defaults for plot based on effect
+  if(effect == "risk_difference"){
+    d <- list(label = "Risk Difference",
+              x = "Time since exposure",
+              label_function = scales::label_percent())
+  }else if(effect == "risk_ratio"){
+    d <- list(label = "Risk Ratio",
+              x = "Time since exposure",
+              label_function =  ggplot2::waiver())
+
+  }else if(effect == "vaccine_effectiveness"){
+    d <- list(label = "Vaccine Effectiveness",
+              x = "Time since vaccination",
+              label_function = scales::label_percent())
+  }
+
+  #Clean up term labels before plotting
   cuminc_0_label <-  paste("Cumulative Incidence:\n", trt_0_label)
   cuminc_1_label <-  paste("Cumulative Incidence:\n", trt_1_label)
-  effect_term <- unique(plot_data$term)[!unique(plot_data$term) %in% c("cuminc_0", "cuminc_1")]
-  effect_label <- switch(effect_term,
-                         "risk_ratio" = "Risk Ratio",
-                         "vaccine_effectiveness" = "Vaccine Effectiveness")
+  term_labels <-  c(cuminc_0_label, cuminc_1_label, d$label)
 
-  x_label <- switch(effect_term,
-                         "risk_ratio" = "exposure",
-                         "vaccine_effectiveness" = "vaccination")
+  plot_data$term_label <- factor(plot_data$term, terms, term_labels)
 
-  plot_data$term_label <- factor(plot_data$term, c("cuminc_0", "cuminc_1", effect_term),
-                                 c(cuminc_0_label, cuminc_1_label, effect_label))
 
-  # Calculate shared y-limits for cumulative incidence
+  #Make main plot
+  p <- ggplot2::ggplot(plot_data,
+          ggplot2::aes(x = .data$t0,
+                       y = .data$estimate,
+                       color = .data$method,
+                       fill = .data$method)) +
+    ggplot2::geom_line()
+
+
+  # For panel plot
+  ## Calculate shared y-limits for cumulative incidence
   cuminc_data <- plot_data[plot_data$term %in% c("cuminc_0", "cuminc_1"), ]
   y_min <- min(cuminc_data[[lower]], na.rm = TRUE)
   y_max <- max(cuminc_data[[upper]], na.rm = TRUE)
 
-  label_function <- switch(effect_term,
-                           "risk_ratio" = ggplot2::waiver(),
-                           "vaccine_effectiveness" = scales::label_percent())
-
-
-  #Main plot
-  p <- ggplot2::ggplot(plot_data,
-                    ggplot2::aes(x = .data$t0,
-                                 y = .data$estimate,
-                                 color = .data$method,
-                                 fill = .data$method)) +
-    ggplot2::geom_line() +
-    ggplot2::facet_wrap(~term_label, scales = "free") +
+  p <- p + ggplot2::facet_wrap(~term_label, scales = "free") +
     ggh4x::facetted_pos_scales(
       y = list(
-        ggplot2::scale_y_continuous(labels = label_function,
+        ggplot2::scale_y_continuous(labels = d$label_function,
                                     limits = c(y_min, y_max)),
-        ggplot2::scale_y_continuous(labels = label_function,
+        ggplot2::scale_y_continuous(labels = d$label_function,
                                     limits = c(y_min, y_max)),
-        ggplot2::scale_y_continuous(labels = label_function)
+        ggplot2::scale_y_continuous(labels = d$label_function)
       )
     )
 
-  # Add ribbon only if CIs exist
-  if(has_ci){
+
+  # Add confidence interval bands
+  if (has_ci) {
     p <- p +
       ggplot2::geom_ribbon(ggplot2::aes(ymin = .data[[lower]], ymax = .data[[upper]]),
                            alpha = if(n_methods > 1) 0.2 else 0.3,
                            linewidth = if(n_methods > 1) 0.1 else 0, show.legend = FALSE)
   }
-
 
   # Add color scales if appropriate, otherwise use default scales
   if (n_methods == length(colors)) {
@@ -118,15 +123,26 @@ plot_ve_panel <- function(plot_data,
       ggplot2::scale_fill_manual(values = colors, name = "Method")
   }
 
-  # Add labels and theme
-  p <- p +
+  # Make captions about confidence intervals
+  ci_labels <- c(wald = "pointwise Wald",
+                 percentile = "pointwise percentile",
+                 simul = "simultaneous")
+
+  caption <- ifelse(has_ci,
+                    paste("\nShaded areas represent",  paste0((1 - alpha) * 100, "%"),
+                          ci_labels[ci_type], "confidence intervals."),
+                    "\nPoint estimates only (no confidence intervals computed/requested).")
+
+  #Add plot labels
+    p <- p +
     ggplot2::labs(
-      x = paste("Time since", x_label),
+      x = d$x,
       y = "Estimate",
-      caption = paste("\nShaded areas represent", ci_level, ci_label,
-                      "confidence intervals.")
-    ) +
-    ggplot2::theme_bw() +
+      caption = caption
+    )
+
+  # Add theme
+  p <- p + ggplot2::theme_bw() +
     ggplot2::theme(
       plot.caption = ggplot2::element_text(hjust = 0),
       strip.background = ggplot2::element_rect(fill = "white", color = "white"),
@@ -134,6 +150,7 @@ plot_ve_panel <- function(plot_data,
       axis.text = ggplot2::element_text(size = 9, colour = "black"),
       axis.title = ggplot2::element_text(size = 11, colour = "black")
     )
+
 
   # Add legend positioning if using method colors
   if (n_methods == 1) {
@@ -162,11 +179,18 @@ plot_ve_panel <- function(plot_data,
 #' @noRd
 validate_confint_type <- function(object, ci_type = NULL) {
 
+  if(object$boot_reps == 0){
+    return("none")
+  }
+
   # Use object's ci_type if not specified
   if (is.null(ci_type)) {
     ci_type <- object$ci_type
   }
 
+  if(ci_type  == "none"){
+    return("none")
+  }
   # Handle "both" - default to "wald"
   if (ci_type == "both") {
     ci_type <- "wald"
@@ -184,16 +208,14 @@ validate_confint_type <- function(object, ci_type = NULL) {
     }
   }
 
-  if(ci_type == "none"){
-    return("none")
-  }else{
-    #Check if requested CI type exists in estimates
-    lower <- paste0(ci_type, "_lower")
-    upper <- paste0(ci_type, "_upper")
-    if (!all(c(lower, upper) %in% colnames(object$estimates[[tolower(object$effect)]]))) {
-      stop("CI type '", ci_type, "' not found in object.\n")
-    }
+
+  #Check if requested CI type exists in estimates
+  lower <- paste0(ci_type, "_lower")
+  upper <- paste0(ci_type, "_upper")
+  if (!all(c(lower, upper) %in% colnames(object$estimates[[tolower(object$effect)]]))) {
+    stop("CI type '", ci_type, "' not found in object.\n")
   }
+
 
   return(ci_type)
 }
