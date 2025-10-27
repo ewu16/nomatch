@@ -1,37 +1,57 @@
 # Format estimates --------------------------------------------------------
 
-#' Convert estimates to tidy long-format data frame
+#' Convert estimates from a fitted object into a tidy data frame
 #'
 #' @description
-#' Converts the `estimates` component of a `vefit` object into a
-#' long-format data frame for easy plotting and analysis.
-#' Each row represents one term (cumulative incidence or derived effect measure) at a specific timepoint.
+#' A convenience function for extracting estimates from a
+#' [`vefit`] object (or its `estimates` component) into a tidy data frame
+#' for plotting and summary tables.
 #'
-#' @param estimates A list of matrices, typically from `fit$estimates` in a `vefit`
-#'   object. Each matrix (e.g., `cuminc_0`, `cuminc_1`, `vaccine_effectiveness`/`risk_ratio`)
-#'   contains estimates, confidence intervals, and related statistics evaluated
-#'   at different timepoints.
+#'  @param x A fitted [`vefit`] object or its `estimates` component (a named list
+#'   of matrices).
+#' @param collapse Logical; if `TRUE` (default), returns a single long-format
+#'   data frame. If `FALSE`, returns a list of data frames (one per term).
 #'
-#' @return
-#' A long-format data frame with:
-#'   - `t0`: the timepoint
-#'   - `term`: what was estimated (`cuminc_0`, `cuminc_1`, or `vaccine_effectiveness`/`risk_ratio`)
-#'   -  Remaining columns from the original matrices (estimates, confidence intervals, ad related statistics.)
+#' @return Either:
+#'   - A long-format data frame (if `collapse = TRUE`), or
+#'   - A list of term-specific data frames (if `collapse = FALSE`).
+#'   The data frame(s) have columns:
+#'    \itemize{
+#'     \item `t0`: evaluation timepoint
+#'     \item `term`: estimated quantity
+#'     \item other columns from the original matrices (e.g. estimate, confidence intervals)
+#'   }
 #'
 #' @export
 #'
-estimates_to_df <- function(estimates){
+estimates_to_df <- function(x, collapse = TRUE){
+    # detect if full vefit object
+    if (inherits(x, "vefit")) {
+        estimates <- x$estimates
+    } else {
+        estimates <- x
+    }
+
+    # validate
+    if (!is.list(estimates) || !all(vapply(estimates, is.matrix, logical(1)))) {
+        stop("Input must be a 'vefit' object or a list of matrices.", call. = FALSE)
+    }
+
     df_list <- lapply(seq_along(estimates), \(i){
         df <-data.frame(estimates[[i]])
         df$term <- names(estimates)[i]
         df$t0 <- as.numeric(rownames(df))
         df <- df[, c("t0", "term", colnames(estimates[[i]]))]
     })
-    estimates_df <- do.call("rbind", df_list)
-    ordered_df <-  estimates_df[order(estimates_df$t0),]
-    rownames(ordered_df) <- NULL
-    ordered_df
 
+    if(collapse){
+        df <- do.call("rbind", df_list)
+        df <-  df[order(df$t0),]
+        rownames(df) <- NULL
+        df
+    }else{
+        df_list
+    }
 }
 
 
