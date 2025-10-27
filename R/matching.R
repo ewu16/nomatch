@@ -1,23 +1,35 @@
-#' Compute a matching-based estimator of VE with confidence intervals
+#' Compute marginal cumulative incidence estimates for a matched cohort
 #'
-#' @description This function is the main function for computing a matching-based estimator
-#' based on Kaplan Meier estimation.
+#' @description This function is the main function for estimating cumulative incidence
+#' in a matched dataset based on Kaplan Meier estimation. It creates the
+#' analysis dataset and performs the analysis for the matched cohort.
 #'
 #' @inheritParams nomatch
 #' @inheritParams clean_matched_data
-#' @param matched_data A data frame for the matched cohort
+#' @param matched_data A data frame for the matched cohort created using [match_rolling_cohort()].
 
-#' @return A list containing the following:
+#'@return An object of class `vefit` containing:
 #' \describe{
-#'  \item{estimates}{A list of matrices of the estimates at each timepoint. Rows of
-#'  each matrix are the terms "cuminc_0", "cuminc_1", "vaccine_effectiveness". Columns of each matrix
-#'  gives the point estimate and confidence intervals at the specified time point.}
-#'  \item{eval_times}{The timepoints at which VE was evaluated}
-#'  \item{n_success_boot}{A numeric vector of the number of successful bootstrap samples for each time point.(Success bootstrap samples are
-#'  those that result in non-missing valid point estimates.)}
-#'  \item{boot_samples}{If `keep_boot_samples = TRUE`, a list of matrices for each term that contain the bootstrap estimates where the rows are the bootstrap iterations and
-#'  the columns are the time points.}
+#'   \item{estimates}{Named list of matrices containing the cumulative incidence and
+#'   effect estimates.
+#'   \describe{
+#'      \item{`cuminc_0`}{ marginal cumulative incidence under no exposure}
+#'      \item{`cuminc_1`}{ marginal cumulative incidence under exposure}
+#'      \item{`risk_difference`}{ `cuminc_1 - cuminc_0`}
+#'      \item{`risk_ratio`}{ `cuminc_1/cuminc_0`}
+#'      \item{`vaccine_effectivess`}{ `1 - risk_ratio`}
+#'   }
+#'      Each matrix has one row per value in `eval_times` and columns including the
+#'     point estimate (`estimate`) and, when requested, confidence limits of the form
+#'     (`{wald/percentile}_lower`, `{wald/percentile}_upper`). }
+#'   \item{models}{Fitted Kaplan Meier}
+#'   \item{n_success_boot}{Integer vector indicating the
+#'   number of successful bootstrap replications per timepoint.}
+#'   \item{boot_samples}{(If `keep_boot_samples = TRUE`) Named list of bootstrap draws
+#'   (stored as matrices) for each term. Rows index bootstrap replicates and columns index `eval_times`.}
 #' }
+#'
+#'
 #' @export
 #'
 matching <- function(matched_data,
@@ -27,7 +39,7 @@ matching <- function(matched_data,
                         exposure_time,
                         immune_lag,
                         eval_times,
-                        effect = c("vaccine_effectiveness", "risk_ratio"),
+                        effect = c("risk_ratio", "vaccine_effectiveness", "risk_difference"),
                         ci_type = c("wald", "percentile", "both"),
                         boot_reps = 0,
                         alpha = 0.05,

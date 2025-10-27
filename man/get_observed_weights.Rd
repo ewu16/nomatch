@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_marginalizing_weights.R
 \name{get_observed_weights}
 \alias{get_observed_weights}
-\title{Estimate observed distributions of exposure eval_times and covariates}
+\title{Estimate observed distributions of exposure times and covariates}
 \usage{
 get_observed_weights(
   data,
@@ -16,33 +16,32 @@ get_observed_weights(
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
 named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
-\code{covariates}.}
+\code{covariates}. Missing values for all columns except \code{exposure_time} are not allowed.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
-be measured from a given time origin (e.g. study start, enrollment, or age)
-for all individuals.}
+be measured from a chosen time origin (e.g. study start, enrollment, or age).}
 
 \item{exposure}{Name of the exposure indicator. The underlying column should
 be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \verb{outcome time}. Set \code{exposure_time} of all unexposed
-individuals to \code{NA}.}
+as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+and must be set to \code{NA} for unexposed individuals.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
-the hazard models; should include all known confounders of
+the hazard models. Include all known, measured confounders of
 exposure and censoring.  Covariates must be measured or defined at the chosen time origin.}
 
-\item{immune_lag}{Non-negative numeric value specifying the time after exposure (tau) that
+\item{immune_lag}{Non-negative numeric value specifying the time after exposure (sometimes denoted by \code{tau}) that
 should be excluded from the risk evaluation period. This argument is
 primarily intended for vaccination exposures, where it is common to exclude
 the time after vaccination when immunity is still building. Time must be
-measured in the same units as that used for \code{outcome_time} and \code{exposure_time}
+measured in the same units as that used for \code{outcome_time} and \code{exposure_time}  (e.g. days)
 and should reflect the biological understanding of when vaccine-induced
 immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
-be set to 0 (no delay period).}
+be set to 0 (no delay period for evaluating risk).}
 }
 \value{
 A list with two data frames:
@@ -52,21 +51,21 @@ A list with two data frames:
 
 Each data frame includes all variables in \code{covariates}, and a \code{prob} column
 with empirical probabilities.
-\code{g_weights} additionally includes a \verb{<exposure_time>} column for exposure eval_times.
+\code{g_weights} additionally includes a \verb{<exposure_time>} column for exposure times.
 }
 }
 \description{
-Computes two empirical probability distributions used to marginalize
+Computes two empirical probability distributions which are used to marginalize
 time- and covariate- specific cumulative incidences:
 \itemize{
-\item \eqn{g(d \mid x)}: the distribution of exposure eval_times within each covariate subgroup
+\item \eqn{g(d \mid x)}: the distribution of exposure times within each covariate subgroup
 of exposed individuals who remain at risk \code{immune_lag} days after exposure.
 \item \eqn{p(x)}: the distribution of covariates among exposed individuals
 who remain at risk \code{immune_lag} days after exposure.
 }
 
-Called internally by \code{\link[=nomatch]{nomatch()}}. Provided as an example of the
-structure needed if a user passes in \code{custom_weights}.
+Called internally by \code{\link[=nomatch]{nomatch()}}. Provides an example of the
+structure for user-specified \code{custom_weights}.
 }
 \examples{
 weights <- get_observed_weights(simdata, "Y", "V", "D_obs",

@@ -14,7 +14,7 @@ compute_wald_pval <- function(term, term_ci_estimate){
 
     z <- (estimate - null_val)/se
 
-    2*(1 - pnorm(abs(z)))
+    2*(1 - stats::pnorm(abs(z)))
 }
 
 # compute_percentile_pval <- function(term, term_boot){

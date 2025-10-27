@@ -19,7 +19,7 @@
 #' @param formula_0 Optional right hand side of the formula for model 0. By default, uses `covariates`.
 #'
 #' @param formula_1 Optional right hand side of the formula for model 1. By default, uses `covariates`
-#'   plus natural spline of vaccination day (4 df). Default `NULL`
+#'   plus natural spline of vaccination day (4 df).
 #'
 #' @param censor_time Time after exposure at which exposed
 #'   individuals are censored during model fitting to prevent extrapolation. By default,

@@ -14,7 +14,7 @@ nomatch(
   covariates,
   immune_lag,
   eval_times,
-  effect = c("vaccine_effectiveness", "risk_ratio"),
+  effect = c("risk_ratio", "vaccine_effectiveness", "risk_difference"),
   weights_source = c("observed", "custom"),
   custom_weights = NULL,
   ci_type = c("wald", "percentile", "both"),
@@ -28,14 +28,13 @@ nomatch(
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
 named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
-\code{covariates}.}
+\code{covariates}. Missing values for all columns except \code{exposure_time} are not allowed.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
-be measured from a given time origin (e.g. study start, enrollment, or age)
-for all individuals.}
+be measured from a chosen time origin (e.g. study start, enrollment, or age).}
 
-\item{outcome_status}{Name of the event indicator. The underlying column should be
+\item{outcome_status}{Name of the event indicator for the outcome. The underlying column should be
 numeric (\code{1} = event, \code{0} = censored).}
 
 \item{exposure}{Name of the exposure indicator. The underlying column should
@@ -43,39 +42,40 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \verb{outcome time}. Set \code{exposure_time} of all unexposed
-individuals to \code{NA}.}
+as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+and must be set to \code{NA} for unexposed individuals.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
-the hazard models; should include all known confounders of
+the hazard models. Include all known, measured confounders of
 exposure and censoring.  Covariates must be measured or defined at the chosen time origin.}
 
-\item{immune_lag}{Non-negative numeric value specifying the time after exposure (tau) that
+\item{immune_lag}{Non-negative numeric value specifying the time after exposure (sometimes denoted by \code{tau}) that
 should be excluded from the risk evaluation period. This argument is
 primarily intended for vaccination exposures, where it is common to exclude
 the time after vaccination when immunity is still building. Time must be
-measured in the same units as that used for \code{outcome_time} and \code{exposure_time}
+measured in the same units as that used for \code{outcome_time} and \code{exposure_time}  (e.g. days)
 and should reflect the biological understanding of when vaccine-induced
 immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
-be set to 0 (no delay period).}
+be set to 0 (no delay period for evaluating risk).}
 
 \item{eval_times}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
-be expressed in terms of time since exposure. All values must be greater
+be expressed in terms of time since exposure and use the same units
+as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All values must be greater
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 
-\item{effect}{Character. Type of effect measure to return (a contrast of
+\item{effect}{Character. Primary effect measure of interest (a contrast of
 the marginal cumulative incidences). Either
-\code{"vaccine_effectiveness"} (default) or \code{"risk_ratio"}.}
+\code{"risk_ratio"}(default), \code{"vaccine_effectiveness"}  or \code{"risk_difference"}.}
 
 \item{weights_source}{Character string specifying the type of marginalizing weights
 to use. Either:
 \itemize{
-\item \code{"observed"} (default): set the marginalizing weights to the empirical
-distribution of exposure eval_times and covariates among the exposed. This
+\item \code{"observed"} (default): use  the empirical
+distribution of exposure times and covariates among the exposed as the marginalizing weights. This
 provides close alignment with the weights implicitly used in matching.
 \item \code{"custom"}: use the user-specified weights provided in the \code{custom_weights} argument.
 }}
@@ -104,7 +104,7 @@ should sum to 1 within each covariate-group)
 \item \code{"wald"} (default): Computes Wald-style intervals using bootstrap standard errors.
 See \strong{Confidence intervals} section for details.
 \item \code{"percentile"}: Computes percentile bootstrap intervals.
-\item \code{"both"}: Computes and returns both sets of intervals.
+\item \code{"both"}: Computes and returns both Wald and percentile intervals.
 }}
 
 \item{boot_reps}{Number of bootstrap replicates for confidence intervals.
@@ -113,7 +113,7 @@ smaller values (e.g., 10-100) for initial exploration. Default: \code{0} (no
 bootstrapping).}
 
 \item{alpha}{Significance level for confidence intervals (Confidence level =
-100*(1-\code{alpha})\%). Default: \code{0.05}.}
+100*(1-alpha)\%). Default: \code{0.05}.}
 
 \item{keep_models}{Logical; return the two fitted hazard models used to compute
 cumulative incidences?
@@ -123,18 +123,21 @@ Default: \code{TRUE}.}
 \code{TRUE}. Must be set to \code{TRUE} if user plans to use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}}
 to obtain simultaneous confidence intervals.}
 
-\item{n_cores}{Integer; parallel cores for bootstrapping. Passed to
+\item{n_cores}{Integer; parallel cores for bootstrapping passed to
 \code{parallel::mclapply} as \code{mc.cores}. On Unix-like OS only; not available on
 Windows. Default: \code{1}.}
 }
 \value{
 An object of class \code{vefit} containing:
 \describe{
-\item{estimates}{List of matrices:
+\item{estimates}{Named list of matrices containing the cumulative incidence and
+effect estimates.
 \describe{
 \item{\code{cuminc_0}}{ marginal cumulative incidence under no exposure}
 \item{\code{cuminc_1}}{ marginal cumulative incidence under exposure}
-\item{\verb{<effect>}}{the selected effect measure}
+\item{\code{risk_difference}}{ \code{cuminc_1 - cuminc_0}}
+\item{\code{risk_ratio}}{ \code{cuminc_1/cuminc_0}}
+\item{\code{vaccine_effectivess}}{ \code{1 - risk_ratio}}
 }
 Each matrix has one row per value in \code{eval_times} and columns including the
 point estimate (\code{estimate}) and, when requested, confidence limits of the form
@@ -147,10 +150,8 @@ See \strong{Modeling} section for details.}
 See \strong{Modeling} section for details.}
 \item{n_success_boot}{Integer vector indicating the
 number of successful bootstrap replications per timepoint.}
-\item{boot_samples}{(If \code{keep_boot_samples = TRUE}) List of bootstrap draws
-(stored as matrices) for each
-returned quantity with names mirroring those in \code{estimates} (i.e. \code{cuminc_0}, \code{cuminc_1}, \verb{<effect>}).
-Rows index bootstrap replicates and columns index \code{eval_times}.}
+\item{boot_samples}{(If \code{keep_boot_samples = TRUE}) Named list of bootstrap draws
+(stored as matrices) for each term. Rows index bootstrap replicates and columns index \code{eval_times}.}
 }
 
 The \code{vefit} object has methods for \code{\link[=print]{print()}}, \code{\link[=summary]{summary()}}, and \code{\link[=plot]{plot()}}.
@@ -161,44 +162,43 @@ Use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}} to add simultaneou
 exposure and no exposure using a G-computation approach. The method fits two
 conditional hazard models- one for each exposure type- and uses
 these models to predict time- and covariate-specific cumulative incidences.
-The conditional cumulative incidences are then marginalized to compute overall
+These cumulative incidences are then marginalized to compute overall
 (marginal) cumulative incidences. By default, the cumulative incidences
 are marginalized over the observed distribution of exposure times and covariates
 among the exposed. The resulting cumulative incidences can be
-summarized as risk ratios (RR = 1 - risk_exposed/risk_unexposed) or
-vaccine effectiveness  (VE = 1 - RR).
+summarized as risk ratios (RR = 1 - risk_exposed/risk_unexposed),
+vaccine effectiveness  (VE = 1 - RR), or risk differences (RD = risk_exposed - risk_unexposed).
 }
 \details{
 \strong{Modeling.} Two Cox proportional hazards models are fit to estimate
-exposure-specific cumulative incidences. The first models the hazard of the
-outcome over the chosen time scale among individuals who have not yet been
-exposed, with exposed individuals censored at their time of exposure. The
-second models the hazard over time since exposure among individuals who were
-exposed and remain at risk \code{tau} days after exposure. Both models adjust for
+exposure-specific cumulative incidences. For the unexposed model, the outcome is modeled
+on the original time scale and includes all individuals, with exposed individuals
+censored at their time of exposure. For the exposed model, the outcome is modeled in
+terms of time since exposure among individuals who were
+exposed and who remained at risk \code{tau} days after exposure. Both models adjust for
 the specified covariates to help control for confounding. The second model
-also flexibly adjusts for exposure time (as a natural cubic spline with 4
+also flexibly adjusts for exposure time (by default, as a natural cubic spline with 4
 degrees of freedom) to capture time-varying background risk. Predicted risks
-from both models are then marginalized over the specified covariate and
-exposure-time distributions to obtain G-computation style cumulative
+from both models are then marginalized over the specified
+exposure-time and covariate distributions to obtain G-computation style cumulative
 incidence estimates.
 
 \strong{Marginalizing weights.} When \code{weights_source = "observed"}, the marginalizing weights
-are the empirical distributions of exposure eval_times and covariates among the
+are the empirical distributions of exposure times and covariates among the
 exposed who remain at-risk \code{tau} days after exposure. These weights are
-returned in the \code{vefit} object under \code{gp_list}. They can also be obtained
+returned in the \code{vefit} object under \code{weights}. They can also be obtained
 prior to the call to \code{nomatch()} by calling \code{get_observed_weights()}.
 
 \strong{Confidence intervals.} Wald CIs are constructed on transformed scales:
 \eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios,
 \eqn{\log{1 - VE}} for vaccine effectiveness, using bootstrap SEs. These are
-then back-transformed to the original scale.
+then back-transformed to the original scale. No transformation is used for risk differences.
 
 \strong{Parallelization.} Bootstraps can be parallelized on Unix via \code{\link[parallel:mclapply]{parallel::mclapply()}}
 by providing \code{n_cores} argument.
 }
 \examples{
 # Fit vaccine effectiveness model using simulated data
-data(simdata)
 
 fit <- nomatch(
   data = simdata,
@@ -210,7 +210,7 @@ fit <- nomatch(
   eval_times = seq(30, 180, by = 30),
   immune_lag = 14,
   boot_reps = 5,
-  n_cores = 2
+  n_cores = 1
 )
 
 # View basic results

@@ -8,16 +8,9 @@ reference:
   - nomatch
   - add_simultaneous_ci
   - plot.vefit
-  - compare_ve_fits
-
-- title: Matching-based estimation
-  desc: Functions for matching cohort design and estimation
-  contents:
-  - match_rolling_cohort
-  - matching
 
 - title: Proposed method estimation
-  desc: Core estimation functions for the g-computation approach
+  desc: Core estimation functions for the G-computation approach
   contents:
   - fit_model_0
   - get_observed_weights
@@ -25,12 +18,20 @@ reference:
   - marginalize_psi_dx_t0
   - compute_psi_bar_times
 
+- title: Matching-based estimation
+  desc: Functions for matching cohort design and estimation
+  contents:
+  - match_rolling_cohort
+  - matching
+
+
 - title: Utilities
   desc: Helper functions for data manipulation and formatting
   contents:
   - print.vefit
   - summary.vefit
   - estimates_to_df
+  - compare_ve_fits
 
 - title: Data
   contents:

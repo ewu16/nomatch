@@ -17,25 +17,24 @@
 #' @param gp_list A list with two data frames:
 #'
 #' - **g_weights** Data frame of covariate-conditional exposure-day probabilities \eqn{g(d \mid x)}.
-#'   Must include:
+#' Must include:
 #'   - `group_id`: covariate group identifier
 #'   - `<exposure_time>`: exposure time variable
 #'   - `prob_g`: probability of exposure time given the covariates
 #'   - all variables in `covariates`
 #'
-#' -  **p_weights** Data frame of covariate probabilities \eqn{p(x)}.
-#'   Must include:
-#'   - `group_id`: covariate group identifier
-#'   - `prob_p`: marginal probability of each covariate group
-#'   - all variables in `covariates`
+#' -  **p_weights** Data frame of covariate probabilities \eqn{p(x)}. Must include:\
+#'    - `group_id`: covariate group identifier
+#'    - `prob_p`: marginal probability of each covariate group
+#'    -  all variables in `covariates`
 #'
 #' Default is `NULL` in which case each row of `psi_dx` gets equal weight.
 #'
-#' @param show_intermediates Logical that only applies when `gp_list` is not `NULL;
-#'  when `FALSE` (default), the function performs marginalization
+#' @param show_intermediates Logical that only applies when `gp_list` is not `NULL`.
+#' - When `FALSE` (default), the function performs marginalization
 #'   in a single step and returns only the overall cumulative incidences
 #'   \eqn{\bar{\psi}_0(t_0)} and \eqn{\bar{\psi}_1(t_0)}.
-#'   When `TRUE``, performs the two-step marginalization
+#' - When `TRUE`, performs the two-step marginalization
 #'   (first over days \eqn{d}, then covariate groups \eqn{x})
 #'   and returns intermediate group-level results \eqn{\psi_v(t_0; x)}.
 #'

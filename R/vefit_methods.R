@@ -1,14 +1,17 @@
-#' Print method for vaccine effectiveness fits
+#' Print method for effectiveness fits
 #'
 #' @description
-#' Prints a concise summary of vaccine effectiveness estimates from a fitted model.
+#' Prints a concise summary of effectiveness estimates from a fitted model.
 #'
-#' @param x An x of class `vefit` created by [nomatch()] or [matching()].
+#' @param x An object of class `vefit` created by [nomatch()] or [matching()].
 #' @param digits Integer indicating the number of decimal places to display. Default is 3.
+#' @param effect The effect measure to output. By default,
+#' this is the `effect` measure chosen in the main function call. Must be one of `risk_difference`, `risk_ratio`,
+#' or `vaccine_effectiveness`.
 #' @param ... Additional arguments (currently ignored).
 #'
 #' @return
-#' Invisibly returns the input x `x`. Called primarily for its side effect
+#' Invisibly returns the input object `x`. Called primarily for its side effect
 #' of printing a summary to the console.
 #'
 #'
@@ -25,6 +28,8 @@ print.vefit <- function(x, digits = 3, effect = NULL,...) {
         title <- "Risk Ratio Estimates"
     }else if(x$effect == "vaccine_effectiveness"){
         title <- "Vaccine Effectiveness Estimates"
+    }else{
+        stop("Effect must be one of 'risk_difference', 'risk_ratio', or 'vaccine_effectiveness'")
     }
 
     cat("\n", title, "\n")
@@ -74,13 +79,13 @@ print.vefit <- function(x, digits = 3, effect = NULL,...) {
     invisible(x)
 }
 
-#' Summary method for vaccine effectiveness fits
+#' Summary method for effectiveness fits
 #' @description
-#' Summarizes how vaccine effectiveness estimates were obtained and displays
-#' cumulative incidence and VE across all evaluation time points.
+#' Summarizes how effectiveness estimates were obtained
 #'
 #' @param object An object of class `vefit` created by [nomatch()] or [matching()].
 #' @param digits Integer indicating the number of decimal places to display. Default is 4.
+#' @param show_models Logical; print model details? Default is FALSE.
 #' @param ... Additional arguments (currently ignored).
 #'
 #' @return
@@ -216,16 +221,20 @@ summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
 #' Plot method for vefit objects
 #'
 #' @description
-#' Plot cumulative incidence and VE estimates across all evaluation time points.
+#' Create a panel plot of cumulative incidence and effectiveness estimates across all evaluation time points.
 #'
 #'
-#' @param x An x of class `vefit` created by [nomatch()] or [matching()].
-#' @param ci_type Character string specifying the type of confidence interval bands to plot.
+#' @param x An object of class `vefit` created by [nomatch()] or [matching()].
+#' @param effect The effect measure to plot next to the cumulative incidence plots. By default,
+#' this is the `effect` measure chosen in the main function call. Must be one of `risk_difference`, `risk_ratio`,
+#' or `vaccine_effectiveness`.
+#' @param ci_type Character string specifying the type of confidence interval band to plot. By default,
+#'   `"wald"` if available, otherwise set to `"percentile"` or `none`.
 #'   One of `"wald", "percentile", "simul"`, or `"none"`. Must choose a `ci_type` whose lower
-#'   and upper bounds are already computed in `x$estimates` component of `x`.
+#'   and upper bounds are already computed in `estimates` component of `x`.
 #' @param color Aesthetic value to map data values to. Default: `"#0072B2"` (blue)
 #' @param ... Additional arguments (currently ignored).
-#' @return a ggplot2 x with line plot for each term (cumulative incidence, VE)
+#' @return a ggplot2 object with three faceted panels (for cumulative incidences and the chosen effect measure)
 #'
 #' @details
 #' For cumulative incidence panels, y-axis limits are shared across methods to
@@ -233,6 +242,22 @@ summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
 #'
 #' @importFrom rlang .data
 #' @export
+#'
+#' @examples
+#' fit <- nomatch(
+#'  data = simdata,
+#'  outcome_time = "Y",
+#'  outcome_status = "event",
+#'  exposure = "V",
+#'  exposure_time = "D_obs",
+#'  covariates = c("x1", "x2"),
+#'  eval_times = seq(30, 180, by = 30),
+#'  immune_lag = 14,
+#'  boot_reps = 5,
+#'  n_cores = 2
+#' )
+#' plot(fit)
+#'
 plot.vefit <- function(x, effect = NULL, ci_type = NULL, color = "#0072B2", ...) {
 
     if(is.null(effect)){

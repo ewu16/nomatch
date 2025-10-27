@@ -27,7 +27,7 @@ returns the bootstrap estimates}
 \item \code{"wald"} (default): Computes Wald-style intervals using bootstrap standard errors.
 See \strong{Confidence intervals} section for details.
 \item \code{"percentile"}: Computes percentile bootstrap intervals.
-\item \code{"both"}: Computes and returns both sets of intervals.
+\item \code{"both"}: Computes and returns both Wald and percentile intervals.
 }}
 
 \item{boot_reps}{Number of bootstrap replicates for confidence intervals.
@@ -41,13 +41,13 @@ timepoints. This argument must be provided when \code{ci_type = "wald"}. Ignored
 when \code{ci_type = "percentile"}.}
 
 \item{alpha}{Significance level for confidence intervals (Confidence level =
-100*(1-\code{alpha})\%). Default: \code{0.05}.}
+100*(1-alpha)\%). Default: \code{0.05}.}
 
 \item{keep_boot_samples}{Logical; return bootstrap samples? Default:
 \code{TRUE}. Must be set to \code{TRUE} if user plans to use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}}
 to obtain simultaneous confidence intervals.}
 
-\item{n_cores}{Integer; parallel cores for bootstrapping. Passed to
+\item{n_cores}{Integer; parallel cores for bootstrapping passed to
 \code{parallel::mclapply} as \code{mc.cores}. On Unix-like OS only; not available on
 Windows. Default: \code{1}.}
 }

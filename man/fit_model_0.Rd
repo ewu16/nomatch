@@ -31,14 +31,13 @@ fit_model_1(
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
 named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
-\code{covariates}.}
+\code{covariates}. Missing values for all columns except \code{exposure_time} are not allowed.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
-be measured from a given time origin (e.g. study start, enrollment, or age)
-for all individuals.}
+be measured from a chosen time origin (e.g. study start, enrollment, or age).}
 
-\item{outcome_status}{Name of the event indicator. The underlying column should be
+\item{outcome_status}{Name of the event indicator for the outcome. The underlying column should be
 numeric (\code{1} = event, \code{0} = censored).}
 
 \item{exposure}{Name of the exposure indicator. The underlying column should
@@ -46,11 +45,11 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \verb{outcome time}. Set \code{exposure_time} of all unexposed
-individuals to \code{NA}.}
+as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+and must be set to \code{NA} for unexposed individuals.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
-the hazard models; should include all known confounders of
+the hazard models. Include all known, measured confounders of
 exposure and censoring.  Covariates must be measured or defined at the chosen time origin.}
 
 \item{formula_0}{Optional right hand side of the formula for model 0. By default, uses \code{covariates}.}
@@ -62,7 +61,7 @@ individuals are censored during model fitting to prevent extrapolation. By defau
 no censoring is applied.}
 
 \item{formula_1}{Optional right hand side of the formula for model 1. By default, uses \code{covariates}
-plus natural spline of vaccination day (4 df). Default \code{NULL}}
+plus natural spline of vaccination day (4 df).}
 }
 \value{
 A fitted \code{coxph} object with additional component \verb{$data} containing

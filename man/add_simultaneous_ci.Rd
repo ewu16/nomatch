@@ -2,39 +2,43 @@
 % Please edit documentation in R/add_simultaneous_ci.R
 \name{add_simultaneous_ci}
 \alias{add_simultaneous_ci}
-\title{Add simultaneous confidence intervals to vaccine effectiveness fit}
+\title{Add simultaneous confidence intervals to effectiveness fit}
 \usage{
 add_simultaneous_ci(object, seed = NULL)
 }
 \arguments{
-\item{object}{An object of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}. Must
+\item{object}{An object of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or
+\code{\link[=matching]{matching()}}. Must
 \itemize{
-\item contain evaluations at multiple timepoints (\code{length(object$eval_times)  > 0}),
+\item contain evaluations at at least 2 timepoints (\verb{length(object$eval_times)  > = 2}),
 \item contain bootstrap samples (\code{keep_boot_samples = TRUE} when fitting).
 }}
 
-\item{seed}{Integer seed for random number generation to ensure reproducible
-critical values for simultaneous confidence intervals. Default is \code{NULL} (no seed set).}
+\item{seed}{Integer seed  to ensure reproducible critical values for
+simultaneous confidence intervals (relied on random number generation).
+Default is \code{NULL} (no seed set).}
 }
 \value{
-The input \code{vefit} object with the following modifications:
+The original \code{vefit} object with the following modifications:
 \describe{
 \item{estimates}{Each matrix gets additional columns describing the simultaneous confidence interval bounds and construction:
 \code{simul_lower}, \code{simul_upper}, \code{simul_n}}
-\item{simul_z_star}{Critical values used for each term (cuminc_0, cuminc_1, ve)}
-\item{simul_excluded_timepoints}{Timepoints excluded from simultaneous bands
-due to insufficient bootstrap samples}
+\item{simul_z_star}{Named vector containing the critical values used for each term}
+\item{simul_excluded_timepoints}{Named list containing a vector of timepoints excluded
+from the simultaneous bands for each term  due to insufficient bootstrap samples}
 }
 }
 \description{
-Computes simultaneous confidence intervals, which maintain the specified coverage
-level across all evaluation timepoints jointly. This is
-useful for making inferences about the entire VE curve.
+Computes simultaneous confidence intervals, which maintain the
+specified coverage level across all evaluation timepoints jointly. This is
+useful for making inferences about the entire cumulative incidence or
+effectiveness curve.
 }
 \details{
-Critical values are computed using the bootstrap covariance structure across
-timepoints. If any timepoint has more than 5\% missing bootstrap samples, it
-is excluded from the simultaneous band and a warning is issued.
+Critical values are computed using the bootstrap covariance
+structure across timepoints. If any timepoint has more than 5\% missing
+bootstrap samples, it is excluded from the simultaneous band and a warning is
+issued.
 }
 \examples{
 # Fit model with bootstrap samples
@@ -55,7 +59,7 @@ fit <- nomatch(
 fit_simul <- add_simultaneous_ci(fit, seed = 123)
 
 # Look at results
-fit_simul$estimates
+fit_simul
 
 # Visualize
 plot(fit_simul, ci_type = "simul")

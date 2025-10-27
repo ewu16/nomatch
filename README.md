@@ -26,11 +26,12 @@ devtools::install_github("ewu16/nomatch")
 ## Example
 
 This minimal example shows how to use `nomatch` to obtain cumulative
-incidences and their related effect measures such as risk ratios, risk
-differences, and vaccine effectiveness.
+incidences and their derived effect measures such as risk differences
+(RD), risk ratios (RR), and vaccine effectiveness (VE = 1 - RR).
 
 We use a simple simulated dataset mimicking data from an observational
-vaccine study, although the methods are agnostic to the disease setting.
+vaccine study, although the methods apply equally to other disease
+settings.
 
 ``` r
 
@@ -39,6 +40,8 @@ library(nomatch)
 
 # Example data
 simdata <- as_tibble(simdata) #for prettier printing 
+
+#View data
 head(simdata)
 #> # A tibble: 6 × 7
 #>      ID    x1    x2     V D_obs     Y event
@@ -69,12 +72,12 @@ Note that the dataset contains the following:
   - `Y` represents follow-up time for an outcome such as infection,
     hospitalization or death (`Y`)
   - `event` indicates whether individual experienced the event or
-    censoring `1 = event, 0 = censored`
+    censoring with values `1 = event, 0 = censored`
 
 ``` r
 
 # Compute cumulative incidence and effect measures 
-fit1 <- nomatch(data = simdata,
+fit <- nomatch(data = simdata,
                   outcome_time = "Y",
                   outcome_status = "event",
                   exposure = "V",
@@ -82,20 +85,22 @@ fit1 <- nomatch(data = simdata,
                   covariates = c("x1", "x2"),
                   immune_lag = 14,
                   eval_times = seq(30, 180, by = 30),
+                  effect = "vaccine_effectiveness", 
                   boot_reps = 10)
 #> Bootstrapping 10 samples...
-#> Time difference of 1.493776 secs
+#> Time difference of 1.456547 secs
 
-# Print main results - Note by default only the chosen effect measure is printed
-# but all effect measures are computed and stored in the fitted object 
-fit1        
+# Print main results 
+## - Note by default only the chosen effect measure is printed
+## but all effect measures are computed and stored in the fitted object 
+fit        
 #> 
 #>  Vaccine Effectiveness Estimates 
 #> ================================================== 
 #> Call: nomatch(data = simdata, outcome_time = "Y", outcome_status = "event", 
 #>     exposure = "V", exposure_time = "D_obs", covariates = c("x1", 
 #>         "x2"), immune_lag = 14, eval_times = seq(30, 180, by = 30), 
-#>     boot_reps = 10) 
+#>     effect = "vaccine_effectiveness", boot_reps = 10) 
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value
@@ -110,7 +115,7 @@ fit1
 #> Use plot() to visualize results
 
 # View additional details about the analytic approach 
-summary(fit1)
+summary(fit)
 #> 
 #> ====================================================================== 
 #> Vaccine Effectiveness Analysis Summary
@@ -118,7 +123,7 @@ summary(fit1)
 #> 
 #> Method:              nomatch (G-computation) 
 #> Evaluation times:    30, 60, 90, 120, 150, 180  
-#> Immune lag (delay period):  14 
+#> Immune lag:          14 
 #> Adjusted for:        x1, x2 
 #> 
 #> Bootstrap:           10 replicates
@@ -142,27 +147,19 @@ summary(fit1)
 #> ---------------------------------------------------------------------- 
 #> N = 10000 | Number of events = 664 
 #> 
-#>      coef exp(coef) se(coef)      z Pr(>|z|)
-#> x1  0.158     1.171    0.078  2.028    0.043
-#> x2 -0.056     0.945    0.019 -2.906    0.004
+#> Use '$model_0' to see model details.
 #> 
 #> ---------------------------------------------------------------------- 
 #> Model for exposed:
 #> ---------------------------------------------------------------------- 
 #> N = 4045 | Number of events = 265 
 #> 
-#>                               coef exp(coef) se(coef)      z Pr(>|z|)
-#> x1                           0.169     1.184    0.124  1.365    0.172
-#> x2                          -0.089     0.915    0.031 -2.896    0.004
-#> splines::ns(D_obs, df = 4)1  0.600     1.821    0.335  1.789    0.074
-#> splines::ns(D_obs, df = 4)2  0.652     1.918    0.621  1.049    0.294
-#> splines::ns(D_obs, df = 4)3 -0.422     0.656    1.127 -0.375    0.708
-#> splines::ns(D_obs, df = 4)4 -0.906     0.404    2.117 -0.428    0.669
+#> Use '$model_1' to see model details.
 #> 
 #> ======================================================================
 
 # Plot cumulative incidence and effect measures over time 
-plot(fit1) 
+plot(fit) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
@@ -178,7 +175,7 @@ If you use the `nomatch` package in your work, please cite the
 following:
 
      @Manual{,
-       title = {nomatch: Estimate Causal Vaccine Effectiveness in Observational Studies
+       title = {nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies
                  Without Matching},
        author = {Emily Wu},
        year = {2025},

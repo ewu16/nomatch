@@ -1,4 +1,4 @@
-#' Compute day- and covariate- specific cumulative incidences
+#' Compute time- and covariate- specific cumulative incidences
 #'
 #' @description
 #'  Wrapper that calls internal functions for predicting cumulative incidences from
@@ -17,7 +17,7 @@
 #' @param fit_1 A fitted model returned from [fit_model_1()]
 #' @param exposure_time Name of the time-to-exposure variable  in `newdata`.
 #'   Used to compute \eqn{\psi_0(t_0; d,x)} where \eqn{d + \tau} and \eqn{d + t_0} are needed.
-#' @param tau Delay period
+#' @param tau Delay period. Internally used argument equivalent to user facing argument `immune_lag`
 #' @param t0  Time since exposure at which to evaluate cumulative incidence.
 #' @param newdata New data at which to do predictions.
 #'
@@ -39,15 +39,15 @@ compute_psi_dx_t0 <- function(fit_0, fit_1, exposure_time, t0, tau, newdata){
 
 #' Compute conditional cumulative incidences from fitted Cox models
 #'
-#' @description These functions compute the conditional day- and covariate-specific cumulative
+#' @description These functions compute the conditional time- and covariate-specific cumulative
 #' incidence for each row of `newdata`.
 #'
 #' - `predict_from_model_0()` computes \eqn{\psi_0(t_0; d, x) = 1 - S_0(d+t_0 \mid x)/S_0(d+\tau \mid x)}
-#'   by calling `predict(fit_0, newdata, type = "survival")` at eval_times
+#'   by calling `predict(fit_0, newdata, type = "survival")` at times
 #' `d + t0` and `d + tau`.
 #'
-#' `predict_from_model_1()` computes \eqn{\psi_1(t_0; d, x) = 1 - S_1(t_0 \mid d, x)/S_1(\tau \mid d, x)}
-#'  `by calling `predict(fit_1, newdata, type = "survival")` at eval_times
+#' - `predict_from_model_1()` computes \eqn{\psi_1(t_0; d, x) = 1 - S_1(t_0 \mid d, x)/S_1(\tau \mid d, x)}
+#'  by calling `predict(fit_1, newdata, type = "survival")` at  times
 #'  `t0` and `tau`.
 #'
 #'

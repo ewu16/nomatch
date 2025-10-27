@@ -2,21 +2,25 @@
 % Please edit documentation in R/vefit_methods.R
 \name{print.vefit}
 \alias{print.vefit}
-\title{Print method for vaccine effectiveness fits}
+\title{Print method for effectiveness fits}
 \usage{
 \method{print}{vefit}(x, digits = 3, effect = NULL, ...)
 }
 \arguments{
-\item{x}{An x of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
+\item{x}{An object of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
 
 \item{digits}{Integer indicating the number of decimal places to display. Default is 3.}
+
+\item{effect}{The effect measure to output. By default,
+this is the \code{effect} measure chosen in the main function call. Must be one of \code{risk_difference}, \code{risk_ratio},
+or \code{vaccine_effectiveness}.}
 
 \item{...}{Additional arguments (currently ignored).}
 }
 \value{
-Invisibly returns the input x \code{x}. Called primarily for its side effect
+Invisibly returns the input object \code{x}. Called primarily for its side effect
 of printing a summary to the console.
 }
 \description{
-Prints a concise summary of vaccine effectiveness estimates from a fitted model.
+Prints a concise summary of effectiveness estimates from a fitted model.
 }

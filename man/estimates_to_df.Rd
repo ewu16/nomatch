@@ -7,6 +7,9 @@
 estimates_to_df(x, collapse = TRUE)
 }
 \arguments{
+\item{x}{A fitted \code{vefit} object or its \code{estimates} component (a named list
+of matrices).}
+
 \item{collapse}{Logical; if \code{TRUE} (default), returns a single long-format
 data frame. If \code{FALSE}, returns a list of data frames (one per term).}
 }
@@ -15,6 +18,8 @@ Either:
 \itemize{
 \item A long-format data frame (if \code{collapse = TRUE}), or
 \item A list of term-specific data frames (if \code{collapse = FALSE}).
+}
+
 The data frame(s) have columns:
 \itemize{
 \item \code{t0}: evaluation timepoint
@@ -22,12 +27,8 @@ The data frame(s) have columns:
 \item other columns from the original matrices (e.g. estimate, confidence intervals)
 }
 }
-}
 \description{
 A convenience function for extracting estimates from a
-\code{\link{vefit}} object (or its \code{estimates} component) into a tidy data frame
+\code{vefit} object (or its \code{estimates} component) into a tidy data frame
 for plotting and summary tables.
-
-@param x A fitted \code{\link{vefit}} object or its \code{estimates} component (a named list
-of matrices).
 }

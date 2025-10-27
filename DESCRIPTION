@@ -1,6 +1,6 @@
 Package: nomatch
-Title: Estimate Causal Vaccine Effectiveness in Observational Studies
-    Without Matching
+Title: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies
+        Without Matching
 Version: 0.0.0.9000
 Authors@R: 
     person("Emily", "Wu", , "emily.wu2@emory.edu", role = c("aut", "cre"),
@@ -21,9 +21,11 @@ Imports:
     stats,
     survival
 Suggests: 
+    dplyr,
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tibble
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

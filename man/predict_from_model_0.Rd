@@ -17,15 +17,15 @@ The \code{newdata} data frame with three additional columns:
 }
 }
 \description{
-These functions compute the conditional day- and covariate-specific cumulative
+These functions compute the conditional time- and covariate-specific cumulative
 incidence for each row of \code{newdata}.
 \itemize{
 \item \code{predict_from_model_0()} computes \eqn{\psi_0(t_0; d, x) = 1 - S_0(d+t_0 \mid x)/S_0(d+\tau \mid x)}
-by calling \code{predict(fit_0, newdata, type = "survival")} at eval_times
+by calling \code{predict(fit_0, newdata, type = "survival")} at times
 \code{d + t0} and \code{d + tau}.
+\item \code{predict_from_model_1()} computes \eqn{\psi_1(t_0; d, x) = 1 - S_1(t_0 \mid d, x)/S_1(\tau \mid d, x)}
+by calling \code{predict(fit_1, newdata, type = "survival")} at  times
+\code{t0} and \code{tau}.
 }
-
-\code{predict_from_model_1()} computes \eqn{\psi_1(t_0; d, x) = 1 - S_1(t_0 \mid d, x)/S_1(\tau \mid d, x)}
-\verb{by calling }predict(fit_1, newdata, type = "survival")\verb{at eval_times}t0\code{and}tau`.
 }
 \keyword{internal}

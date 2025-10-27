@@ -1,29 +1,31 @@
-#' Add simultaneous confidence intervals to vaccine effectiveness fit
+#' Add simultaneous confidence intervals to effectiveness fit
 #'
-#' @description
-#' Computes simultaneous confidence intervals, which maintain the specified coverage
-#' level across all evaluation timepoints jointly. This is
-#' useful for making inferences about the entire VE curve.
+#' @description Computes simultaneous confidence intervals, which maintain the
+#' specified coverage level across all evaluation timepoints jointly. This is
+#' useful for making inferences about the entire cumulative incidence or
+#' effectiveness curve.
 #'
-#' @param object An object of class `vefit` created by [nomatch()] or [matching()]. Must
-#'   * contain evaluations at multiple timepoints (`length(object$eval_times)  > 0`),
+#' @param object An object of class `vefit` created by [nomatch()] or
+#'   [matching()]. Must
+#'   * contain evaluations at at least 2 timepoints (`length(object$eval_times)  > = 2`),
 #'   * contain bootstrap samples (`keep_boot_samples = TRUE` when fitting).
-#' @param seed Integer seed for random number generation to ensure reproducible
-#'   critical values for simultaneous confidence intervals. Default is `NULL` (no seed set).
+#' @param seed Integer seed  to ensure reproducible critical values for
+#'   simultaneous confidence intervals (relied on random number generation).
+#'   Default is `NULL` (no seed set).
 #'
-#' @return The input `vefit` object with the following modifications:
+#' @return The original `vefit` object with the following modifications:
 #'   \describe{
 #'    \item{estimates}{Each matrix gets additional columns describing the simultaneous confidence interval bounds and construction:
 #'    `simul_lower`, `simul_upper`, `simul_n`}
-#'     \item{simul_z_star}{Critical values used for each term (cuminc_0, cuminc_1, ve)}
-#'     \item{simul_excluded_timepoints}{Timepoints excluded from simultaneous bands
-#'       due to insufficient bootstrap samples}
+#'     \item{simul_z_star}{Named vector containing the critical values used for each term}
+#'     \item{simul_excluded_timepoints}{Named list containing a vector of timepoints excluded
+#'      from the simultaneous bands for each term  due to insufficient bootstrap samples}
 #'   }
 #'
-#' @details
-#' Critical values are computed using the bootstrap covariance structure across
-#' timepoints. If any timepoint has more than 5% missing bootstrap samples, it
-#' is excluded from the simultaneous band and a warning is issued.
+#' @details Critical values are computed using the bootstrap covariance
+#' structure across timepoints. If any timepoint has more than 5% missing
+#' bootstrap samples, it is excluded from the simultaneous band and a warning is
+#' issued.
 #'
 #' @export
 #'
@@ -46,7 +48,7 @@
 #' fit_simul <- add_simultaneous_ci(fit, seed = 123)
 #'
 #' # Look at results
-#' fit_simul$estimates
+#' fit_simul
 #'
 #' # Visualize
 #' plot(fit_simul, ci_type = "simul")

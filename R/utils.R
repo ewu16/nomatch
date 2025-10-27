@@ -4,10 +4,10 @@
 #'
 #' @description
 #' A convenience function for extracting estimates from a
-#' [`vefit`] object (or its `estimates` component) into a tidy data frame
+#' `vefit` object (or its `estimates` component) into a tidy data frame
 #' for plotting and summary tables.
 #'
-#'  @param x A fitted [`vefit`] object or its `estimates` component (a named list
+#' @param x A fitted `vefit` object or its `estimates` component (a named list
 #'   of matrices).
 #' @param collapse Logical; if `TRUE` (default), returns a single long-format
 #'   data frame. If `FALSE`, returns a list of data frames (one per term).
@@ -15,7 +15,8 @@
 #' @return Either:
 #'   - A long-format data frame (if `collapse = TRUE`), or
 #'   - A list of term-specific data frames (if `collapse = FALSE`).
-#'   The data frame(s) have columns:
+#'
+#'  The data frame(s) have columns:
 #'    \itemize{
 #'     \item `t0`: evaluation timepoint
 #'     \item `term`: estimated quantity

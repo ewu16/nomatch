@@ -27,18 +27,25 @@ Must include:
 \item \code{prob_g}: probability of exposure time given the covariates
 \item all variables in \code{covariates}
 }
-\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}.
-Must include:
+\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}. Must include:\
+\itemize{
 \item \code{group_id}: covariate group identifier
 \item \code{prob_p}: marginal probability of each covariate group
 \item all variables in \code{covariates}
 }
+}
 
 Default is \code{NULL} in which case each row of \code{psi_dx} gets equal weight.}
 
-\item{show_intermediates}{Logical that only applies when \code{gp_list} is not \verb{NULL; when }FALSE\verb{(default), the function performs marginalization in a single step and returns only the overall cumulative incidences \eqn{\bar{\psi}_0(t_0)} and \eqn{\bar{\psi}_1(t_0)}. When}TRUE``, performs the two-step marginalization
+\item{show_intermediates}{Logical that only applies when \code{gp_list} is not \code{NULL}.
+\itemize{
+\item When \code{FALSE} (default), the function performs marginalization
+in a single step and returns only the overall cumulative incidences
+\eqn{\bar{\psi}_0(t_0)} and \eqn{\bar{\psi}_1(t_0)}.
+\item When \code{TRUE}, performs the two-step marginalization
 (first over days \eqn{d}, then covariate groups \eqn{x})
-and returns intermediate group-level results \eqn{\psi_v(t_0; x)}.}
+and returns intermediate group-level results \eqn{\psi_v(t_0; x)}.
+}}
 }
 \value{
 When \code{show_intermediates = FALSE}, a named numeric vector with two elements:

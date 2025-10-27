@@ -1,20 +1,22 @@
-#' Match vaccinated and unvaccinated individuals using rolling cohort design
+#' Match exposed and unexposed individuals using rolling cohort design
 #'
-#' @description Creates 1:1 matched pairs of vaccinated ("cases") and
-#' unvaccinated ("controls") individuals. Uses a rolling cohort design where
-#' controls must be unvaccinated and event-free at the time they are matched to
+#' @description Creates 1:1 matched pairs of exposed ("cases") and
+#' unexposed("controls") individuals. Uses a rolling cohort design where
+#' controls must be unexposed and event-free at the time they are matched to
 #' a case.
 #'
-#' @details For each vaccination time, newly vaccinated individuals are matched
+#' @details For each exposure time, newly exposed individuals are matched
 #' to eligible controls using exact covariate matching. Controls are eligible if
-#' unvaccinated and event-free at that time. Vaccinated individuals may appear
-#' as a control (when they are not yet vaccinated) and as a case.
+#' unexposed and event-free at that time. Exposed individuals may appear in
+#' the final matched dataset twice, as a control (when they are not yet exposed) and as a case.
 #'
 #'
 #' @inheritParams nomatch
-#' @param data Data frame with study population
-#' @param id_name Name of unique identifier variable of individuals
-#' @param matching_vars Character vector of variables to match on exactly
+#' @param data A data frame with one row per individual containing the columns
+#'  named in `outcome_time`, `exposure`, `exposure_time`, `matching_vars` and
+#'  `id_name`. Missing values for all columns except `exposure_time` are not allowed.
+#' @param id_name Name of unique identifier variable of individuals.
+#' @param matching_vars Character vector of variables to use for exact matching.
 #' @param replace Logical. Allow controls to be reused? Default: `FALSE`
 #' @param seed Integer for reproducibility. Default: `NULL`
 
@@ -23,26 +25,26 @@
 #' \describe{
 #'   \item{matched_data}{Data frame of matched pairs with original variables plus:
 #'       \itemize{
-#'       \item `match_index_time`: Matching time
+#'       \item `match_index_time`: Time at which individuals were matched
 #'       \item `match_type`: "case" or "control"
 #'       \item `match_<exposure>`: Treatment at matching
 #'       \item `match_id`: Pair identifier
 #'     }
 #'    }
-#'   \item{n_unmatched_cases}{Number of unmatched vaccinated individuals}
+#'   \item{n_unmatched_cases}{Number of unmatched exposed individuals}
 #'   \item{discarded}{Logical vector indicating excluded individuals}
 #' }
 #'
 #' @export
 #' @examples
 #' matched_cohort <- match_rolling_cohort(
-#' data = simdata,
-#' outcome_time =  "Y",
-#' exposure = "V",
-#' exposure_time = "D_obs",
-#' matching_vars = c("x1", "x2"),
-#' id_name = "ID",
-#' seed = 5678
+#'   data = simdata,
+#'   outcome_time =  "Y",
+#'   exposure = "V",
+#'   exposure_time = "D_obs",
+#'   matching_vars = c("x1", "x2"),
+#'   id_name = "ID",
+#'   seed = 5678
 #' )
 match_rolling_cohort <- function(data, outcome_time, exposure, exposure_time, matching_vars, id_name, replace = FALSE, seed = NULL){
 
@@ -74,11 +76,11 @@ match_rolling_cohort <- function(data, outcome_time, exposure, exposure_time, ma
     matched_df_list <- list() #store matched groups
     n_pairs_counter <- 0 #keep track of how many pairs have been matched
 
-    #vaccinated serve as "cases" for matching, unvaccinated are "controls"
+    #exposed serve as "cases" for matching, unexposed are "controls"
     cases <- subset(data, data[[exposure]] == 1)
     observed_ds <- sort(unique(data[[exposure_time]]))
 
-    #loop through observed vaccination eval_times- each newly vaccinated person is eligible for matching
+    #loop through observed vaccination eval_times- each newly exposed person is eligible for matching
     for(d in observed_ds){
         #cases on day d
         case_d <- subset(cases, cases[[exposure_time]] == d)

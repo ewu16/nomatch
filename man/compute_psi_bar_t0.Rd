@@ -16,7 +16,7 @@ Used to compute \eqn{\psi_0(t_0; d,x)} where \eqn{d + \tau} and \eqn{d + t_0} ar
 
 \item{t0}{Time since exposure at which to evaluate cumulative incidence.}
 
-\item{tau}{Delay period}
+\item{tau}{Delay period. Internally used argument equivalent to user facing argument \code{immune_lag}}
 
 \item{newdata}{New data at which to do predictions.}
 
@@ -30,11 +30,12 @@ Must include:
 \item \code{prob_g}: probability of exposure time given the covariates
 \item all variables in \code{covariates}
 }
-\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}.
-Must include:
+\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}. Must include:\
+\itemize{
 \item \code{group_id}: covariate group identifier
 \item \code{prob_p}: marginal probability of each covariate group
 \item all variables in \code{covariates}
+}
 }
 
 Default is \code{NULL} in which case each row of \code{psi_dx} gets equal weight.}

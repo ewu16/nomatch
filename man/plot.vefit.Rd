@@ -7,23 +7,44 @@
 \method{plot}{vefit}(x, effect = NULL, ci_type = NULL, color = "#0072B2", ...)
 }
 \arguments{
-\item{x}{An x of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
+\item{x}{An object of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
 
-\item{ci_type}{Character string specifying the type of confidence interval bands to plot.
+\item{effect}{The effect measure to plot next to the cumulative incidence plots. By default,
+this is the \code{effect} measure chosen in the main function call. Must be one of \code{risk_difference}, \code{risk_ratio},
+or \code{vaccine_effectiveness}.}
+
+\item{ci_type}{Character string specifying the type of confidence interval band to plot. By default,
+\code{"wald"} if available, otherwise set to \code{"percentile"} or \code{none}.
 One of \verb{"wald", "percentile", "simul"}, or \code{"none"}. Must choose a \code{ci_type} whose lower
-and upper bounds are already computed in \code{x$estimates} component of \code{x}.}
+and upper bounds are already computed in \code{estimates} component of \code{x}.}
 
 \item{color}{Aesthetic value to map data values to. Default: \code{"#0072B2"} (blue)}
 
 \item{...}{Additional arguments (currently ignored).}
 }
 \value{
-a ggplot2 x with line plot for each term (cumulative incidence, VE)
+a ggplot2 object with three faceted panels (for cumulative incidences and the chosen effect measure)
 }
 \description{
-Plot cumulative incidence and VE estimates across all evaluation time points.
+Create a panel plot of cumulative incidence and effectiveness estimates across all evaluation time points.
 }
 \details{
 For cumulative incidence panels, y-axis limits are shared across methods to
 facilitate comparison. The VE panel uses free y-axis scaling.
+}
+\examples{
+fit <- nomatch(
+ data = simdata,
+ outcome_time = "Y",
+ outcome_status = "event",
+ exposure = "V",
+ exposure_time = "D_obs",
+ covariates = c("x1", "x2"),
+ eval_times = seq(30, 180, by = 30),
+ immune_lag = 14,
+ boot_reps = 5,
+ n_cores = 2
+)
+plot(fit)
+
 }

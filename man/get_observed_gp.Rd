@@ -10,19 +10,18 @@ get_observed_gp(data, outcome_time, exposure, exposure_time, covariates, tau)
 \arguments{
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
-be measured from a given time origin (e.g. study start, enrollment, or age)
-for all individuals.}
+be measured from a chosen time origin (e.g. study start, enrollment, or age).}
 
 \item{exposure}{Name of the exposure indicator. The underlying column should
 be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \verb{outcome time}. Set \code{exposure_time} of all unexposed
-individuals to \code{NA}.}
+as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+and must be set to \code{NA} for unexposed individuals.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
-the hazard models; should include all known confounders of
+the hazard models. Include all known, measured confounders of
 exposure and censoring.  Covariates must be measured or defined at the chosen time origin.}
 
 \item{tau}{Numeric. Only vaccinated who are at-risk tau days after vaccination are included.}

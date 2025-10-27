@@ -24,13 +24,14 @@ Used to compute \eqn{\psi_0(t_0; d,x)} where \eqn{d + \tau} and \eqn{d + t_0} ar
 
 \item{eval_times}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
-be expressed in terms of time since exposure. All values must be greater
+be expressed in terms of time since exposure and use the same units
+as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All values must be greater
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 
-\item{tau}{Delay period}
+\item{tau}{Delay period. Internally used argument equivalent to user facing argument \code{immune_lag}}
 
 \item{newdata}{New data at which to do predictions.}
 
@@ -44,11 +45,12 @@ Must include:
 \item \code{prob_g}: probability of exposure time given the covariates
 \item all variables in \code{covariates}
 }
-\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}.
-Must include:
+\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}. Must include:\
+\itemize{
 \item \code{group_id}: covariate group identifier
 \item \code{prob_p}: marginal probability of each covariate group
 \item all variables in \code{covariates}
+}
 }
 
 Default is \code{NULL} in which case each row of \code{psi_dx} gets equal weight.}

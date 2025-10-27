@@ -2,7 +2,7 @@
 % Please edit documentation in R/compare_ve_fits.R
 \name{compare_ve_fits}
 \alias{compare_ve_fits}
-\title{Compare two vefit objects}
+\title{Compare two effectiveness fit objects}
 \usage{
 compare_ve_fits(
   fit1,
@@ -13,9 +13,9 @@ compare_ve_fits(
 )
 }
 \arguments{
-\item{fit1}{A vefit object (typically from \code{\link{matching}})}
+\item{fit1}{A vefit object (typically from \code{\link[=matching]{matching()}})}
 
-\item{fit2}{A vefit object (typically from \code{\link{nomatch}})}
+\item{fit2}{A vefit object (typically from \code{\link[=nomatch]{nomatch()}})}
 
 \item{labels}{Character vector of length 2 providing labels for the two methods.
 Default is \code{c("Method 1", "Method 2")}.}
@@ -33,7 +33,7 @@ A ggplot2 object with three faceted panels showing cumulative incidence
 and VE estimates for both methods.
 }
 \description{
-Plot cumulative incidence and VE estimates for two
+Plot cumulative incidence and effectiveness estimates for two
 different methods using colors to distinguish methods
 }
 \details{
@@ -41,7 +41,7 @@ Both \code{fit1} and \code{fit2} must have the same significance level (alpha).
 The function will stop with an error if alphas differ.
 
 For cumulative incidence panels, y-axis limits are shared across methods to
-facilitate comparison. The VE panel uses free y-axis scaling.
+facilitate comparison. The effect measure panel uses free y-axis scaling.
 }
 \examples{
 \dontrun{

@@ -71,6 +71,8 @@ plot_ve_panel <- function(plot_data,
     d <- list(label = "Vaccine Effectiveness",
               x = "Time since vaccination",
               label_function = scales::label_percent())
+  }else{
+    stop("Effect must be one of 'risk_difference', 'risk_ratio', or 'vaccine_effectiveness'")
   }
 
   #Clean up term labels before plotting

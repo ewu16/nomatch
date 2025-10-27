@@ -3,7 +3,7 @@
 \docType{package}
 \name{nomatch-package}
 \alias{nomatch-package}
-\title{nomatch: Estimate Causal Vaccine Effectiveness in Observational Studies Without Matching}
+\title{nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies Without Matching}
 \description{
 Implements estimators for a proposed causal estimand of vaccine effectiveness using observational data.
 }

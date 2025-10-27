@@ -2,7 +2,7 @@
 % Please edit documentation in R/vefit_methods.R
 \name{summary.vefit}
 \alias{summary.vefit}
-\title{Summary method for vaccine effectiveness fits}
+\title{Summary method for effectiveness fits}
 \usage{
 \method{summary}{vefit}(object, digits = 4, show_models = FALSE, ...)
 }
@@ -11,6 +11,8 @@
 
 \item{digits}{Integer indicating the number of decimal places to display. Default is 4.}
 
+\item{show_models}{Logical; print model details? Default is FALSE.}
+
 \item{...}{Additional arguments (currently ignored).}
 }
 \value{
@@ -18,6 +20,5 @@ Invisibly returns the input object \code{object}. Called primarily for its side 
 of printing a detailed summary to the console.
 }
 \description{
-Summarizes how vaccine effectiveness estimates were obtained and displays
-cumulative incidence and VE across all evaluation time points.
+Summarizes how effectiveness estimates were obtained
 }

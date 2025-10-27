@@ -1,11 +1,11 @@
-#' Compare two vefit objects
+#' Compare two effectiveness fit objects
 #'
 #' @description
-#' Plot cumulative incidence and VE estimates for two
+#' Plot cumulative incidence and effectiveness estimates for two
 #' different methods using colors to distinguish methods
 #'
-#' @param fit1 A vefit object (typically from \code{\link{matching}})
-#' @param fit2 A vefit object (typically from \code{\link{nomatch}})
+#' @param fit1 A vefit object (typically from [matching()])
+#' @param fit2 A vefit object (typically from [nomatch()])
 #' @param labels Character vector of length 2 providing labels for the two methods.
 #'  Default is \code{c("Method 1", "Method 2")}.
 #' @param ci_type Character string specifying the type of confidence interval to plot.
@@ -23,7 +23,7 @@
 #' The function will stop with an error if alphas differ.
 #'
 #' For cumulative incidence panels, y-axis limits are shared across methods to
-#' facilitate comparison. The VE panel uses free y-axis scaling.
+#' facilitate comparison. The effect measure panel uses free y-axis scaling.
 #'
 #' @export
 #'

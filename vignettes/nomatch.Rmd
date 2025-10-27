@@ -109,7 +109,7 @@ but `boot_reps = 1000` is recommended to construct reliable confidence intervals
 ```{r}
 
 # Compute cumulative incidence 
-fit1 <- nomatch(data = simdata,
+fit <- nomatch(data = simdata,
                   outcome_time = "Y",
                   outcome_status = "event",
                   exposure = "V",
@@ -125,11 +125,11 @@ fit1 <- nomatch(data = simdata,
 Here we see the vaccine effectiveness estimates for our simulated dataset. 
 
 ```{r}
-fit1
+fit
 ```
 
 The cumulative incidence estimates (`cuminc_0` for unexposed and  `cuminc_1` for exposed) ) and other effects (`risk_difference`, `risk_ratio`, and `vaccine_effectiveness`) are also stored within the 
-fitted object. These can be examined via `fit1$estimates`. 
+fitted object. These can be examined via `fit$estimates`. 
 
 If all confounders are adjusted for, the resulting cumulative incidence/effect estimates can be interpreted as the cumulative incidences/effect that would be observed in a clinical trial in which participants 1) are similar to those observed to be exposed and 2) who enroll into the study such that the distribution of enrollments times matches the distribution of observed exposure times. 
 
@@ -142,7 +142,7 @@ In the model for the exposed, the time to endpoint of interest is measured relat
 exposure. The model includes all exposed individuals at risk `immune_lag` days after exposure,
 flexibly adjusting for the time of exposure (by default, using natural cubic splines with four degrees of freedom), as well baseline covariates. A summary of the estimation approach and fitted models can be obtained by 
 ```{r}
-summary(fit1)
+summary(fit)
 ```
 
 
@@ -159,7 +159,7 @@ to provide a fine grid of `eval_times` to produce smooth curves.
 Our example plot will be somewhat crude due to the small number of timepoints used in the function call. 
 
 ```{r}
-plot(fit1)
+plot(fit)
 ```
 
 #### Plotting simultaneous confidence intervals 
@@ -173,12 +173,12 @@ which we now save in a new object.
 
 ```{r}
 #Compute simultaneous CI
-fit1_with_simul <- add_simultaneous_ci(fit1, seed = 1234)
+fit_with_simul <- add_simultaneous_ci(fit, seed = 1234)
 ```
 
 The simultaneous confidence interals are now printed with the object.  
 ```{r}
-fit1_with_simul
+fit_with_simul
 ```
 
 We can also plot the cumulative incidence curves with simultaneous confidence intervals
@@ -187,7 +187,7 @@ computed before plotting; otherwise, the call will error.
 
 ```{r}
 #Plot simultaneous confidence bands 
-plot(fit1_with_simul , ci_type = "simul") 
+plot(fit_with_simul , ci_type = "simul") 
 ```
 
 The simultaneous confidence intervals indicate that if we were to repeatedly construct
@@ -202,7 +202,7 @@ The utility function `estimates_to_df()` takes the `estimates` component
 of the fitted object and reformats it as a long dataset that can be used for plotting. 
 
 ```{r}
-plot_data <- estimates_to_df(fit1)
+plot_data <- estimates_to_df(fit)
 
 head(as_tibble(plot_data))
 ```
@@ -268,7 +268,7 @@ fit_matching
 
 # Plot matching vs proposed estimator - nomatch tends to have similar point estimates but narrower
 # confidence intervals
-compare_ve_fits(fit_matching, fit1, labels = c("Matching", "nomatch (G-computation)"))
+compare_ve_fits(fit_matching, fit, labels = c("Matching", "nomatch (G-computation)"))
 ```
 
 

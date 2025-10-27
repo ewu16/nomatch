@@ -2,7 +2,7 @@
 % Please edit documentation in R/matching.R
 \name{matching}
 \alias{matching}
-\title{Compute a matching-based estimator of VE with confidence intervals}
+\title{Compute marginal cumulative incidence estimates for a matched cohort}
 \usage{
 matching(
   matched_data,
@@ -12,7 +12,7 @@ matching(
   exposure_time,
   immune_lag,
   eval_times,
-  effect = c("vaccine_effectiveness", "risk_ratio"),
+  effect = c("risk_ratio", "vaccine_effectiveness", "risk_difference"),
   ci_type = c("wald", "percentile", "both"),
   boot_reps = 0,
   alpha = 0.05,
@@ -22,14 +22,13 @@ matching(
 )
 }
 \arguments{
-\item{matched_data}{A data frame for the matched cohort}
+\item{matched_data}{A data frame for the matched cohort created using \code{\link[=match_rolling_cohort]{match_rolling_cohort()}}.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
-be measured from a given time origin (e.g. study start, enrollment, or age)
-for all individuals.}
+be measured from a chosen time origin (e.g. study start, enrollment, or age).}
 
-\item{outcome_status}{Name of the event indicator. The underlying column should be
+\item{outcome_status}{Name of the event indicator for the outcome. The underlying column should be
 numeric (\code{1} = event, \code{0} = censored).}
 
 \item{exposure}{Name of the exposure indicator. The underlying column should
@@ -37,29 +36,30 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \verb{outcome time}. Set \code{exposure_time} of all unexposed
-individuals to \code{NA}.}
+as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+and must be set to \code{NA} for unexposed individuals.}
 
-\item{immune_lag}{Non-negative numeric value specifying the time after exposure (tau) that
+\item{immune_lag}{Non-negative numeric value specifying the time after exposure (sometimes denoted by \code{tau}) that
 should be excluded from the risk evaluation period. This argument is
 primarily intended for vaccination exposures, where it is common to exclude
 the time after vaccination when immunity is still building. Time must be
-measured in the same units as that used for \code{outcome_time} and \code{exposure_time}
+measured in the same units as that used for \code{outcome_time} and \code{exposure_time}  (e.g. days)
 and should reflect the biological understanding of when vaccine-induced
 immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
-be set to 0 (no delay period).}
+be set to 0 (no delay period for evaluating risk).}
 
 \item{eval_times}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
-be expressed in terms of time since exposure. All values must be greater
+be expressed in terms of time since exposure and use the same units
+as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All values must be greater
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 
-\item{effect}{Character. Type of effect measure to return (a contrast of
+\item{effect}{Character. Primary effect measure of interest (a contrast of
 the marginal cumulative incidences). Either
-\code{"vaccine_effectiveness"} (default) or \code{"risk_ratio"}.}
+\code{"risk_ratio"}(default), \code{"vaccine_effectiveness"}  or \code{"risk_difference"}.}
 
 \item{ci_type}{Method for constructing bootstrap confidence intervals. One of
 \code{"wald"}, \code{"percentile"}, or \code{"both"}.
@@ -67,7 +67,7 @@ the marginal cumulative incidences). Either
 \item \code{"wald"} (default): Computes Wald-style intervals using bootstrap standard errors.
 See \strong{Confidence intervals} section for details.
 \item \code{"percentile"}: Computes percentile bootstrap intervals.
-\item \code{"both"}: Computes and returns both sets of intervals.
+\item \code{"both"}: Computes and returns both Wald and percentile intervals.
 }}
 
 \item{boot_reps}{Number of bootstrap replicates for confidence intervals.
@@ -76,7 +76,7 @@ smaller values (e.g., 10-100) for initial exploration. Default: \code{0} (no
 bootstrapping).}
 
 \item{alpha}{Significance level for confidence intervals (Confidence level =
-100*(1-\code{alpha})\%). Default: \code{0.05}.}
+100*(1-alpha)\%). Default: \code{0.05}.}
 
 \item{keep_models}{Logical; return the two fitted hazard models used to compute
 cumulative incidences?
@@ -86,24 +86,34 @@ Default: \code{TRUE}.}
 \code{TRUE}. Must be set to \code{TRUE} if user plans to use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}}
 to obtain simultaneous confidence intervals.}
 
-\item{n_cores}{Integer; parallel cores for bootstrapping. Passed to
+\item{n_cores}{Integer; parallel cores for bootstrapping passed to
 \code{parallel::mclapply} as \code{mc.cores}. On Unix-like OS only; not available on
 Windows. Default: \code{1}.}
 }
 \value{
-A list containing the following:
+An object of class \code{vefit} containing:
 \describe{
-\item{estimates}{A list of matrices of the estimates at each timepoint. Rows of
-each matrix are the terms "cuminc_0", "cuminc_1", "vaccine_effectiveness". Columns of each matrix
-gives the point estimate and confidence intervals at the specified time point.}
-\item{eval_times}{The timepoints at which VE was evaluated}
-\item{n_success_boot}{A numeric vector of the number of successful bootstrap samples for each time point.(Success bootstrap samples are
-those that result in non-missing valid point estimates.)}
-\item{boot_samples}{If \code{keep_boot_samples = TRUE}, a list of matrices for each term that contain the bootstrap estimates where the rows are the bootstrap iterations and
-the columns are the time points.}
+\item{estimates}{Named list of matrices containing the cumulative incidence and
+effect estimates.
+\describe{
+\item{\code{cuminc_0}}{ marginal cumulative incidence under no exposure}
+\item{\code{cuminc_1}}{ marginal cumulative incidence under exposure}
+\item{\code{risk_difference}}{ \code{cuminc_1 - cuminc_0}}
+\item{\code{risk_ratio}}{ \code{cuminc_1/cuminc_0}}
+\item{\code{vaccine_effectivess}}{ \code{1 - risk_ratio}}
+}
+Each matrix has one row per value in \code{eval_times} and columns including the
+point estimate (\code{estimate}) and, when requested, confidence limits of the form
+(\verb{\{wald/percentile\}_lower}, \verb{\{wald/percentile\}_upper}). }
+\item{models}{Fitted Kaplan Meier}
+\item{n_success_boot}{Integer vector indicating the
+number of successful bootstrap replications per timepoint.}
+\item{boot_samples}{(If \code{keep_boot_samples = TRUE}) Named list of bootstrap draws
+(stored as matrices) for each term. Rows index bootstrap replicates and columns index \code{eval_times}.}
 }
 }
 \description{
-This function is the main function for computing a matching-based estimator
-based on Kaplan Meier estimation.
+This function is the main function for estimating cumulative incidence
+in a matched dataset based on Kaplan Meier estimation. It creates the
+analysis dataset and performs the analysis for the matched cohort.
 }

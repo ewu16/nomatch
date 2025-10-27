@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_psi_dx.R
 \name{compute_psi_dx_t0}
 \alias{compute_psi_dx_t0}
-\title{Compute day- and covariate- specific cumulative incidences}
+\title{Compute time- and covariate- specific cumulative incidences}
 \usage{
 compute_psi_dx_t0(fit_0, fit_1, exposure_time, t0, tau, newdata)
 }
@@ -16,7 +16,7 @@ Used to compute \eqn{\psi_0(t_0; d,x)} where \eqn{d + \tau} and \eqn{d + t_0} ar
 
 \item{t0}{Time since exposure at which to evaluate cumulative incidence.}
 
-\item{tau}{Delay period}
+\item{tau}{Delay period. Internally used argument equivalent to user facing argument \code{immune_lag}}
 
 \item{newdata}{New data at which to do predictions.}
 }

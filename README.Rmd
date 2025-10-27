@@ -36,10 +36,10 @@ devtools::install_github("ewu16/nomatch")
 ## Example
 
 This minimal example shows how to use `nomatch` to obtain cumulative incidences and 
-their related effect measures such as risk ratios, risk differences, and  vaccine effectiveness.
+their derived effect measures such as risk differences (RD), risk ratios (RR), and  vaccine effectiveness (VE = 1 - RR).
 
 We use a simple simulated dataset mimicking data from an observational vaccine study,
-although the methods are agnostic to the disease setting. 
+although the methods apply equally to other disease settings. 
 
 ```{r example, fig.width = 8, fig.height = 4}
 
@@ -48,6 +48,8 @@ library(nomatch)
 
 # Example data
 simdata <- as_tibble(simdata) #for prettier printing 
+
+#View data
 head(simdata)
 ```
 
@@ -64,7 +66,7 @@ assumed that the unexposed group does not receive an active comparator)
 
 - right censored survival data `(Y, event)` 
    - `Y` represents follow-up time for an outcome such as infection, hospitalization or death (`Y`)
-   - `event` indicates whether individual experienced the event or censoring `1 = event, 0 = censored`
+   - `event` indicates whether individual experienced the event or censoring with values `1 = event, 0 = censored`
 
 
 ```{r}
@@ -78,11 +80,13 @@ fit <- nomatch(data = simdata,
                   covariates = c("x1", "x2"),
                   immune_lag = 14,
                   eval_times = seq(30, 180, by = 30),
+                  effect = "vaccine_effectiveness", 
                   boot_reps = 10)
 
-# Print main results - Note by default only the chosen effect measure is printed
-# but all effect measures are computed and stored in the fitted object 
-fit1        
+# Print main results 
+## - Note by default only the chosen effect measure is printed
+## but all effect measures are computed and stored in the fitted object 
+fit        
 
 # View additional details about the analytic approach 
 summary(fit)
@@ -107,7 +111,7 @@ toBibtex(c)
 
 ```
  @Manual{,
-   title = {nomatch: Estimate Causal Vaccine Effectiveness in Observational Studies
+   title = {nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies
              Without Matching},
    author = {Emily Wu},
    year = {2025},
