@@ -84,12 +84,14 @@ compute_km_ve <- function(adata,
     #Compute cumulative incidences and derived effect measures
     cuminc_0 <- 1 - surv_0
     cuminc_1 <- 1 - surv_1
+    rd <- cuminc_1 - cuminc_0
     rr <- cuminc_1/cuminc_0
     ve <- 1 - rr
 
     est  <- cbind(
         cuminc_0 = cuminc_0,
         cuminc_1 = cuminc_1,
+        risk_difference = rd,
         risk_ratio = rr,
         vaccine_effectiveness = ve
     )

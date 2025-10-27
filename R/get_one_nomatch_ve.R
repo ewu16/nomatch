@@ -82,13 +82,18 @@ get_one_nomatch_ve <- function(data,
     # 3 - Compute VE
     # --------------------------------------------------------------------------
     cuminc <- compute_psi_bar_times(fit_0, fit_1, exposure_time, eval_times, tau, gp_list$g_weights, gp_list = gp_list)
+    rd <- cuminc[, "cuminc_1"] - cuminc[, "cuminc_0"]
     rr <-  cuminc[, "cuminc_1"]/cuminc[, "cuminc_0"]
     ve <- 1 - rr
+    pt_estimates = cbind(cuminc,
+                         risk_difference = rd,
+                         risk_ratio = rr,
+                         vaccine_effectiveness = ve)
 
     # --------------------------------------------------------------------------
     # Return items
     # --------------------------------------------------------------------------
-    out <- list(pt_estimates = cbind(cuminc, "risk_ratio" = rr, "vaccine_effectiveness" = ve))
+    out <- list(pt_estimates = pt_estimates)
     check_pt_estimates(out$pt_estimates)
 
     if(keep_models){
