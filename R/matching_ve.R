@@ -42,14 +42,13 @@ matching_ve <- function(matched_data,
 
 
     # Check data/inputs
-    validate_ve_inputs(
+    validate_matching_ve_inputs(
         data = matched_data,
         outcome_time = outcome_time,
         outcome_status = outcome_status,
         exposure = exposure,
         exposure_time = exposure_time,
-        covariates = NULL,
-        tau = tau,
+        immune_lag = tau,
         eval_times = eval_times
     )
 
@@ -90,33 +89,33 @@ matching_ve <- function(matched_data,
     )
     ci_est <- boot$ci_estimates
     boot_samples <- boot$boot_samples
-
     # --------------------------------------------------------------------------
     # 3 - Add p-values and format
     # --------------------------------------------------------------------------
-    terms_keep <- names(ci_est)
+    if(is.null(ci_est)){
+        pt_est  <- original$pt_estimates
+        est <- lapply(colnames(pt_est), \(term) cbind(estimate = pt_est[,term]))
+        names(est) <- colnames(pt_est)
 
-    est <- lapply(names(ci_est), \(term){
-        #Add p-values
-        wald <- ci_type %in% c("wald", "both")
-        percentile <- ci_type %in% c("percentile", "both")
+    }else{
+        est <- lapply(names(ci_est), \(term){
+            #Add p-values
+            wald <- ci_type %in% c("wald", "both")
+            wald_pval <-       if(wald) compute_wald_pval(term, ci_est[[term]]) else NULL
 
-        wald_pval <-       if(wald) compute_wald_pval(term, ci_est[[term]]) else NULL
-        percentile_pval <- if(percentile) compute_percentile_pval(term, boot_samples[[term]]) else NULL
+            x <- cbind(ci_est[[term]],
+                       wald_pval = wald_pval)
 
-        x <- cbind(ci_est[[term]],
-                   wald_pval = wald_pval,
-                   percentile_pval = percentile_pval)
+            #Format column order
+            col_order <- c("estimate",
+                           paste0("wald_", c("lower", "upper", "se", "pval", "n")),
+                           paste0("percentile_", c("lower", "upper", "pval", "n")))
 
-        #Format column order
-        col_order <- c("estimate",
-                       paste0("wald_", c("lower", "upper", "se", "pval", "n")),
-                       paste0("percentile_", c("lower", "upper", "pval", "n")))
+            x[, intersect(col_order, colnames(x)), drop = FALSE]
 
-        x[, intersect(col_order, colnames(x)), drop = FALSE]
-
-    })
-    names(est) <- terms_keep
+        })
+        names(est) <- names(ci_est)
+    }
 
 
     # --------------------------------------------------------------------------
@@ -133,7 +132,7 @@ matching_ve <- function(matched_data,
         n_success_boot   = boot$n_success_boot,
         boot_errors  = boot$boot_errors,
         boot_nas     = boot$boot_nas,
-        boot_samples     = if (keep_boot_samples) boot_samples[terms_keep] else NULL,
+        boot_samples     = if (keep_boot_samples) boot_samples else NULL,
 
         # User-provided or default specifications
         outcome_time = outcome_time,
