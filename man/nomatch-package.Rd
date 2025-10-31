@@ -5,7 +5,7 @@
 \alias{nomatch-package}
 \title{nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies Without Matching}
 \description{
-Implements estimators for a proposed causal estimand of vaccine effectiveness using observational data.
+Implements estimators of marginal cumulative incidence for binary interventions using observational data.
 }
 \seealso{
 Useful links:

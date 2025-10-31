@@ -4,16 +4,20 @@
 \alias{print.nomatchfit}
 \title{Print method for effectiveness fits}
 \usage{
-\method{print}{nomatchfit}(x, digits = 3, effect = NULL, ...)
+\method{print}{nomatchfit}(
+  x,
+  digits = 3,
+  effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"),
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class \code{nomatchfit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
 
 \item{digits}{Integer indicating the number of decimal places to display. Default is 3.}
 
-\item{effect}{The effect measure to output. By default,
-this is the \code{effect} measure chosen in the main function call. Must be one of \code{risk_difference}, \code{risk_ratio},
-or \code{relative_risk_reduction}.}
+\item{effect}{The effect measure to output.  Either
+\code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or \code{"risk_difference"}.}
 
 \item{...}{Additional arguments (currently ignored).}
 }

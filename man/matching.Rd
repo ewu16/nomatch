@@ -12,7 +12,6 @@ matching(
   exposure_time,
   immune_lag,
   timepoints,
-  effect = c("risk_ratio", "relative_risk_reduction", "risk_difference"),
   ci_type = c("wald", "percentile", "both"),
   boot_reps = 0,
   alpha = 0.05,
@@ -56,10 +55,6 @@ than \code{ immune_lag} and and should correspond to clinically meaningful follo
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
-
-\item{effect}{Character. Primary effect measure of interest (a contrast of
-the marginal cumulative incidences). Either
-\code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or \code{"risk_difference"}.}
 
 \item{ci_type}{Method for constructing bootstrap confidence intervals. One of
 \code{"wald"}, \code{"percentile"}, or \code{"both"}.

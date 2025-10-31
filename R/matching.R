@@ -39,7 +39,6 @@ matching <- function(matched_data,
                         exposure_time,
                         immune_lag,
                         timepoints,
-                        effect = c("risk_ratio", "relative_risk_reduction", "risk_difference"),
                         ci_type = c("wald", "percentile", "both"),
                         boot_reps = 0,
                         alpha = 0.05,
@@ -48,7 +47,6 @@ matching <- function(matched_data,
                         n_cores = 1){
 
     call <- match.call()
-    effect = match.arg(effect)
     ci_type <- match.arg(ci_type)
     tau <- immune_lag
 
@@ -153,7 +151,6 @@ matching <- function(matched_data,
         exposure_time = exposure_time,
         immune_lag = tau,
         timepoints = timepoints,
-        effect = effect,
         ci_type = ci_type,
         boot_reps = boot_reps,
         alpha = alpha,

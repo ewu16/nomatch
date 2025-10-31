@@ -7,6 +7,7 @@
 compare_ve_fits(
   fit1,
   fit2,
+  effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"),
   labels = c("Method 1", "Method 2"),
   ci_type = NULL,
   colors = c("#F8766D", "#00BFC4")
@@ -16,6 +17,9 @@ compare_ve_fits(
 \item{fit1}{A nomatchfit object (typically from \code{\link[=matching]{matching()}})}
 
 \item{fit2}{A nomatchfit object (typically from \code{\link[=nomatch]{nomatch()}})}
+
+\item{effect}{The effect measure to plot next to the cumulative incidence plots.
+Either \code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or \code{"risk_difference"}.}
 
 \item{labels}{Character vector of length 2 providing labels for the two methods.
 Default is \code{c("Method 1", "Method 2")}.}

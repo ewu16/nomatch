@@ -10,7 +10,7 @@
 #'  are marginalized over the observed distribution of exposure times and covariates
 #'  among the exposed. The resulting cumulative incidences can be
 #'   summarized as risk ratios (RR = 1 - risk_exposed/risk_unexposed),
-#'   vaccine effectiveness  (VE = 1 - RR), or risk differences (RD = risk_exposed - risk_unexposed).
+#'   relative risk reduction (1 - RR), or risk differences (RD = risk_exposed - risk_unexposed).
 #'
 #'@param data A data frame with one row per individual containing the columns
 #'  named in `outcome_time`, `outcome_status`, `exposure`, `exposure_time`, and
@@ -45,9 +45,6 @@
 #'  durations, such as 30, 60, or 90 days after exposure. A fine grid of
 #'  timepoints (e.g., `timepoints = (immune_lag + 1):100`) can be provided if cumulative
 #'  incidence curves over time are desired.
-#'@param effect Character. Primary effect measure of interest (a contrast of
-#'  the marginal cumulative incidences). Either
-#'  `"risk_ratio"`(default), `"relative_risk_reduction"`  or `"risk_difference"`.
 #'@param weights_source Character string specifying the type of marginalizing weights
 #'  to use. Either:
 #'   - `"observed"` (default): use  the empirical
@@ -156,8 +153,8 @@
 #'
 #'
 #' **Confidence intervals.** Wald CIs are constructed on transformed scales:
-#'\eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios,
-#'\eqn{\log{1 - VE}} for vaccine effectiveness, using bootstrap SEs. These are
+#'\eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios/relative risk 
+#' reduction, using bootstrap SEs. These are
 #'then back-transformed to the original scale. No transformation is used for risk differences.
 #'
 #' **Parallelization.** Bootstraps can be parallelized on Unix via [parallel::mclapply()]
@@ -166,7 +163,7 @@
 #'@export
 #'
 #' @examples
-#' # Fit vaccine effectiveness model using simulated data
+#' # Fit effectiveness model using simulated data
 #'
 #' fit <- nomatch(
 #'   data = simdata,
@@ -192,7 +189,6 @@ nomatch <- function(data,
                   covariates,
                   immune_lag,
                   timepoints,
-                  effect = c("risk_ratio", "relative_risk_reduction", "risk_difference"),
                   weights_source = c("observed", "custom"),
                   custom_weights = NULL,
                   ci_type = c("wald", "percentile", "both"),
@@ -212,7 +208,6 @@ nomatch <- function(data,
     # Normalize user choices
     call <- match.call()
 
-    effect <- match.arg(effect)
     weights_source      <- match.arg(weights_source)
     ci_type   <- match.arg(ci_type)
     tau <- immune_lag
@@ -372,7 +367,6 @@ nomatch <- function(data,
          covariates = covariates,
          immune_lag = tau,
          timepoints = timepoints,
-         effect = effect,
          ci_type = ci_type,
          boot_reps = boot_reps,
          alpha = alpha,

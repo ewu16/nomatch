@@ -5,9 +5,8 @@
 #'
 #' @param x An object of class `nomatchfit` created by [nomatch()] or [matching()].
 #' @param digits Integer indicating the number of decimal places to display. Default is 3.
-#' @param effect The effect measure to output. By default,
-#' this is the `effect` measure chosen in the main function call. Must be one of `risk_difference`, `risk_ratio`,
-#' or `relative_risk_reduction`.
+#' @param effect The effect measure to output.  Either
+#'  `"risk_ratio"`(default), `"relative_risk_reduction"`  or `"risk_difference"`.
 #' @param ... Additional arguments (currently ignored).
 #'
 #' @return
@@ -17,19 +16,15 @@
 #'
 #'
 #' @export
-print.nomatchfit <- function(x, digits = 3, effect = NULL,...) {
-    if(is.null(effect)){
-        effect <- x$effect
-    }
-
-    if(x$effect == "risk_difference"){
+print.nomatchfit <- function(x, digits = 3, effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"),...) {
+    effect <- match.arg(effect)
+  
+    if(effect == "risk_difference"){
         title <- "Risk Difference Estimates"
-    }else if(x$effect == "risk_ratio"){
+    }else if(effect == "risk_ratio"){
         title <- "Risk Ratio Estimates"
-    }else if(x$effect == "relative_risk_reduction"){
-        title <- "Vaccine Effectiveness Estimates"
-    }else{
-        stop("Effect must be one of 'risk_difference', 'risk_ratio', or 'relative_risk_reduction'")
+    }else if(effect == "relative_risk_reduction"){
+        title <- "Relative Risk Reduction Estimates"
     }
 
     cat("\n", title, "\n")
@@ -94,17 +89,10 @@ print.nomatchfit <- function(x, digits = 3, effect = NULL,...) {
 #'
 #' @export
 summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
-    if(object$effect == "risk_difference"){
-        title <- "Risk Difference"
-    }else if(object$effect == "risk_ratio"){
-        title <- "Risk Ratio"
-    }else if(object$effect == "relative_risk_reduction"){
-        title <- "Vaccine Effectiveness"
-    }
-
+  
     cat("\n")
     cat(strrep("=", 70), "\n")
-    cat(title, "Analysis Summary\n")
+    cat("Analysis Summary\n")
     cat(strrep("=", 70), "\n\n")
 
     # ---- Key Parameters ----
@@ -225,9 +213,8 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
 #'
 #'
 #' @param x An object of class `nomatchfit` created by [nomatch()] or [matching()].
-#' @param effect The effect measure to plot next to the cumulative incidence plots. By default,
-#' this is the `effect` measure chosen in the main function call. Must be one of `risk_difference`, `risk_ratio`,
-#' or `relative_risk_reduction`.
+#' @param effect The effect measure to plot next to the cumulative incidence plots. 
+#' Either `"risk_ratio"`(default), `"relative_risk_reduction"`  or `"risk_difference"`.
 #' @param ci_type Character string specifying the type of confidence interval band to plot. By default,
 #'   `"wald"` if available, otherwise set to `"percentile"` or `none`.
 #'   One of `"wald", "percentile", "simul"`, or `"none"`. Must choose a `ci_type` whose lower
@@ -258,11 +245,9 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
 #' )
 #' plot(fit)
 #'
-plot.nomatchfit <- function(x, effect = NULL, ci_type = NULL, color = "#0072B2", ...) {
+plot.nomatchfit <- function(x, effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"), ci_type = NULL, color = "#0072B2", ...) {
 
-    if(is.null(effect)){
-        effect <- x$effect
-    }
+    effect <- match.arg(effect)
 
     if(length(x$timepoints) < 2){
         message("Only one evaluation time supplied; returning point estimate(s) instead of a plot")

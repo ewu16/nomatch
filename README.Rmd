@@ -36,7 +36,7 @@ devtools::install_github("ewu16/nomatch")
 ## Example
 
 This minimal example shows how to use `nomatch` to obtain cumulative incidences and 
-their derived effect measures such as risk differences (RD), risk ratios (RR), and  vaccine effectiveness (VE = 1 - RR).
+their derived effect measures such as risk differences (RD), risk ratios (RR), and relative risk reduction (1 - RR).
 
 We use a simple simulated dataset mimicking data from an observational vaccine study,
 although the methods apply equally to other disease settings. 
@@ -80,11 +80,10 @@ fit <- nomatch(data = simdata,
                covariates = c("x1", "x2"),
                immune_lag = 14,
                timepoints = seq(30, 180, by = 30),
-               effect = "relative_risk_reduction", 
                boot_reps = 10)
 
 # Print main results 
-## - Note by default only the chosen effect measure is printed
+## By default shows risk ratios 
 ## but all effect measures are computed and stored in the fitted object 
 fit        
 

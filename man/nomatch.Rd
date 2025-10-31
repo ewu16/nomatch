@@ -14,7 +14,6 @@ nomatch(
   covariates,
   immune_lag,
   timepoints,
-  effect = c("risk_ratio", "relative_risk_reduction", "risk_difference"),
   weights_source = c("observed", "custom"),
   custom_weights = NULL,
   ci_type = c("wald", "percentile", "both"),
@@ -68,10 +67,6 @@ than \code{ immune_lag} and and should correspond to clinically meaningful follo
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
-
-\item{effect}{Character. Primary effect measure of interest (a contrast of
-the marginal cumulative incidences). Either
-\code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or \code{"risk_difference"}.}
 
 \item{weights_source}{Character string specifying the type of marginalizing weights
 to use. Either:
@@ -178,7 +173,7 @@ These cumulative incidences are then marginalized to compute overall
 are marginalized over the observed distribution of exposure times and covariates
 among the exposed. The resulting cumulative incidences can be
 summarized as risk ratios (RR = 1 - risk_exposed/risk_unexposed),
-vaccine effectiveness  (VE = 1 - RR), or risk differences (RD = risk_exposed - risk_unexposed).
+relative risk reduction (1 - RR), or risk differences (RD = risk_exposed - risk_unexposed).
 }
 \details{
 \strong{Modeling.} Two Cox proportional hazards models are fit to estimate
@@ -201,15 +196,15 @@ returned in the \code{nomatchfit} object under \code{weights}. They can also be 
 prior to the call to \code{nomatch()} by calling \code{get_observed_weights()}.
 
 \strong{Confidence intervals.} Wald CIs are constructed on transformed scales:
-\eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios,
-\eqn{\log{1 - VE}} for vaccine effectiveness, using bootstrap SEs. These are
+\eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios/relative risk
+reduction, using bootstrap SEs. These are
 then back-transformed to the original scale. No transformation is used for risk differences.
 
 \strong{Parallelization.} Bootstraps can be parallelized on Unix via \code{\link[parallel:mclapply]{parallel::mclapply()}}
 by providing \code{n_cores} argument.
 }
 \examples{
-# Fit vaccine effectiveness model using simulated data
+# Fit effectiveness model using simulated data
 
 fit <- nomatch(
   data = simdata,

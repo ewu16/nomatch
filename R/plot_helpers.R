@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Creates a three-panel plot showing cumulative incidence (no vaccine),
-#' cumulative incidence (vaccine), and vaccine effectiveness over time.
+#' cumulative incidence (vaccine), and effectiveness over time.
 #' This function handles both single method and comparison plots.
 #'
 #' @param plot_data A data frame containing estimates to plot. Must include
@@ -11,6 +11,8 @@
 #' @param ci_type Character string specifying the type of confidence interval.
 #'   One of "wald", "percentile", "simul", or "none"
 #' @param alpha Numeric significance level for confidence intervals (e.g., 0.05 for 95% CIs).
+#' @param effect The effect measure to plot next to the cumulative incidence plots. 
+#' Either `"risk_ratio"`(default), `"relative_risk_reduction"`  or `"risk_difference"`.
 #' @param colors Character vector of colors. Length should match the number of
 #'   unique methods in `plot_data`. If `NULL` or length doesn't match, ggplot2's
 #'   default colors are used.
@@ -31,10 +33,12 @@
 plot_ve_panel <- function(plot_data,
                            ci_type,
                            alpha,
-                           effect,
+                           effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"),
                            trt_0_label = "Unexposed",
                            trt_1_label = "Exposed",
                            colors = NULL) {
+  
+  effect <- match.arg(effect)
 
   n_methods <- length(unique(plot_data$method))
   has_ci <- (ci_type != "none")
@@ -68,8 +72,8 @@ plot_ve_panel <- function(plot_data,
               label_function =  ggplot2::waiver())
 
   }else if(effect == "relative_risk_reduction"){
-    d <- list(label = "Vaccine Effectiveness",
-              x = "Time since vaccination",
+    d <- list(label = "Relative Risk Reduction",
+              x = "Time since exposure",
               label_function = scales::label_percent())
   }else{
     stop("Effect must be one of 'risk_difference', 'risk_ratio', or 'relative_risk_reduction'")
@@ -214,7 +218,7 @@ validate_confint_type <- function(object, ci_type = NULL) {
   #Check if requested CI type exists in estimates
   lower <- paste0(ci_type, "_lower")
   upper <- paste0(ci_type, "_upper")
-  if (!all(c(lower, upper) %in% colnames(object$estimates[[tolower(object$effect)]]))) {
+  if (!all(c(lower, upper) %in% colnames(object$estimates[[1]]))) {
     stop("CI type '", ci_type, "' not found in object.\n")
   }
 

@@ -5,8 +5,8 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Emily", "Wu", , "emily.wu2@emory.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0003-5487-6753"))
-Description: Implements estimators for a proposed causal estimand of
-    vaccine effectiveness using observational data.
+Description: Implements estimators of marginal cumulative incidence 
+    for binary interventions using observational data.
 License: MIT + file LICENSE
 URL: https://ewu16.github.io/nomatch/, https://github.com/ewu16/nomatch
 BugReports: https://github.com/ewu16/nomatch/issues

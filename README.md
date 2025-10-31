@@ -27,7 +27,7 @@ devtools::install_github("ewu16/nomatch")
 
 This minimal example shows how to use `nomatch` to obtain cumulative
 incidences and their derived effect measures such as risk differences
-(RD), risk ratios (RR), and vaccine effectiveness (VE = 1 - RR).
+(RD), risk ratios (RR), and relative risk reduction (1 - RR).
 
 We use a simple simulated dataset mimicking data from an observational
 vaccine study, although the methods apply equally to other disease
@@ -85,31 +85,30 @@ fit <- nomatch(data = simdata,
                covariates = c("x1", "x2"),
                immune_lag = 14,
                timepoints = seq(30, 180, by = 30),
-               effect = "relative_risk_reduction", 
                boot_reps = 10)
 #> Bootstrapping 10 samples...
-#> Time difference of 1.489327 secs
+#> Time difference of 1.523599 secs
 
 # Print main results 
-## - Note by default only the chosen effect measure is printed
+## By default shows risk ratios 
 ## but all effect measures are computed and stored in the fitted object 
 fit        
 #> 
-#>  Vaccine Effectiveness Estimates 
+#>  Risk Ratio Estimates 
 #> ================================================== 
 #> Call: nomatch(data = simdata, outcome_time = "Y", outcome_status = "event", 
 #>     exposure = "V", exposure_time = "D_obs", covariates = c("x1", 
 #>         "x2"), immune_lag = 14, timepoints = seq(30, 180, by = 30), 
-#>     effect = "relative_risk_reduction", boot_reps = 10) 
+#>     boot_reps = 10) 
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value
-#> 1        30    0.466             0.0902              0.686     0.086340
-#> 2        60    0.395             0.2359              0.521     0.000925
-#> 3        90    0.397             0.2594              0.508     0.000148
-#> 4       120    0.339             0.2011              0.453     0.000448
-#> 5       150    0.269             0.1387              0.380     0.001338
-#> 6       180    0.172             0.0444              0.283     0.018627
+#> 1        30    0.534              0.314              0.910     0.086340
+#> 2        60    0.605              0.479              0.764     0.000925
+#> 3        90    0.603              0.492              0.741     0.000148
+#> 4       120    0.661              0.547              0.799     0.000448
+#> 5       150    0.731              0.620              0.861     0.001338
+#> 6       180    0.828              0.717              0.956     0.018627
 #> 
 #> Use summary() for more details
 #> Use plot() to visualize results
@@ -118,7 +117,7 @@ fit
 summary(fit)
 #> 
 #> ====================================================================== 
-#> Vaccine Effectiveness Analysis Summary
+#> Analysis Summary
 #> ====================================================================== 
 #> 
 #> Method:              nomatch (G-computation) 

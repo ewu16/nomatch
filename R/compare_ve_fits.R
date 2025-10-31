@@ -6,6 +6,8 @@
 #'
 #' @param fit1 A nomatchfit object (typically from [matching()])
 #' @param fit2 A nomatchfit object (typically from [nomatch()])
+#' @param effect The effect measure to plot next to the cumulative incidence plots. 
+#' Either `"risk_ratio"`(default), `"relative_risk_reduction"`  or `"risk_difference"`.
 #' @param labels Character vector of length 2 providing labels for the two methods.
 #'  Default is \code{c("Method 1", "Method 2")}.
 #' @param ci_type Character string specifying the type of confidence interval to plot.
@@ -40,9 +42,11 @@
 #' }
 compare_ve_fits <- function(fit1,
                             fit2,
+                            effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"),
                             labels = c("Method 1", "Method 2"),
                             ci_type = NULL,
                             colors = c("#F8766D", "#00BFC4")) {
+    effect <- match.arg(effect)
 
     # Validation
     if (!is.nomatchfit(fit1) || !is.nomatchfit(fit2)) {
@@ -79,7 +83,7 @@ compare_ve_fits <- function(fit1,
         plot_data = plot_data,
         ci_type = ci_type,
         alpha = alpha1,
-        effect = fit1$effect,
+        effect = effect,
         colors = colors
     )
 }

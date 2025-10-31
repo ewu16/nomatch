@@ -32,7 +32,7 @@ an alternative to matching methods, which can suffer from substantial efficiency
 Estimation involves fitting two exposure-specific Cox models which adjust for baseline confounders.
 Predictions from these models are used to compute marginal 
 cumulative incidence under interventions of exposure and no exposure.
-Effect measures such as risk differences, risk ratios, and vaccine effectiveness are also provided. 
+Effect measures such as risk differences, risk ratios, and relative risk reduction are also provided. 
 
 
 
@@ -121,10 +121,10 @@ fit <- nomatch(data = simdata,
 
 ```
 
-We can print the vaccine effectiveness estimates for our simulated dataset. 
+We can print the relative risk reduction (i.e vaccine effectiveness) estimates for our simulated dataset. 
 
 ```{r}
-fit
+print(fit, effect = "relative_risk_reduction")
 ```
 
 The cumulative incidence estimates (`cuminc_0` for unexposed and  `cuminc_1` for exposed) ) and other effects (`risk_difference`, `risk_ratio`, and `relative_risk_reduction`) are also stored within the 
@@ -158,7 +158,7 @@ to provide a fine grid of `timepoints` to produce smooth curves.
 Our example plot will be somewhat crude due to the small number of timepoints used in the function call. 
 
 ```{r}
-plot(fit)
+plot(fit, effect = "relative_risk_reduction")
 ```
 
 #### Plotting simultaneous confidence intervals 
@@ -174,7 +174,7 @@ which we now save in a new object.
 fit_with_simul <- add_simultaneous_ci(fit, seed = 1234)
 ```
 
-The simultaneous confidence interals are now stored in the fitted object.  
+The simultaneous confidence intervals are now stored in the fitted object.  
 ```{r}
 fit_with_simul
 ```
@@ -185,7 +185,7 @@ computed before plotting; otherwise, the call will error.
 
 ```{r}
 #Plot simultaneous confidence bands 
-plot(fit_with_simul , ci_type = "simul") 
+plot(fit_with_simul , effect = "relative_risk_reduction", ci_type = "simul") 
 ```
 
 The simultaneous confidence intervals indicate that if we were to repeatedly construct
@@ -266,7 +266,7 @@ fit_matching
 
 # Plot matching vs proposed estimator - nomatch tends to have similar point estimates but narrower
 # confidence intervals
-compare_ve_fits(fit_matching, fit, labels = c("Matching", "nomatch (G-computation)"))
+compare_ve_fits(fit_matching, fit, effect = "relative_risk_reduction", labels = c("Matching", "nomatch (G-computation)"))
 ```
 
 

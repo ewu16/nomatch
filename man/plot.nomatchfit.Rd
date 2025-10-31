@@ -4,14 +4,19 @@
 \alias{plot.nomatchfit}
 \title{Plot method for nomatchfit objects}
 \usage{
-\method{plot}{nomatchfit}(x, effect = NULL, ci_type = NULL, color = "#0072B2", ...)
+\method{plot}{nomatchfit}(
+  x,
+  effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"),
+  ci_type = NULL,
+  color = "#0072B2",
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class \code{nomatchfit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
 
-\item{effect}{The effect measure to plot next to the cumulative incidence plots. By default,
-this is the \code{effect} measure chosen in the main function call. Must be one of \code{risk_difference}, \code{risk_ratio},
-or \code{relative_risk_reduction}.}
+\item{effect}{The effect measure to plot next to the cumulative incidence plots.
+Either \code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or \code{"risk_difference"}.}
 
 \item{ci_type}{Character string specifying the type of confidence interval band to plot. By default,
 \code{"wald"} if available, otherwise set to \code{"percentile"} or \code{none}.
