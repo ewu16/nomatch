@@ -13,7 +13,10 @@
 one_boot_nomatch <- function(data,
                         outcome_time, outcome_status, exposure, exposure_time,
                         covariates,
-                        eval_times, tau,
+                        tau,
+                        eval_times, 
+                        formula_0,
+                        formula_1, 
                         custom_gp_list){
 
     # --------------------------------------------------------------------------
@@ -35,6 +38,8 @@ one_boot_nomatch <- function(data,
                           custom_gp_list = custom_gp_list,
                           eval_times = eval_times,
                           tau = tau,
+                          formula_0 = formula_0,
+                          formula_1 = formula_1, 
                           keep_models = FALSE,
                           return_gp_list = FALSE)
 

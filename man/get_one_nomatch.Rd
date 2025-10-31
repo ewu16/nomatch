@@ -13,6 +13,8 @@ get_one_nomatch(
   covariates,
   tau,
   eval_times,
+  formula_0,
+  formula_1,
   censor_time = max(eval_times),
   custom_gp_list = NULL,
   keep_models = TRUE,

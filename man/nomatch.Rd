@@ -22,7 +22,9 @@ nomatch(
   alpha = 0.05,
   keep_models = TRUE,
   keep_boot_samples = TRUE,
-  n_cores = 1
+  n_cores = 1,
+  formula_unexposed = NULL,
+  formula_exposed = NULL
 )
 }
 \arguments{
@@ -126,6 +128,15 @@ to obtain simultaneous confidence intervals.}
 \item{n_cores}{Integer; parallel cores for bootstrapping passed to
 \code{parallel::mclapply} as \code{mc.cores}. On Unix-like OS only; not available on
 Windows. Default: \code{1}.}
+
+\item{formula_unexposed}{A character specification of the right-hand side of the formula
+to use for fitting the hazard model for the unexposed. The set of variables in the formula
+must be identical to the set of variables in \code{covariates}.}
+
+\item{formula_exposed}{A character specification of the right-hand side of the formula
+to use for fitting the hazard model for the exposed. The set of variables in the formula
+must contain the variables in \code{covariates} and \code{exposure_time}. It is recommended
+that \code{exposure_time} be modeled flexibly (e.g. using splines).}
 }
 \value{
 An object of class \code{vefit} containing:

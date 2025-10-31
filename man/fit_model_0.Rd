@@ -12,7 +12,6 @@ fit_model_0(
   outcome_status,
   exposure,
   exposure_time,
-  covariates,
   formula_0 = NULL
 )
 
@@ -22,10 +21,9 @@ fit_model_1(
   outcome_status,
   exposure,
   exposure_time,
-  covariates,
   tau,
-  censor_time = NULL,
-  formula_1 = NULL
+  formula_1 = NULL,
+  censor_time = NULL
 )
 }
 \arguments{
@@ -48,20 +46,16 @@ follow-up).}
 as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
-\item{covariates}{Character vector of covariates to adjust for when fitting
-the hazard models. Include all known, measured confounders of
-exposure and censoring.  Covariates must be measured or defined at the chosen time origin.}
-
 \item{formula_0}{Optional right hand side of the formula for model 0. By default, uses \code{covariates}.}
 
 \item{tau}{Delay period so that events before tau are not included.}
 
+\item{formula_1}{Optional right hand side of the formula for model 1. By default, uses \code{covariates}
+plus natural spline of vaccination day (4 df).}
+
 \item{censor_time}{Time after exposure at which exposed
 individuals are censored during model fitting to prevent extrapolation. By default,
 no censoring is applied.}
-
-\item{formula_1}{Optional right hand side of the formula for model 1. By default, uses \code{covariates}
-plus natural spline of vaccination day (4 df).}
 }
 \value{
 A fitted \code{coxph} object with additional component \verb{$data} containing

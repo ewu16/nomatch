@@ -88,7 +88,7 @@ fit <- nomatch(data = simdata,
                   effect = "vaccine_effectiveness", 
                   boot_reps = 10)
 #> Bootstrapping 10 samples...
-#> Time difference of 1.456547 secs
+#> Time difference of 1.533158 secs
 
 # Print main results 
 ## - Note by default only the chosen effect measure is printed

@@ -11,8 +11,10 @@ one_boot_nomatch(
   exposure,
   exposure_time,
   covariates,
-  eval_times,
   tau,
+  eval_times,
+  formula_0,
+  formula_1,
   custom_gp_list
 )
 }

@@ -37,12 +37,8 @@
 #' @export
 #'
 fit_model_0 <- function(data, outcome_time, outcome_status, exposure, exposure_time,
-                        covariates, formula_0 = NULL){
+                         formula_0 = NULL){
 
-    #Define formula
-    if(is.null(formula_0)){
-        formula_0 <- stats::reformulate(covariates)
-    }
 
     #Extract covariates
     covars <- stats::get_all_vars(formula_0, data)
@@ -80,16 +76,10 @@ fit_model_0 <- function(data, outcome_time, outcome_status, exposure, exposure_t
 #' @param tau Delay period so that events before tau are not included.
 #' @export
 fit_model_1 <- function(data, outcome_time, outcome_status, exposure, exposure_time,
-                        covariates, tau, censor_time = NULL, formula_1 = NULL){
+                        tau, formula_1 = NULL, censor_time = NULL){
 
     if(is.null(censor_time)){
         censor_time <- Inf #effectively prevents additional censoring
-    }
-
-    #Define formula
-    if(is.null(formula_1)){
-        d_term <- paste0("splines::ns(", exposure_time, ", df = 4)")
-        formula_1 <-stats::reformulate(c(covariates, d_term))
     }
 
     #Extract covariates

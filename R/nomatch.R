@@ -87,6 +87,19 @@
 #'@param n_cores Integer; parallel cores for bootstrapping passed to
 #'  `parallel::mclapply` as `mc.cores`. On Unix-like OS only; not available on
 #'  Windows. Default: `1`.
+#'  
+#'@param formula_unexposed A character specification of the right-hand side of the formula 
+#' to use for fitting the hazard model for the unexposed. The set of variables in the formula
+#' must be identical to the set of variables in `covariates`. 
+#' 
+#' @param formula_exposed A character specification of the right-hand side of the formula 
+#' to use for fitting the hazard model for the exposed. The set of variables in the formula
+#' must contain the variables in `covariates` and `exposure_time`. It is recommended
+#' that `exposure_time` be modeled flexibly (e.g. using splines). 
+#' 
+#'@param n_cores Integer; parallel cores for bootstrapping passed to
+#'  `parallel::mclapply` as `mc.cores`. On Unix-like OS only; not available on
+#'  Windows. Default: `1`.
 #'
 #'
 #'@return An object of class `vefit` containing:
@@ -187,7 +200,9 @@ nomatch <- function(data,
                   alpha = 0.05,
                   keep_models = TRUE,
                   keep_boot_samples = TRUE,
-                  n_cores = 1
+                  n_cores = 1,
+                  formula_unexposed = NULL,
+                  formula_exposed = NULL
                   ){
 
     # --------------------------------------------------------------------------
@@ -231,12 +246,30 @@ nomatch <- function(data,
         custom_gp_list <- NULL
      }
 
-     descrip <- get_basic_descriptives_nomatch(data,
-                                       outcome_time = outcome_time,
-                                       outcome_status = outcome_status,
-                                       exposure = exposure,
-                                       exposure_time = exposure_time,
-                                       tau = tau)
+     descrip <- get_basic_descriptives_nomatch(
+         data = data,
+         outcome_time = outcome_time,
+         outcome_status = outcome_status,
+         exposure = exposure,
+         exposure_time = exposure_time,
+         tau = tau
+         )
+     
+     hazard_formulas <- resolve_hazard_formulas(
+         formula_unexposed = formula_unexposed,
+         formula_exposed = formula_exposed,
+         covariates = covariates,
+         exposure_time = exposure_time
+         )
+     
+     validate_formulas(
+         formula_unexposed = hazard_formulas$formula_unexposed,
+         formula_exposed = hazard_formulas$formula_exposed,
+         covariates = covariates,
+         exposure_time = exposure_time
+        )
+
+     
 
      # --------------------------------------------------------------------------
      # 1 - Get original estimate
@@ -249,7 +282,9 @@ nomatch <- function(data,
                              covariates = covariates,
                              tau = tau,
                              eval_times = eval_times,
-                             custom_gp_list = custom_gp_list
+                             custom_gp_list = custom_gp_list,
+                             formula_0 = hazard_formulas$formula_unexposed,
+                             formula_1 = hazard_formulas$formula_exposed
                             )
 
      original <- do.call(get_one_nomatch, estimation_args)

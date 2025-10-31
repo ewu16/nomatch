@@ -48,6 +48,8 @@ get_one_nomatch <- function(data,
                        covariates,
                        tau,
                        eval_times,
+                       formula_0,
+                       formula_1, 
                        censor_time = max(eval_times),
                        custom_gp_list = NULL,
                        keep_models = TRUE,
@@ -57,12 +59,26 @@ get_one_nomatch <- function(data,
     # --------------------------------------------------------------------------
     # 1 - Fit survival models
     # --------------------------------------------------------------------------
-    fit_0 <- fit_model_0(data, outcome_time, outcome_status, exposure, exposure_time,
-                         covariates)
+    fit_0 <- fit_model_0(
+        data = data,
+        outcome_time = outcome_time, 
+        outcome_status = outcome_status, 
+        exposure = exposure, 
+        exposure_time = exposure_time, 
+        formula_0 = formula_0
+        )
 
     # Note: model_1 depends on censor time and tau (subset)
-    fit_1 <- fit_model_1(data, outcome_time, outcome_status, exposure, exposure_time,
-                         covariates, tau, censor_time)
+    fit_1 <- fit_model_1(
+        data = data,
+        outcome_time = outcome_time, 
+        outcome_status = outcome_status, 
+        exposure = exposure, 
+        exposure_time = exposure_time, 
+        formula_1 = formula_1,
+        tau = tau, 
+        censor_time = censor_time
+    )
 
     # --------------------------------------------------------------------------
     # 2 - Get/fit marginalizing distributions depending on weights_source type
