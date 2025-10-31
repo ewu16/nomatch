@@ -75,7 +75,6 @@ natural cubic spline with 4 degrees of freedom.</p>
 <span>  <span class="va">outcome_status</span>,</span>
 <span>  <span class="va">exposure</span>,</span>
 <span>  <span class="va">exposure_time</span>,</span>
-<span>  <span class="va">covariates</span>,</span>
 <span>  formula_0 <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -85,10 +84,9 @@ natural cubic spline with 4 degrees of freedom.</p>
 <span>  <span class="va">outcome_status</span>,</span>
 <span>  <span class="va">exposure</span>,</span>
 <span>  <span class="va">exposure_time</span>,</span>
-<span>  <span class="va">covariates</span>,</span>
 <span>  <span class="va">tau</span>,</span>
-<span>  censor_time <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  formula_1 <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  formula_1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  censor_time <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -125,12 +123,6 @@ as that used for <code>outcome_time</code>. Must be a non-missing numeric value 
 and must be set to <code>NA</code> for unexposed individuals.</p></dd>
 
 
-<dt id="arg-covariates">covariates<a class="anchor" aria-label="anchor" href="#arg-covariates"></a></dt>
-<dd><p>Character vector of covariates to adjust for when fitting
-the hazard models. Include all known, measured confounders of
-exposure and censoring.  Covariates must be measured or defined at the chosen time origin.</p></dd>
-
-
 <dt id="arg-formula-">formula_0<a class="anchor" aria-label="anchor" href="#arg-formula-"></a></dt>
 <dd><p>Optional right hand side of the formula for model 0. By default, uses <code>covariates</code>.</p></dd>
 
@@ -139,15 +131,15 @@ exposure and censoring.  Covariates must be measured or defined at the chosen ti
 <dd><p>Delay period so that events before tau are not included.</p></dd>
 
 
+<dt id="arg-formula-">formula_1<a class="anchor" aria-label="anchor" href="#arg-formula-"></a></dt>
+<dd><p>Optional right hand side of the formula for model 1. By default, uses <code>covariates</code>
+plus natural spline of vaccination day (4 df).</p></dd>
+
+
 <dt id="arg-censor-time">censor_time<a class="anchor" aria-label="anchor" href="#arg-censor-time"></a></dt>
 <dd><p>Time after exposure at which exposed
 individuals are censored during model fitting to prevent extrapolation. By default,
 no censoring is applied.</p></dd>
-
-
-<dt id="arg-formula-">formula_1<a class="anchor" aria-label="anchor" href="#arg-formula-"></a></dt>
-<dd><p>Optional right hand side of the formula for model 1. By default, uses <code>covariates</code>
-plus natural spline of vaccination day (4 df).</p></dd>
 
 </dl></div>
     <div class="section level2">

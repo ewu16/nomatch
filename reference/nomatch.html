@@ -83,7 +83,9 @@ vaccine effectiveness  (VE = 1 - RR), or risk differences (RD = risk_exposed - r
 <span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  keep_models <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  keep_boot_samples <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_cores <span class="op">=</span> <span class="fl">1</span></span>
+<span>  n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  formula_unexposed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  formula_exposed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -215,6 +217,19 @@ to obtain simultaneous confidence intervals.</p></dd>
 <code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">parallel::mclapply</a></code> as <code>mc.cores</code>. On Unix-like OS only; not available on
 Windows. Default: <code>1</code>.</p></dd>
 
+
+<dt id="arg-formula-unexposed">formula_unexposed<a class="anchor" aria-label="anchor" href="#arg-formula-unexposed"></a></dt>
+<dd><p>A character specification of the right-hand side of the formula
+to use for fitting the hazard model for the unexposed. The set of variables in the formula
+must be identical to the set of variables in <code>covariates</code>.</p></dd>
+
+
+<dt id="arg-formula-exposed">formula_exposed<a class="anchor" aria-label="anchor" href="#arg-formula-exposed"></a></dt>
+<dd><p>A character specification of the right-hand side of the formula
+to use for fitting the hazard model for the exposed. The set of variables in the formula
+must contain the variables in <code>covariates</code> and <code>exposure_time</code>. It is recommended
+that <code>exposure_time</code> be modeled flexibly (e.g. using splines).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -308,7 +323,7 @@ by providing <code>n_cores</code> argument.</p>
 <span class="r-in"><span>  n_cores <span class="op">=</span> <span class="fl">1</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrapping 5 samples...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time difference of 1.929935 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time difference of 1.650558 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># View basic results</span></span></span>
 <span class="r-in"><span><span class="va">fit</span><span class="op">$</span><span class="va">estimates</span></span></span>
