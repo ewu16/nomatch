@@ -77,7 +77,7 @@ compute_boot_ci <- function(x, boot_x, ci_type, alpha = .05, transform = NULL, z
     cuminc_1              = .transformations[["logit"]],
     risk_difference       = .transformations[["identity"]],
     risk_ratio            = .transformations[["log_rr"]],
-    vaccine_effectiveness = .transformations[["log_ve"]]
+    relative_risk_reduction = .transformations[["log_ve"]]
 )
 
 

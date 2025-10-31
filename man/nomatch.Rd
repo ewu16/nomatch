@@ -13,8 +13,8 @@ nomatch(
   exposure_time,
   covariates,
   immune_lag,
-  eval_times,
-  effect = c("risk_ratio", "vaccine_effectiveness", "risk_difference"),
+  timepoints,
+  effect = c("risk_ratio", "relative_risk_reduction", "risk_difference"),
   weights_source = c("observed", "custom"),
   custom_weights = NULL,
   ci_type = c("wald", "percentile", "both"),
@@ -60,18 +60,18 @@ and should reflect the biological understanding of when vaccine-induced
 immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
 be set to 0 (no delay period for evaluating risk).}
 
-\item{eval_times}{Numeric vector specifying the timepoints at which to compute
+\item{timepoints}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure and use the same units
 as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All values must be greater
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
+timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 
 \item{effect}{Character. Primary effect measure of interest (a contrast of
 the marginal cumulative incidences). Either
-\code{"risk_ratio"}(default), \code{"vaccine_effectiveness"}  or \code{"risk_difference"}.}
+\code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or \code{"risk_difference"}.}
 
 \item{weights_source}{Character string specifying the type of marginalizing weights
 to use. Either:
@@ -139,7 +139,7 @@ must contain the variables in \code{covariates} and \code{exposure_time}. It is 
 that \code{exposure_time} be modeled flexibly (e.g. using splines).}
 }
 \value{
-An object of class \code{vefit} containing:
+An object of class \code{nomatchfit} containing:
 \describe{
 \item{estimates}{Named list of matrices containing the cumulative incidence and
 effect estimates.
@@ -150,7 +150,7 @@ effect estimates.
 \item{\code{risk_ratio}}{ \code{cuminc_1/cuminc_0}}
 \item{\code{vaccine_effectivess}}{ \code{1 - risk_ratio}}
 }
-Each matrix has one row per value in \code{eval_times} and columns including the
+Each matrix has one row per value in \code{timepoints} and columns including the
 point estimate (\code{estimate}) and, when requested, confidence limits of the form
 (\verb{\{wald/percentile\}_lower}, \verb{\{wald/percentile\}_upper}). }
 \item{weights}{List with dataframes \code{g_weights}, \code{p_weights} specifying
@@ -162,10 +162,10 @@ See \strong{Modeling} section for details.}
 \item{n_success_boot}{Integer vector indicating the
 number of successful bootstrap replications per timepoint.}
 \item{boot_samples}{(If \code{keep_boot_samples = TRUE}) Named list of bootstrap draws
-(stored as matrices) for each term. Rows index bootstrap replicates and columns index \code{eval_times}.}
+(stored as matrices) for each term. Rows index bootstrap replicates and columns index \code{timepoints}.}
 }
 
-The \code{vefit} object has methods for \code{\link[=print]{print()}}, \code{\link[=summary]{summary()}}, and \code{\link[=plot]{plot()}}.
+The \code{nomatchfit} object has methods for \code{\link[=print]{print()}}, \code{\link[=summary]{summary()}}, and \code{\link[=plot]{plot()}}.
 Use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}} to add simultaneous confidence intervals.
 }
 \description{
@@ -197,7 +197,7 @@ incidence estimates.
 \strong{Marginalizing weights.} When \code{weights_source = "observed"}, the marginalizing weights
 are the empirical distributions of exposure times and covariates among the
 exposed who remain at-risk \code{tau} days after exposure. These weights are
-returned in the \code{vefit} object under \code{weights}. They can also be obtained
+returned in the \code{nomatchfit} object under \code{weights}. They can also be obtained
 prior to the call to \code{nomatch()} by calling \code{get_observed_weights()}.
 
 \strong{Confidence intervals.} Wald CIs are constructed on transformed scales:
@@ -218,7 +218,7 @@ fit <- nomatch(
   exposure = "V",
   exposure_time = "D_obs",
   covariates = c("x1", "x2"),
-  eval_times = seq(30, 180, by = 30),
+  timepoints = seq(30, 180, by = 30),
   immune_lag = 14,
   boot_reps = 5,
   n_cores = 1

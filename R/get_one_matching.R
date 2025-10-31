@@ -15,7 +15,7 @@ get_one_matching <- function(matched_data,
                                 exposure,
                                 exposure_time,
                                 tau,
-                                eval_times,
+                                timepoints,
                                 keep_models = TRUE,
                                 keep_adata = TRUE){
 
@@ -31,7 +31,7 @@ get_one_matching <- function(matched_data,
                         adata_outcome_name = "match_T",
                         adata_event_name =  paste0("match_", outcome_status),
                         adata_trt_name = paste0("match_", exposure),
-                        eval_times = eval_times,
+                        timepoints = timepoints,
                         keep_models = keep_models)
 
    check_pt_estimates(out$pt_estimates)
@@ -67,7 +67,7 @@ compute_km_ve <- function(adata,
                           adata_outcome_name,
                           adata_event_name,
                           adata_trt_name,
-                          eval_times,
+                          timepoints,
                           keep_models = TRUE){
 
     # Build formula and fit KM
@@ -75,7 +75,7 @@ compute_km_ve <- function(adata,
     km_fit <- survival::survfit(stats::reformulate(adata_trt_name, response = outcome) , data = adata)
 
     # Summarize at requested times
-    surv_probs <- summary(km_fit, times = eval_times)
+    surv_probs <- summary(km_fit, times = timepoints)
 
     ## survival probabilities fo each group (assumed to have 2 groups_
     surv_0 <- surv_probs$surv[surv_probs$strata == levels(surv_probs$strata)[1]]
@@ -93,10 +93,10 @@ compute_km_ve <- function(adata,
         cuminc_1 = cuminc_1,
         risk_difference = rd,
         risk_ratio = rr,
-        vaccine_effectiveness = ve
+        relative_risk_reduction = ve
     )
 
-    rownames(est) <- eval_times
+    rownames(est) <- timepoints
 
     out <- list(
         pt_estimates = est,

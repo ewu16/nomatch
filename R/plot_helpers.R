@@ -6,7 +6,7 @@
 #' This function handles both single method and comparison plots.
 #'
 #' @param plot_data A data frame containing estimates to plot. Must include
-#'   columns: `t0` (time), `estimate`, `term` (one of "cuminc_0", "cuminc_1", "vaccine_effectiveness"),
+#'   columns: `t0` (time), `estimate`, `term` (one of "cuminc_0", "cuminc_1", "relative_risk_reduction"),
 #'   `<ci_type>_lower`, `<ci_type>_upper`, and `method`
 #' @param ci_type Character string specifying the type of confidence interval.
 #'   One of "wald", "percentile", "simul", or "none"
@@ -18,7 +18,7 @@
 #' @return A ggplot2 object with three faceted panels.
 #'
 #' @details
-#' This is an internal helper function used by `plot.vefit()` and `compare_ve_fits()`.
+#' This is an internal helper function used by `plot.nomatchfit()` and `compare_ve_fits()`.
 #' The function automatically detects whether it's plotting a single method or
 #' comparing multiple methods based on the `method` column in `plot_data`.
 #'
@@ -67,12 +67,12 @@ plot_ve_panel <- function(plot_data,
               x = "Time since exposure",
               label_function =  ggplot2::waiver())
 
-  }else if(effect == "vaccine_effectiveness"){
+  }else if(effect == "relative_risk_reduction"){
     d <- list(label = "Vaccine Effectiveness",
               x = "Time since vaccination",
               label_function = scales::label_percent())
   }else{
-    stop("Effect must be one of 'risk_difference', 'risk_ratio', or 'vaccine_effectiveness'")
+    stop("Effect must be one of 'risk_difference', 'risk_ratio', or 'relative_risk_reduction'")
   }
 
   #Clean up term labels before plotting
@@ -173,7 +173,7 @@ plot_ve_panel <- function(plot_data,
 
 #' Validate and normalize CI type for plotting
 #'
-#' @param object A vefit object
+#' @param object A nomatchfit object
 #' @param ci_type Character string or NULL
 #'
 #' @return A validated ci_type string for plotting (one of "wald", "percentile", "simul")

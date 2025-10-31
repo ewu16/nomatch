@@ -4,8 +4,8 @@
 #' Plot cumulative incidence and effectiveness estimates for two
 #' different methods using colors to distinguish methods
 #'
-#' @param fit1 A vefit object (typically from [matching()])
-#' @param fit2 A vefit object (typically from [nomatch()])
+#' @param fit1 A nomatchfit object (typically from [matching()])
+#' @param fit2 A nomatchfit object (typically from [nomatch()])
 #' @param labels Character vector of length 2 providing labels for the two methods.
 #'  Default is \code{c("Method 1", "Method 2")}.
 #' @param ci_type Character string specifying the type of confidence interval to plot.
@@ -45,8 +45,8 @@ compare_ve_fits <- function(fit1,
                             colors = c("#F8766D", "#00BFC4")) {
 
     # Validation
-    if (!is.vefit(fit1) || !is.vefit(fit2)) {
-        stop("Both fit1 and fit2 must be vefit objects", call. = FALSE)
+    if (!is.nomatchfit(fit1) || !is.nomatchfit(fit2)) {
+        stop("Both fit1 and fit2 must be nomatchfit objects", call. = FALSE)
     }
 
     if (length(labels) != 2 || length(colors) != 2) {

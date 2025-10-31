@@ -92,10 +92,10 @@ Here, we need to provide several types of arguments:
 
 - `data, outcome_time, outcome_status, exposure, exposure_time, covariates`: Primary arguments providing the dataset and the names of the variables in the dataset that describe the outcome, exposure, and covariates to adjust for. 
 
-- `immune_lag, eval_times`: Arguments that specify what cumulative incidences to compute. The first, `immune_lag`,
+- `immune_lag, timepoints`: Arguments that specify what cumulative incidences to compute. The first, `immune_lag`,
 is used to compute cumulative incidences that ignore events that occur within `immune_lag` days; the population of interest is 
 defined to be the subset of individuals who would remain endpoint-free `immune_lag` days after exposure. This is often used in vaccine studies because the vaccine takes time to induce an immune response and become effective. We will set `immune_lag = 14` (2 weeks) for our pretend vaccine study, but this can also be set to `0` when not relevant
-to the setting of interest. The second, `eval_times`, specifies the timepoints of interest
+to the setting of interest. The second, `timepoints`, specifies the timepoints of interest
 for evaluating cumulative incidence. Here we've specified to compute
 the cumulative incidence of infection/severity outcomes occurring within `30, 60, 90, ..180`
 days after vaccination. 
@@ -115,7 +115,7 @@ fit <- nomatch(data = simdata,
                exposure_time = "D_obs", 
                covariates = c("x1", "x2"),
                immune_lag = 14,
-               eval_times = seq(30, 180, by = 30),
+               timepoints = seq(30, 180, by = 30),
                boot_reps = 10)
 
 
@@ -127,7 +127,7 @@ We can print the vaccine effectiveness estimates for our simulated dataset.
 fit
 ```
 
-The cumulative incidence estimates (`cuminc_0` for unexposed and  `cuminc_1` for exposed) ) and other effects (`risk_difference`, `risk_ratio`, and `vaccine_effectiveness`) are also stored within the 
+The cumulative incidence estimates (`cuminc_0` for unexposed and  `cuminc_1` for exposed) ) and other effects (`risk_difference`, `risk_ratio`, and `relative_risk_reduction`) are also stored within the 
 fitted object. These can be examined via `fit$estimates`. 
 
 If all confounders are adjusted for, the resulting cumulative incidence/effect estimates can be interpreted as the cumulative incidences or effect that would be observed in a clinical trial in which participants 1) are similar to those observed to be exposed and 2) who enroll into the study such that the distribution of enrollments times matches the distribution of observed exposure times. 
@@ -154,7 +154,7 @@ for marginalization are returned in the `$weights` component of the fitted objec
 
 We can make a quick panel plot of the cumulative incidence and vaccine effectiveness estimates
 over time using `plot()`. Note that if cumulative incidence curves are of interest, it is recommended
-to provide a fine grid of `eval_times` to produce smooth curves. 
+to provide a fine grid of `timepoints` to produce smooth curves. 
 Our example plot will be somewhat crude due to the small number of timepoints used in the function call. 
 
 ```{r}
@@ -259,7 +259,7 @@ fit_matching <-matching(matched_data = matched_data,
                         exposure = "V",
                         exposure_time = "D_obs", 
                         immune_lag = 14,
-                        eval_times = seq(30, 180, by = 30),
+                        timepoints = seq(30, 180, by = 30),
                         boot_reps = 10) 
 
 fit_matching

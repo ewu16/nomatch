@@ -7,7 +7,7 @@ reference:
   contents:
   - nomatch
   - add_simultaneous_ci
-  - plot.vefit
+  - plot.nomatchfit
 
 - title: Proposed method estimation
   desc: Core estimation functions for the G-computation approach
@@ -28,8 +28,8 @@ reference:
 - title: Utilities
   desc: Helper functions for data manipulation and formatting
   contents:
-  - print.vefit
-  - summary.vefit
+  - print.nomatchfit
+  - summary.nomatchfit
   - estimates_to_df
   - compare_ve_fits
 

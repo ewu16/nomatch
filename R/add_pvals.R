@@ -2,7 +2,7 @@ compute_wald_pval <- function(term, term_ci_estimate){
     null_val <- switch(term,
                        "risk_difference" = 0,
                        "risk_ratio" = 1,
-                       "vaccine_effectiveness" = 0,
+                       "relative_risk_reduction" = 0,
                         NULL)
 
     if(is.null(null_val)){
@@ -21,7 +21,7 @@ compute_wald_pval <- function(term, term_ci_estimate){
 #     null_val <- switch(term,
 #                        "risk_difference" = 0,
 #                        "risk_ratio" = 1,
-#                        "vaccine_effectiveness" = 0,
+#                        "relative_risk_reduction" = 0,
 #                        NULL)
 #
 #     if(is.null(null_val)){

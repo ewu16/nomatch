@@ -4,10 +4,10 @@
 #'
 #' @description
 #' A convenience function for extracting estimates from a
-#' `vefit` object (or its `estimates` component) into a tidy data frame
+#' `nomatchfit` object (or its `estimates` component) into a tidy data frame
 #' for plotting and summary tables.
 #'
-#' @param x A fitted `vefit` object or its `estimates` component (a named list
+#' @param x A fitted `nomatchfit` object or its `estimates` component (a named list
 #'   of matrices).
 #' @param collapse Logical; if `TRUE` (default), returns a single long-format
 #'   data frame. If `FALSE`, returns a list of data frames (one per term).
@@ -26,8 +26,8 @@
 #' @export
 #'
 estimates_to_df <- function(x, collapse = TRUE){
-    # detect if full vefit object
-    if (inherits(x, "vefit")) {
+    # detect if full nomatchfit object
+    if (inherits(x, "nomatchfit")) {
         estimates <- x$estimates
     } else {
         estimates <- x
@@ -35,7 +35,7 @@ estimates_to_df <- function(x, collapse = TRUE){
 
     # validate
     if (!is.list(estimates) || !all(vapply(estimates, is.matrix, logical(1)))) {
-        stop("Input must be a 'vefit' object or a list of matrices.", call. = FALSE)
+        stop("Input must be a 'nomatchfit' object or a list of matrices.", call. = FALSE)
     }
 
     df_list <- lapply(seq_along(estimates), \(i){

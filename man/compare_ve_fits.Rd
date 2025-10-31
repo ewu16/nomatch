@@ -13,9 +13,9 @@ compare_ve_fits(
 )
 }
 \arguments{
-\item{fit1}{A vefit object (typically from \code{\link[=matching]{matching()}})}
+\item{fit1}{A nomatchfit object (typically from \code{\link[=matching]{matching()}})}
 
-\item{fit2}{A vefit object (typically from \code{\link[=nomatch]{nomatch()}})}
+\item{fit2}{A nomatchfit object (typically from \code{\link[=nomatch]{nomatch()}})}
 
 \item{labels}{Character vector of length 2 providing labels for the two methods.
 Default is \code{c("Method 1", "Method 2")}.}

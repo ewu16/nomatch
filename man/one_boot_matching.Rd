@@ -11,7 +11,7 @@ one_boot_matching(
   exposure,
   exposure_time,
   tau,
-  eval_times,
+  timepoints,
   limit_type = "fixed",
   data = NULL,
   id_name = NULL,
@@ -38,13 +38,13 @@ follow-up).}
 as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
-\item{eval_times}{Numeric vector specifying the timepoints at which to compute
+\item{timepoints}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure and use the same units
 as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All values must be greater
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
+timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 }
 \value{

@@ -7,7 +7,7 @@ test_that("validate_nomatch_inputs() passes with good input", {
         exposure_time = "D_obs",
         covariates = c("x1","x2"),
         immune_lag = 14,
-        eval_times = c(30,60)
+        timepoints = c(30,60)
     ))
 })
 
@@ -19,7 +19,7 @@ test_that("validate_nomatch_inputs() surfaces sub-validator errors", {
         "Missing required column", ignore.case = TRUE
     )
 
-    # invalid eval_times < immune_lag
+    # invalid timepoints < immune_lag
     expect_error(
         validate_nomatch_inputs(simdata, "Y", "event", "V", "D_obs", c("x1","x2"), 14, c(7,14)),
         "must be > `immune_lag`", ignore.case = TRUE

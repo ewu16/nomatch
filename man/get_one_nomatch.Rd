@@ -12,10 +12,10 @@ get_one_nomatch(
   exposure_time,
   covariates,
   tau,
-  eval_times,
+  timepoints,
   formula_0,
   formula_1,
-  censor_time = max(eval_times),
+  censor_time = max(timepoints),
   custom_gp_list = NULL,
   keep_models = TRUE,
   return_gp_list = TRUE
@@ -45,18 +45,18 @@ and must be set to \code{NA} for unexposed individuals.}
 the hazard models. Include all known, measured confounders of
 exposure and censoring.  Covariates must be measured or defined at the chosen time origin.}
 
-\item{eval_times}{Numeric vector specifying the timepoints at which to compute
+\item{timepoints}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure and use the same units
 as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All values must be greater
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
+timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 
 \item{censor_time}{Time after exposure at which exposed
 individuals are administratively censored during model fitting. Default:
-\code{max(eval_times)}. This limits estimation to the observed  period of interest and
+\code{max(timepoints)}. This limits estimation to the observed  period of interest and
 prevents extrapolation beyond the largest evaluation time.
 Typically, users should leave this at the default.}
 
@@ -82,7 +82,7 @@ automatically set to \code{FALSE}.}
 List with components:
 \describe{
 \item{pt_estimates}{Matrix of point estimates with one row per evaluation time and
-one column per measure (\code{cuminc_0}, \code{cuminc_1}, \code{risk_ratio},\code{vaccine_effectiveness}).}
+one column per measure (\code{cuminc_0}, \code{cuminc_1}, \code{risk_ratio},\code{relative_risk_reduction}).}
 \item{model_0, model_1}{Fitted Cox models (if \code{keep_models = TRUE})}
 \item{gp_list}{Marginalizing distributions (if \code{return_gp_list = TRUE})}
 }

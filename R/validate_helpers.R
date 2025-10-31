@@ -81,14 +81,14 @@ validate_covariates <- function(data, covariates){
     invisible(NULL)
 }
 
-validate_time_args <- function(immune_lag, eval_times){
+validate_time_args <- function(immune_lag, timepoints){
     if (!is.numeric(immune_lag) || length(immune_lag) != 1L || is.na(immune_lag))
         stop("`immune_lag` must be a single non-missing numeric value.", call. = FALSE)
     if (immune_lag < 0) stop("`immune_lag` must be >= 0.", call. = FALSE)
-    if (!is.numeric(eval_times) || length(eval_times) < 1 || anyNA(eval_times))
-        stop("`eval_times` must be a numeric vector with length > 0 and no missing values.", call. = FALSE)
-    if (any(eval_times <= immune_lag))
-        stop("All `eval_times` must be > `immune_lag` (", immune_lag, ").", call. = FALSE)
+    if (!is.numeric(timepoints) || length(timepoints) < 1 || anyNA(timepoints))
+        stop("`timepoints` must be a numeric vector with length > 0 and no missing values.", call. = FALSE)
+    if (any(timepoints <= immune_lag))
+        stop("All `timepoints` must be > `immune_lag` (", immune_lag, ").", call. = FALSE)
     if (immune_lag > 28) warning("immune_lag = ", immune_lag, " days is unusually long. Please verify this is intentional.")
     invisible(NULL)
 }

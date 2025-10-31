@@ -3,11 +3,11 @@
 #' @description
 #' Prints a concise summary of effectiveness estimates from a fitted model.
 #'
-#' @param x An object of class `vefit` created by [nomatch()] or [matching()].
+#' @param x An object of class `nomatchfit` created by [nomatch()] or [matching()].
 #' @param digits Integer indicating the number of decimal places to display. Default is 3.
 #' @param effect The effect measure to output. By default,
 #' this is the `effect` measure chosen in the main function call. Must be one of `risk_difference`, `risk_ratio`,
-#' or `vaccine_effectiveness`.
+#' or `relative_risk_reduction`.
 #' @param ... Additional arguments (currently ignored).
 #'
 #' @return
@@ -17,7 +17,7 @@
 #'
 #'
 #' @export
-print.vefit <- function(x, digits = 3, effect = NULL,...) {
+print.nomatchfit <- function(x, digits = 3, effect = NULL,...) {
     if(is.null(effect)){
         effect <- x$effect
     }
@@ -26,10 +26,10 @@ print.vefit <- function(x, digits = 3, effect = NULL,...) {
         title <- "Risk Difference Estimates"
     }else if(x$effect == "risk_ratio"){
         title <- "Risk Ratio Estimates"
-    }else if(x$effect == "vaccine_effectiveness"){
+    }else if(x$effect == "relative_risk_reduction"){
         title <- "Vaccine Effectiveness Estimates"
     }else{
-        stop("Effect must be one of 'risk_difference', 'risk_ratio', or 'vaccine_effectiveness'")
+        stop("Effect must be one of 'risk_difference', 'risk_ratio', or 'relative_risk_reduction'")
     }
 
     cat("\n", title, "\n")
@@ -83,7 +83,7 @@ print.vefit <- function(x, digits = 3, effect = NULL,...) {
 #' @description
 #' Summarizes how effectiveness estimates were obtained
 #'
-#' @param object An object of class `vefit` created by [nomatch()] or [matching()].
+#' @param object An object of class `nomatchfit` created by [nomatch()] or [matching()].
 #' @param digits Integer indicating the number of decimal places to display. Default is 4.
 #' @param show_models Logical; print model details? Default is FALSE.
 #' @param ... Additional arguments (currently ignored).
@@ -93,12 +93,12 @@ print.vefit <- function(x, digits = 3, effect = NULL,...) {
 #' of printing a detailed summary to the console.
 #'
 #' @export
-summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
+summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
     if(object$effect == "risk_difference"){
         title <- "Risk Difference"
     }else if(object$effect == "risk_ratio"){
         title <- "Risk Ratio"
-    }else if(object$effect == "vaccine_effectiveness"){
+    }else if(object$effect == "relative_risk_reduction"){
         title <- "Vaccine Effectiveness"
     }
 
@@ -109,8 +109,8 @@ summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
 
     # ---- Key Parameters ----
     cat("Method:             ", object$method, "\n")
-    cat("Evaluation times:   ", paste(utils::head(object$eval_times), collapse = ", "),
-        ifelse(length(object$eval_times) > 6, ", ...", ""), "\n")
+    cat("Evaluation times:   ", paste(utils::head(object$timepoints), collapse = ", "),
+        ifelse(length(object$timepoints) > 6, ", ...", ""), "\n")
     cat("Immune lag:         ", object$immune_lag, "\n")
 
     if(object$method ==  "nomatch (G-computation)"){
@@ -218,16 +218,16 @@ summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
     invisible(object)
 }
 
-#' Plot method for vefit objects
+#' Plot method for nomatchfit objects
 #'
 #' @description
 #' Create a panel plot of cumulative incidence and effectiveness estimates across all evaluation time points.
 #'
 #'
-#' @param x An object of class `vefit` created by [nomatch()] or [matching()].
+#' @param x An object of class `nomatchfit` created by [nomatch()] or [matching()].
 #' @param effect The effect measure to plot next to the cumulative incidence plots. By default,
 #' this is the `effect` measure chosen in the main function call. Must be one of `risk_difference`, `risk_ratio`,
-#' or `vaccine_effectiveness`.
+#' or `relative_risk_reduction`.
 #' @param ci_type Character string specifying the type of confidence interval band to plot. By default,
 #'   `"wald"` if available, otherwise set to `"percentile"` or `none`.
 #'   One of `"wald", "percentile", "simul"`, or `"none"`. Must choose a `ci_type` whose lower
@@ -251,20 +251,20 @@ summary.vefit <- function(object, digits = 4, show_models = FALSE,...) {
 #'  exposure = "V",
 #'  exposure_time = "D_obs",
 #'  covariates = c("x1", "x2"),
-#'  eval_times = seq(30, 180, by = 30),
+#'  timepoints = seq(30, 180, by = 30),
 #'  immune_lag = 14,
 #'  boot_reps = 5,
 #'  n_cores = 2
 #' )
 #' plot(fit)
 #'
-plot.vefit <- function(x, effect = NULL, ci_type = NULL, color = "#0072B2", ...) {
+plot.nomatchfit <- function(x, effect = NULL, ci_type = NULL, color = "#0072B2", ...) {
 
     if(is.null(effect)){
         effect <- x$effect
     }
 
-    if(length(x$eval_times) < 2){
+    if(length(x$timepoints) < 2){
         message("Only one evaluation time supplied; returning point estimate(s) instead of a plot")
         est_df <- estimates_to_df(x$estimates)
         print(est_df)
@@ -281,10 +281,10 @@ plot.vefit <- function(x, effect = NULL, ci_type = NULL, color = "#0072B2", ...)
                   trt_1_label = paste(x$exposure, "= 1"))
 }
 
-#' Check if x is a vefit
+#' Check if x is a nomatchfit
 #' @keywords internal
 #' @noRd
-is.vefit <- function(x) {
-    inherits(x, "vefit")
+is.nomatchfit <- function(x) {
+    inherits(x, "nomatchfit")
 }
 

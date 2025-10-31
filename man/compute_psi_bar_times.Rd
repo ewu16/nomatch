@@ -8,7 +8,7 @@ compute_psi_bar_times(
   fit_0,
   fit_1,
   exposure_time,
-  eval_times,
+  timepoints,
   tau,
   newdata,
   gp_list
@@ -22,13 +22,13 @@ compute_psi_bar_times(
 \item{exposure_time}{Name of the time-to-exposure variable  in \code{newdata}.
 Used to compute \eqn{\psi_0(t_0; d,x)} where \eqn{d + \tau} and \eqn{d + t_0} are needed.}
 
-\item{eval_times}{Numeric vector specifying the timepoints at which to compute
+\item{timepoints}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure and use the same units
 as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All values must be greater
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
+timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 
 \item{tau}{Delay period. Internally used argument equivalent to user facing argument \code{immune_lag}}

@@ -7,10 +7,10 @@
 add_simultaneous_ci(object, seed = NULL)
 }
 \arguments{
-\item{object}{An object of class \code{vefit} created by \code{\link[=nomatch]{nomatch()}} or
+\item{object}{An object of class \code{nomatchfit} created by \code{\link[=nomatch]{nomatch()}} or
 \code{\link[=matching]{matching()}}. Must
 \itemize{
-\item contain evaluations at at least 2 timepoints (\verb{length(object$eval_times)  > = 2}),
+\item contain evaluations at at least 2 timepoints (\verb{length(object$timepoints)  > = 2}),
 \item contain bootstrap samples (\code{keep_boot_samples = TRUE} when fitting).
 }}
 
@@ -19,7 +19,7 @@ simultaneous confidence intervals (relied on random number generation).
 Default is \code{NULL} (no seed set).}
 }
 \value{
-The original \code{vefit} object with the following modifications:
+The original \code{nomatchfit} object with the following modifications:
 \describe{
 \item{estimates}{Each matrix gets additional columns describing the simultaneous confidence interval bounds and construction:
 \code{simul_lower}, \code{simul_upper}, \code{simul_n}}
@@ -49,7 +49,7 @@ fit <- nomatch(
   exposure = "V",
   exposure_time = "D_obs",
   covariates = c("x1", "x2"),
-  eval_times = seq(30, 180, by = 30),
+  timepoints = seq(30, 180, by = 30),
   immune_lag = 14,
   boot_reps = 100,
   keep_boot_samples = TRUE

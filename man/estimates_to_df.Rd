@@ -7,7 +7,7 @@
 estimates_to_df(x, collapse = TRUE)
 }
 \arguments{
-\item{x}{A fitted \code{vefit} object or its \code{estimates} component (a named list
+\item{x}{A fitted \code{nomatchfit} object or its \code{estimates} component (a named list
 of matrices).}
 
 \item{collapse}{Logical; if \code{TRUE} (default), returns a single long-format
@@ -29,6 +29,6 @@ The data frame(s) have columns:
 }
 \description{
 A convenience function for extracting estimates from a
-\code{vefit} object (or its \code{estimates} component) into a tidy data frame
+\code{nomatchfit} object (or its \code{estimates} component) into a tidy data frame
 for plotting and summary tables.
 }

@@ -11,8 +11,8 @@ matching(
   exposure,
   exposure_time,
   immune_lag,
-  eval_times,
-  effect = c("risk_ratio", "vaccine_effectiveness", "risk_difference"),
+  timepoints,
+  effect = c("risk_ratio", "relative_risk_reduction", "risk_difference"),
   ci_type = c("wald", "percentile", "both"),
   boot_reps = 0,
   alpha = 0.05,
@@ -48,18 +48,18 @@ and should reflect the biological understanding of when vaccine-induced
 immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
 be set to 0 (no delay period for evaluating risk).}
 
-\item{eval_times}{Numeric vector specifying the timepoints at which to compute
+\item{timepoints}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure and use the same units
 as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All values must be greater
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., \code{eval_times = (immune_lag + 1):100}) can be provided if cumulative
+timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
 incidence curves over time are desired.}
 
 \item{effect}{Character. Primary effect measure of interest (a contrast of
 the marginal cumulative incidences). Either
-\code{"risk_ratio"}(default), \code{"vaccine_effectiveness"}  or \code{"risk_difference"}.}
+\code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or \code{"risk_difference"}.}
 
 \item{ci_type}{Method for constructing bootstrap confidence intervals. One of
 \code{"wald"}, \code{"percentile"}, or \code{"both"}.
@@ -91,7 +91,7 @@ to obtain simultaneous confidence intervals.}
 Windows. Default: \code{1}.}
 }
 \value{
-An object of class \code{vefit} containing:
+An object of class \code{nomatchfit} containing:
 \describe{
 \item{estimates}{Named list of matrices containing the cumulative incidence and
 effect estimates.
@@ -102,14 +102,14 @@ effect estimates.
 \item{\code{risk_ratio}}{ \code{cuminc_1/cuminc_0}}
 \item{\code{vaccine_effectivess}}{ \code{1 - risk_ratio}}
 }
-Each matrix has one row per value in \code{eval_times} and columns including the
+Each matrix has one row per value in \code{timepoints} and columns including the
 point estimate (\code{estimate}) and, when requested, confidence limits of the form
 (\verb{\{wald/percentile\}_lower}, \verb{\{wald/percentile\}_upper}). }
 \item{models}{Fitted Kaplan Meier}
 \item{n_success_boot}{Integer vector indicating the
 number of successful bootstrap replications per timepoint.}
 \item{boot_samples}{(If \code{keep_boot_samples = TRUE}) Named list of bootstrap draws
-(stored as matrices) for each term. Rows index bootstrap replicates and columns index \code{eval_times}.}
+(stored as matrices) for each term. Rows index bootstrap replicates and columns index \code{timepoints}.}
 }
 }
 \description{

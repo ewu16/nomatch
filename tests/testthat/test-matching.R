@@ -3,7 +3,7 @@ test_that("matching() fails gracefully when outcomes are missing", {
     matched_data$Y[1] <- NA
 
     expect_error(
-        matching(matched_data, "Y", "event", "V", "D_obs", immune_lag = 14, eval_times = c(30,60)),
+        matching(matched_data, "Y", "event", "V", "D_obs", immune_lag = 14, timepoints = c(30,60)),
         "Missing values in `outcome_time`", ignore.case = TRUE
     )
 })

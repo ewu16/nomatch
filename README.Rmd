@@ -79,8 +79,8 @@ fit <- nomatch(data = simdata,
                exposure_time = "D_obs", 
                covariates = c("x1", "x2"),
                immune_lag = 14,
-               eval_times = seq(30, 180, by = 30),
-               effect = "vaccine_effectiveness", 
+               timepoints = seq(30, 180, by = 30),
+               effect = "relative_risk_reduction", 
                boot_reps = 10)
 
 # Print main results 

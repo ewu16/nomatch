@@ -95,19 +95,19 @@ test_that("validate_covariates() errors on missingness in any covariate", {
 
 test_that("validate_time_args() enforces types, ranges, relationships, and warns on long lag", {
     # happy path
-    expect_no_error(validate_time_args(immune_lag = 14, eval_times = c(30, 60)))
+    expect_no_error(validate_time_args(immune_lag = 14, timepoints = c(30, 60)))
 
     # immune_lag issues
-    expect_error(validate_time_args(immune_lag = NA_real_, eval_times = 30), "single non-missing", ignore.case = TRUE)
-    expect_error(validate_time_args(immune_lag = -1, eval_times = 30), "must be >= 0", ignore.case = TRUE)
+    expect_error(validate_time_args(immune_lag = NA_real_, timepoints = 30), "single non-missing", ignore.case = TRUE)
+    expect_error(validate_time_args(immune_lag = -1, timepoints = 30), "must be >= 0", ignore.case = TRUE)
 
-    # eval_times issues
-    expect_error(validate_time_args(14, eval_times = numeric(0)), "length > 0", ignore.case = TRUE)
-    expect_error(validate_time_args(14, eval_times = c(NA, 60)), "no missing values", ignore.case = TRUE)
-    expect_error(validate_time_args(14, eval_times = c(7, 14)), "must be > `immune_lag`", ignore.case = TRUE)
+    # timepoints issues
+    expect_error(validate_time_args(14, timepoints = numeric(0)), "length > 0", ignore.case = TRUE)
+    expect_error(validate_time_args(14, timepoints = c(NA, 60)), "no missing values", ignore.case = TRUE)
+    expect_error(validate_time_args(14, timepoints = c(7, 14)), "must be > `immune_lag`", ignore.case = TRUE)
 
     # warning on long lag
-    expect_warning(validate_time_args(immune_lag = 29, eval_times = c(60, 90)), "unusually long", ignore.case = TRUE)
+    expect_warning(validate_time_args(immune_lag = 29, timepoints = c(60, 90)), "unusually long", ignore.case = TRUE)
 })
 
 

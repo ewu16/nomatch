@@ -18,11 +18,11 @@
 #'
 #' @export
 #'
-compute_psi_bar_times <- function(fit_0, fit_1, exposure_time, eval_times, tau, newdata, gp_list){
-    out <- sapply(eval_times, \(t){
+compute_psi_bar_times <- function(fit_0, fit_1, exposure_time, timepoints, tau, newdata, gp_list){
+    out <- sapply(timepoints, \(t){
         compute_psi_bar_t0(fit_0, fit_1, exposure_time, t0 = t, tau, newdata, gp_list)
     })
-    colnames(out) <- eval_times
+    colnames(out) <- timepoints
     t(out)
 }
 

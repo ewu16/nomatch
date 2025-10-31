@@ -5,15 +5,15 @@
 #' useful for making inferences about the entire cumulative incidence or
 #' effectiveness curve.
 #'
-#' @param object An object of class `vefit` created by [nomatch()] or
+#' @param object An object of class `nomatchfit` created by [nomatch()] or
 #'   [matching()]. Must
-#'   * contain evaluations at at least 2 timepoints (`length(object$eval_times)  > = 2`),
+#'   * contain evaluations at at least 2 timepoints (`length(object$timepoints)  > = 2`),
 #'   * contain bootstrap samples (`keep_boot_samples = TRUE` when fitting).
 #' @param seed Integer seed  to ensure reproducible critical values for
 #'   simultaneous confidence intervals (relied on random number generation).
 #'   Default is `NULL` (no seed set).
 #'
-#' @return The original `vefit` object with the following modifications:
+#' @return The original `nomatchfit` object with the following modifications:
 #'   \describe{
 #'    \item{estimates}{Each matrix gets additional columns describing the simultaneous confidence interval bounds and construction:
 #'    `simul_lower`, `simul_upper`, `simul_n`}
@@ -38,7 +38,7 @@
 #'   exposure = "V",
 #'   exposure_time = "D_obs",
 #'   covariates = c("x1", "x2"),
-#'   eval_times = seq(30, 180, by = 30),
+#'   timepoints = seq(30, 180, by = 30),
 #'   immune_lag = 14,
 #'   boot_reps = 100,
 #'   keep_boot_samples = TRUE
@@ -56,11 +56,11 @@
 add_simultaneous_ci <- function(object, seed = NULL){
 
   # Validate inputs
-  if (!is.vefit(object)) {
-    stop("Object must be a vefit object", call. = FALSE)
+  if (!is.nomatchfit(object)) {
+    stop("Object must be a nomatchfit object", call. = FALSE)
   }
 
-  if (length(object$eval_times) <= 1) {
+  if (length(object$timepoints) <= 1) {
     stop("Object must have more than 1 timepoint for simultaneous CIs",
          call. = FALSE)
   }

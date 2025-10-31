@@ -80,7 +80,7 @@ match_rolling_cohort <- function(data, outcome_time, exposure, exposure_time, ma
     cases <- subset(data, data[[exposure]] == 1)
     observed_ds <- sort(unique(data[[exposure_time]]))
 
-    #loop through observed vaccination eval_times- each newly exposed person is eligible for matching
+    #loop through observed vaccination timepoints- each newly exposed person is eligible for matching
     for(d in observed_ds){
         #cases on day d
         case_d <- subset(cases, cases[[exposure_time]] == d)
@@ -131,7 +131,7 @@ match_rolling_cohort <- function(data, outcome_time, exposure, exposure_time, ma
             n_pairs_counter <- n_pairs_counter + n_matches
 
         }#end loop for covariate groups
-    }#end loop for observed vaccination eval_times
+    }#end loop for observed vaccination timepoints
 
     #handle case where no matches are found
     if(length(matched_df_list) == 0) {

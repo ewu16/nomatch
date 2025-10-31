@@ -37,17 +37,17 @@
 #'  and should reflect the biological understanding of when vaccine-induced
 #'  immunity develops (usually 1-2 weeks). For non-vaccine exposures, ` immune_lag` can
 #'  be set to 0 (no delay period for evaluating risk).
-#'@param eval_times Numeric vector specifying the timepoints at which to compute
+#'@param timepoints Numeric vector specifying the timepoints at which to compute
 #'  cumulative incidence and the derived effect measures. The timepoints should
 #'  be expressed in terms of time since exposure and use the same units
 #'  as that used for `outcome_time` and `exposure_time` (e.g. days). All values must be greater
 #'  than ` immune_lag` and and should correspond to clinically meaningful follow-up
 #'  durations, such as 30, 60, or 90 days after exposure. A fine grid of
-#'  timepoints (e.g., `eval_times = (immune_lag + 1):100`) can be provided if cumulative
+#'  timepoints (e.g., `timepoints = (immune_lag + 1):100`) can be provided if cumulative
 #'  incidence curves over time are desired.
 #'@param effect Character. Primary effect measure of interest (a contrast of
 #'  the marginal cumulative incidences). Either
-#'  `"risk_ratio"`(default), `"vaccine_effectiveness"`  or `"risk_difference"`.
+#'  `"risk_ratio"`(default), `"relative_risk_reduction"`  or `"risk_difference"`.
 #'@param weights_source Character string specifying the type of marginalizing weights
 #'  to use. Either:
 #'   - `"observed"` (default): use  the empirical
@@ -102,7 +102,7 @@
 #'  Windows. Default: `1`.
 #'
 #'
-#'@return An object of class `vefit` containing:
+#'@return An object of class `nomatchfit` containing:
 #' \describe{
 #'   \item{estimates}{Named list of matrices containing the cumulative incidence and
 #'   effect estimates.
@@ -113,7 +113,7 @@
 #'      \item{`risk_ratio`}{ `cuminc_1/cuminc_0`}
 #'      \item{`vaccine_effectivess`}{ `1 - risk_ratio`}
 #'   }
-#'      Each matrix has one row per value in `eval_times` and columns including the
+#'      Each matrix has one row per value in `timepoints` and columns including the
 #'     point estimate (`estimate`) and, when requested, confidence limits of the form
 #'     (`{wald/percentile}_lower`, `{wald/percentile}_upper`). }
 #'   \item{weights}{List with dataframes `g_weights`, `p_weights` specifying
@@ -125,10 +125,10 @@
 #'   \item{n_success_boot}{Integer vector indicating the
 #'   number of successful bootstrap replications per timepoint.}
 #'   \item{boot_samples}{(If `keep_boot_samples = TRUE`) Named list of bootstrap draws
-#'   (stored as matrices) for each term. Rows index bootstrap replicates and columns index `eval_times`.}
+#'   (stored as matrices) for each term. Rows index bootstrap replicates and columns index `timepoints`.}
 #' }
 #'
-#' The `vefit` object has methods for [print()], [summary()], and [plot()].
+#' The `nomatchfit` object has methods for [print()], [summary()], and [plot()].
 #' Use [add_simultaneous_ci()] to add simultaneous confidence intervals.
 #'
 #'
@@ -151,7 +151,7 @@
 #'**Marginalizing weights.** When `weights_source = "observed"`, the marginalizing weights
 #'are the empirical distributions of exposure times and covariates among the
 #'exposed who remain at-risk `tau` days after exposure. These weights are
-#'returned in the `vefit` object under `weights`. They can also be obtained
+#'returned in the `nomatchfit` object under `weights`. They can also be obtained
 #'prior to the call to `nomatch()` by calling `get_observed_weights()`.
 #'
 #'
@@ -175,7 +175,7 @@
 #'   exposure = "V",
 #'   exposure_time = "D_obs",
 #'   covariates = c("x1", "x2"),
-#'   eval_times = seq(30, 180, by = 30),
+#'   timepoints = seq(30, 180, by = 30),
 #'   immune_lag = 14,
 #'   boot_reps = 5,
 #'   n_cores = 1
@@ -191,8 +191,8 @@ nomatch <- function(data,
                   exposure_time,
                   covariates,
                   immune_lag,
-                  eval_times,
-                  effect = c("risk_ratio", "vaccine_effectiveness", "risk_difference"),
+                  timepoints,
+                  effect = c("risk_ratio", "relative_risk_reduction", "risk_difference"),
                   weights_source = c("observed", "custom"),
                   custom_weights = NULL,
                   ci_type = c("wald", "percentile", "both"),
@@ -226,7 +226,7 @@ nomatch <- function(data,
         exposure_time = exposure_time,
         covariates = covariates,
         immune_lag = tau,
-        eval_times = eval_times
+        timepoints = timepoints
     )
 
      if(identical(weights_source, "custom") ){
@@ -281,7 +281,7 @@ nomatch <- function(data,
                              exposure_time = exposure_time,
                              covariates = covariates,
                              tau = tau,
-                             eval_times = eval_times,
+                             timepoints = timepoints,
                              custom_gp_list = custom_gp_list,
                              formula_0 = hazard_formulas$formula_unexposed,
                              formula_1 = hazard_formulas$formula_exposed
@@ -371,7 +371,7 @@ nomatch <- function(data,
          exposure_time = exposure_time,
          covariates = covariates,
          immune_lag = tau,
-         eval_times = eval_times,
+         timepoints = timepoints,
          effect = effect,
          ci_type = ci_type,
          boot_reps = boot_reps,
@@ -383,7 +383,7 @@ nomatch <- function(data,
          method =  "nomatch (G-computation)"
          )
 
-     class(out) <- "vefit"
+     class(out) <- "nomatchfit"
 
     return(out)
 }

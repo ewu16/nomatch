@@ -16,7 +16,7 @@
 #'
 #' @param censor_time Time after exposure at which exposed
 #'   individuals are administratively censored during model fitting. Default:
-#'   `max(eval_times)`. This limits estimation to the observed  period of interest and
+#'   `max(timepoints)`. This limits estimation to the observed  period of interest and
 #'   prevents extrapolation beyond the largest evaluation time.
 #'   Typically, users should leave this at the default.
 #' @param weights_source Character string specifying how to construct marginalizing weights.
@@ -32,7 +32,7 @@
 ##' @return List with components:
 #' \describe{
 #'   \item{pt_estimates}{Matrix of point estimates with one row per evaluation time and
-#'     one column per measure (`cuminc_0`, `cuminc_1`, `risk_ratio`,`vaccine_effectiveness`).}
+#'     one column per measure (`cuminc_0`, `cuminc_1`, `risk_ratio`,`relative_risk_reduction`).}
 #'   \item{model_0, model_1}{Fitted Cox models (if `keep_models = TRUE`)}
 #'   \item{gp_list}{Marginalizing distributions (if `return_gp_list = TRUE`)}
 #' }
@@ -47,10 +47,10 @@ get_one_nomatch <- function(data,
                        exposure_time,
                        covariates,
                        tau,
-                       eval_times,
+                       timepoints,
                        formula_0,
                        formula_1, 
-                       censor_time = max(eval_times),
+                       censor_time = max(timepoints),
                        custom_gp_list = NULL,
                        keep_models = TRUE,
                        return_gp_list = TRUE){
@@ -97,14 +97,14 @@ get_one_nomatch <- function(data,
     # --------------------------------------------------------------------------
     # 3 - Compute VE
     # --------------------------------------------------------------------------
-    cuminc <- compute_psi_bar_times(fit_0, fit_1, exposure_time, eval_times, tau, gp_list$g_weights, gp_list = gp_list)
+    cuminc <- compute_psi_bar_times(fit_0, fit_1, exposure_time, timepoints, tau, gp_list$g_weights, gp_list = gp_list)
     rd <- cuminc[, "cuminc_1"] - cuminc[, "cuminc_0"]
     rr <-  cuminc[, "cuminc_1"]/cuminc[, "cuminc_0"]
     ve <- 1 - rr
     pt_estimates = cbind(cuminc,
                          risk_difference = rd,
                          risk_ratio = rr,
-                         vaccine_effectiveness = ve)
+                         relative_risk_reduction = ve)
 
     # --------------------------------------------------------------------------
     # Return items

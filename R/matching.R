@@ -8,7 +8,7 @@
 #' @inheritParams clean_matched_data
 #' @param matched_data A data frame for the matched cohort created using [match_rolling_cohort()].
 
-#'@return An object of class `vefit` containing:
+#'@return An object of class `nomatchfit` containing:
 #' \describe{
 #'   \item{estimates}{Named list of matrices containing the cumulative incidence and
 #'   effect estimates.
@@ -19,14 +19,14 @@
 #'      \item{`risk_ratio`}{ `cuminc_1/cuminc_0`}
 #'      \item{`vaccine_effectivess`}{ `1 - risk_ratio`}
 #'   }
-#'      Each matrix has one row per value in `eval_times` and columns including the
+#'      Each matrix has one row per value in `timepoints` and columns including the
 #'     point estimate (`estimate`) and, when requested, confidence limits of the form
 #'     (`{wald/percentile}_lower`, `{wald/percentile}_upper`). }
 #'   \item{models}{Fitted Kaplan Meier}
 #'   \item{n_success_boot}{Integer vector indicating the
 #'   number of successful bootstrap replications per timepoint.}
 #'   \item{boot_samples}{(If `keep_boot_samples = TRUE`) Named list of bootstrap draws
-#'   (stored as matrices) for each term. Rows index bootstrap replicates and columns index `eval_times`.}
+#'   (stored as matrices) for each term. Rows index bootstrap replicates and columns index `timepoints`.}
 #' }
 #'
 #'
@@ -38,8 +38,8 @@ matching <- function(matched_data,
                         exposure,
                         exposure_time,
                         immune_lag,
-                        eval_times,
-                        effect = c("risk_ratio", "vaccine_effectiveness", "risk_difference"),
+                        timepoints,
+                        effect = c("risk_ratio", "relative_risk_reduction", "risk_difference"),
                         ci_type = c("wald", "percentile", "both"),
                         boot_reps = 0,
                         alpha = 0.05,
@@ -61,7 +61,7 @@ matching <- function(matched_data,
         exposure = exposure,
         exposure_time = exposure_time,
         immune_lag = tau,
-        eval_times = eval_times
+        timepoints = timepoints
     )
 
     # --------------------------------------------------------------------------
@@ -73,7 +73,7 @@ matching <- function(matched_data,
                             exposure = exposure,
                             exposure_time = exposure_time,
                             tau = tau,
-                            eval_times = eval_times)
+                            timepoints = timepoints)
 
     original <- do.call(get_one_matching, estimation_args)
 
@@ -152,7 +152,7 @@ matching <- function(matched_data,
         exposure = exposure,
         exposure_time = exposure_time,
         immune_lag = tau,
-        eval_times = eval_times,
+        timepoints = timepoints,
         effect = effect,
         ci_type = ci_type,
         boot_reps = boot_reps,
@@ -164,7 +164,7 @@ matching <- function(matched_data,
         method =  "matching"
     )
 
-    class(out) <- "vefit"
+    class(out) <- "nomatchfit"
 
     return(out)
 }

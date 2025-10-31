@@ -92,12 +92,12 @@ estimate_bootstrap_ci <- function(one_boot_function,
 
     # Compile results
     boot_mat <- do.call(rbind, results[good])
-    eval_times <- one_boot_args$eval_times
+    timepoints <- one_boot_args$timepoints
 
     boot_samples <- stats::setNames(
         lapply(1:ncol(boot_mat), \(i){
-            m <- matrix(as.numeric(boot_mat[,i]), ncol = length(eval_times), byrow = TRUE)
-            colnames(m) <- eval_times
+            m <- matrix(as.numeric(boot_mat[,i]), ncol = length(timepoints), byrow = TRUE)
+            colnames(m) <- timepoints
             rownames(m) <- 1:nrow(m)
             return(m)
         }),

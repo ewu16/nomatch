@@ -84,11 +84,11 @@ fit <- nomatch(data = simdata,
                exposure_time = "D_obs", 
                covariates = c("x1", "x2"),
                immune_lag = 14,
-               eval_times = seq(30, 180, by = 30),
-               effect = "vaccine_effectiveness", 
+               timepoints = seq(30, 180, by = 30),
+               effect = "relative_risk_reduction", 
                boot_reps = 10)
 #> Bootstrapping 10 samples...
-#> Time difference of 1.455535 secs
+#> Time difference of 1.489327 secs
 
 # Print main results 
 ## - Note by default only the chosen effect measure is printed
@@ -99,8 +99,8 @@ fit
 #> ================================================== 
 #> Call: nomatch(data = simdata, outcome_time = "Y", outcome_status = "event", 
 #>     exposure = "V", exposure_time = "D_obs", covariates = c("x1", 
-#>         "x2"), immune_lag = 14, eval_times = seq(30, 180, by = 30), 
-#>     effect = "vaccine_effectiveness", boot_reps = 10) 
+#>         "x2"), immune_lag = 14, timepoints = seq(30, 180, by = 30), 
+#>     effect = "relative_risk_reduction", boot_reps = 10) 
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value
