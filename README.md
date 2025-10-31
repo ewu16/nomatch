@@ -62,7 +62,7 @@ Note that the dataset contains the following:
 
 - exposure status (`V`) with values `1 = vaccinated, 0 = unvaccinated`.
   (Note: its currently assumed that the unexposed group does not receive
-  an active comparator)
+  an active comparator.)
 
 - time to vaccination (`D_obs`); for unvaccinated individuals this is
   left as `NA`.
@@ -70,25 +70,25 @@ Note that the dataset contains the following:
 - right censored survival data `(Y, event)`
 
   - `Y` represents follow-up time for an outcome such as infection,
-    hospitalization or death (`Y`)
+    hospitalization or death.
   - `event` indicates whether individual experienced the event or
-    censoring with values `1 = event, 0 = censored`
+    censoring with values `1 = event, 0 = censored`.
 
 ``` r
 
 # Compute cumulative incidence and effect measures 
 fit <- nomatch(data = simdata,
-                  outcome_time = "Y",
-                  outcome_status = "event",
-                  exposure = "V",
-                  exposure_time = "D_obs", 
-                  covariates = c("x1", "x2"),
-                  immune_lag = 14,
-                  eval_times = seq(30, 180, by = 30),
-                  effect = "vaccine_effectiveness", 
-                  boot_reps = 10)
+               outcome_time = "Y",
+               outcome_status = "event",
+               exposure = "V",
+               exposure_time = "D_obs", 
+               covariates = c("x1", "x2"),
+               immune_lag = 14,
+               eval_times = seq(30, 180, by = 30),
+               effect = "vaccine_effectiveness", 
+               boot_reps = 10)
 #> Bootstrapping 10 samples...
-#> Time difference of 1.533158 secs
+#> Time difference of 1.455535 secs
 
 # Print main results 
 ## - Note by default only the chosen effect measure is printed

@@ -25,29 +25,28 @@ library(dplyr)
 
 ## Introduction
 
-The `nomatch` package is designed to use a G-computation style estimator to compute
-estimates of marginal cumulative incidence in observational cohort studies with a binary exposure and time-to-event outcome. 
-The estimator aligns with the target trial emulation framework (Hernan 2016) and provides
+The `nomatch` package is designed to use G-computation style estimation to compute
+estimates of marginal cumulative incidence in observational cohort studies with a binary exposure and a time-to-event outcome. 
+The approach aligns with the target trial emulation framework (Hernan 2016) and provides
 an alternative to matching methods, which can suffer from substantial efficiency loss.
-The estimator adjusts for baseline confounders and time to exposure, which may be measured on 
-calendar time scale, age, or other time scale, by fitting
-two conditional Cox models. These models are used to compute marginal 
-cumulative incidence under "interventions" of exposure and no exposure;
-derived effect measures such as risk differences, risk ratios, and vaccine effectiveness are also provided. 
+Estimation involves fitting two exposure-specific Cox models which adjust for baseline confounders.
+Predictions from these models are used to compute marginal 
+cumulative incidence under interventions of exposure and no exposure.
+Effect measures such as risk differences, risk ratios, and vaccine effectiveness are also provided. 
 
 
 
-## nomatch 
+## Usage
 
 We examine the use of `nomatch` to produce estimates of effectiveness for a
-binary exposure (intervention). The package can be loaded as follows: 
+binary exposure. The package can be loaded as follows: 
 
 ```{r setup}
 library(nomatch)
 ```
 
-We will illustrate the use of the package using the simple simulated dataset `simdata` 
-included in the package. For exposition, we will pretend this dataset represents data from an 
+We will illustrate the use of the package using a simple simulated dataset, `simdata`, 
+included in the package. For exposition, we will assume this dataset represents data from an 
 observational vaccine study. In practice, data from other disease settings can be used as well. 
 The first few rows of `simdata` can be viewed as follows:
 
@@ -60,15 +59,15 @@ head(simdata)
 ```
 
 
-The data contains one row per individual (`ID`) and a set of baseline covariates (`x1`, `x2`). 
-There are two variables related to an individual's exposure which are 1) their vaccination status (`V`), a binary indicator with values `1 = vaccinated, 0 = unvaccinated` 
-and 2) their time to receiving vaccination (`D_obs`), a numeric value or 
+The data contains one row per individual (`ID`) and a set of individual baseline covariates (`x1`, `x2`).
+Information on an individual's exposure is encompassed in  1) their vaccination status (`V`), a binary indicator with values `1 = vaccinated, 0 = unvaccinated` 
+and 2) their time to receiving vaccination (`D_obs`), a numeric value for vaccinated individuals and 
 `NA` for unvaccinated individuals.
 The data also includes right-censored survival outcomes`(Y, event)` where `Y` represents follow-up time for an outcome (e.g. infection or death), and `event` indicates whether the individual experienced the event with values `1 = event, 0 = censored`. 
 
 We will assume that time to vaccination `D_obs` and time to outcome `Y` are measured relative
-to a calendar date of study start; this is motivated by the fact that calendar time is
-often an important time scale in vaccine studies due to changing infection dynamics. In other settings, relevant time scales may include
+to a calendar date of study start because calendar time is
+often an important time scale in vaccine studies due to changing infection dynamics. In other settings, the relevant time scale may be
 time since enrollment or other meaningful event, or age. Regardless of the choice of time scale, 
 the same time origin should be used to define the time to exposure and time to outcome variables, 
 as well as the baseline covariates. 
@@ -77,13 +76,13 @@ as well as the baseline covariates.
 ### Estimating cumulative incidence
 
 To learn about the real-world effectiveness of an intervention, we can try to
-compare the incidence of failure at a fixed time under the active and control exposure. 
-We assume that the exposed group consists of initiators (.e.g vaccinated individuals) 
+compare the incidence of the endpoint of interest at a fixed time after exposure when individuals are assigned to an active or control exposure. 
+We will assume that the exposed group consists of initiators (e.g vaccinated individuals) 
 and that the non-exposed group consists of non-initiators (e.g. unvaccinated individuals).
-A challenge in analyzing such data is that the start of follow-up is not well-defined for the
-unexposed group. One way to circumvent this issue is to imagine that we can assign individuals in a certain covariate group to receive an exposure (or no exposure) on a certain day. In this case, the natural start of follow-up 
-is the assigned day for receiving the exposure, just as start of follow-up in a randomized trial coincides with the day of randomization. 
-This allows us to define cumulative incidences of the outcome for each intervention-day and for each covariate group. 
+An analytical challenge in this setting is that the start of follow-up  for the
+unexposed group is not well-defined. One way to circumvent this issue is to imagine that we can assign individuals in a certain covariate group to receive an exposure (or no exposure) on a certain day. In this case, the natural start of follow-up 
+is the assigned day for receiving the exposure, just as start of follow-up in a randomized trial is the day of randomization. 
+This allows us to define cumulative incidences for each intervention-day and for each covariate group. 
 These day- and covariate-specific cumulative incidences can then be marginalized (e.g. over the distribution of
 exposure days and covariates among those observed to be exposed) to obtain
 overall cumulative incidence estimates. 
@@ -91,17 +90,17 @@ overall cumulative incidence estimates.
 We can invoke the `nomatch` function to compute these marginal cumulative incidences. 
 Here, we need to provide several types of arguments: 
 
-- `data, outcome_time, outcome_status, exposure, exposure_time, covariates`: First, we need to provide  our dataset and the names of the variables in the dataset that describe the outcome, exposure, and covariates to adjust for. 
+- `data, outcome_time, outcome_status, exposure, exposure_time, covariates`: Primary arguments providing the dataset and the names of the variables in the dataset that describe the outcome, exposure, and covariates to adjust for. 
 
-- `immune_lag, eval_times`: Then we specify what cumulative incidences to compute. The first argument, `immune_lag`,
+- `immune_lag, eval_times`: Arguments that specify what cumulative incidences to compute. The first, `immune_lag`,
 is used to compute cumulative incidences that ignore events that occur within `immune_lag` days; the population of interest is 
 defined to be the subset of individuals who would remain endpoint-free `immune_lag` days after exposure. This is often used in vaccine studies because the vaccine takes time to induce an immune response and become effective. We will set `immune_lag = 14` (2 weeks) for our pretend vaccine study, but this can also be set to `0` when not relevant
-to the setting of interest. The second argument, `eval_times`, specifies the timepoints of interest
+to the setting of interest. The second, `eval_times`, specifies the timepoints of interest
 for evaluating cumulative incidence. Here we've specified to compute
 the cumulative incidence of infection/severity outcomes occurring within `30, 60, 90, ..180`
 days after vaccination. 
 
-- `boot_reps`: Since confidence intervals for the estimated cumulative incidences and effect measures are based on bootstrapping procedures, we need to provide the number of bootstrap replications. Note that we use a small number here so the example runs quicly,
+- `boot_reps`: Argument for the number of bootstrap replications to use since confidence intervals for the estimated cumulative incidences and effect measures are based on bootstrapping procedures. Note that we use a small number here so the example runs quicly,
 but `boot_reps = 1000` is recommended to construct reliable confidence intervals for interpretation. By default, Wald-style bootstrap confidence intervals and p-values are returned. 
 
 
@@ -110,19 +109,19 @@ but `boot_reps = 1000` is recommended to construct reliable confidence intervals
 
 # Compute cumulative incidence 
 fit <- nomatch(data = simdata,
-                  outcome_time = "Y",
-                  outcome_status = "event",
-                  exposure = "V",
-                  exposure_time = "D_obs", 
-                  covariates = c("x1", "x2"),
-                  immune_lag = 14,
-                  eval_times = seq(30, 180, by = 30),
-                  boot_reps = 10)
+               outcome_time = "Y",
+               outcome_status = "event",
+               exposure = "V",
+               exposure_time = "D_obs", 
+               covariates = c("x1", "x2"),
+               immune_lag = 14,
+               eval_times = seq(30, 180, by = 30),
+               boot_reps = 10)
 
 
 ```
 
-Here we see the vaccine effectiveness estimates for our simulated dataset. 
+We can print the vaccine effectiveness estimates for our simulated dataset. 
 
 ```{r}
 fit
@@ -131,7 +130,7 @@ fit
 The cumulative incidence estimates (`cuminc_0` for unexposed and  `cuminc_1` for exposed) ) and other effects (`risk_difference`, `risk_ratio`, and `vaccine_effectiveness`) are also stored within the 
 fitted object. These can be examined via `fit$estimates`. 
 
-If all confounders are adjusted for, the resulting cumulative incidence/effect estimates can be interpreted as the cumulative incidences/effect that would be observed in a clinical trial in which participants 1) are similar to those observed to be exposed and 2) who enroll into the study such that the distribution of enrollments times matches the distribution of observed exposure times. 
+If all confounders are adjusted for, the resulting cumulative incidence/effect estimates can be interpreted as the cumulative incidences or effect that would be observed in a clinical trial in which participants 1) are similar to those observed to be exposed and 2) who enroll into the study such that the distribution of enrollments times matches the distribution of observed exposure times. 
 
 ### Additional details about estimation approach 
 
@@ -165,8 +164,7 @@ plot(fit)
 #### Plotting simultaneous confidence intervals 
 
 Note that in the plot above, we have plotted the pointwise confidence intervals, which
-are just the usual 95% confidence intervals plotted at each timepoint. If instead of
-inference on each timepoint, we would like to make inference 
+are just the usual 95% confidence intervals plotted at each timepoint. If we would instead like to make inference 
 on the entire curve, we need to construct simultaneous confidence intervals. 
 We can do this using the `add_simulatenous_ci()` function which computes simultaneous confidence intervals given an existing fitted object, provided that the bootstrap samples were saved in the object (i.e. `keep_boot_samples = TRUE`, the default). This function returns the original fitted object updated with simultaneous confidence intervals
 which we now save in a new object. 
@@ -176,7 +174,7 @@ which we now save in a new object.
 fit_with_simul <- add_simultaneous_ci(fit, seed = 1234)
 ```
 
-The simultaneous confidence interals are now printed with the object.  
+The simultaneous confidence interals are now stored in the fitted object.  
 ```{r}
 fit_with_simul
 ```
@@ -256,13 +254,13 @@ matched_data <- matched_cohort[[1]]
 
 
 fit_matching <-matching(matched_data = matched_data,
-                           outcome_time = "Y",
-                           outcome_status = "event",
-                           exposure = "V",
-                           exposure_time = "D_obs", 
-                           immune_lag = 14,
-                           eval_times = seq(30, 180, by = 30),
-                           boot_reps = 10) 
+                        outcome_time = "Y",
+                        outcome_status = "event",
+                        exposure = "V",
+                        exposure_time = "D_obs", 
+                        immune_lag = 14,
+                        eval_times = seq(30, 180, by = 30),
+                        boot_reps = 10) 
 
 fit_matching
 
