@@ -62,32 +62,31 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <code>nomatch</code> package is designed to use a G-computation
-style estimator to compute estimates of marginal cumulative incidence in
-observational cohort studies with a binary exposure and time-to-event
-outcome. The estimator aligns with the target trial emulation framework
-(Hernan 2016) and provides an alternative to matching methods, which can
-suffer from substantial efficiency loss. The estimator adjusts for
-baseline confounders and time to exposure, which may be measured on
-calendar time scale, age, or other time scale, by fitting two
-conditional Cox models. These models are used to compute marginal
-cumulative incidence under “interventions” of exposure and no exposure;
-derived effect measures such as risk differences, risk ratios, and
-vaccine effectiveness are also provided.</p>
+<p>The <code>nomatch</code> package is designed to use G-computation
+style estimation to compute estimates of marginal cumulative incidence
+in observational cohort studies with a binary exposure and a
+time-to-event outcome. The approach aligns with the target trial
+emulation framework (Hernan 2016) and provides an alternative to
+matching methods, which can suffer from substantial efficiency loss.
+Estimation involves fitting two exposure-specific Cox models which
+adjust for baseline confounders. Predictions from these models are used
+to compute marginal cumulative incidence under interventions of exposure
+and no exposure. Effect measures such as risk differences, risk ratios,
+and vaccine effectiveness are also provided.</p>
 </div>
 <div class="section level2">
-<h2 id="nomatch">nomatch<a class="anchor" aria-label="anchor" href="#nomatch"></a>
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <p>We examine the use of <code>nomatch</code> to produce estimates of
-effectiveness for a binary exposure (intervention). The package can be
-loaded as follows:</p>
+effectiveness for a binary exposure. The package can be loaded as
+follows:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ewu16.github.io/nomatch/">nomatch</a></span><span class="op">)</span></span></code></pre></div>
-<p>We will illustrate the use of the package using the simple simulated
-dataset <code>simdata</code> included in the package. For exposition, we
-will pretend this dataset represents data from an observational vaccine
-study. In practice, data from other disease settings can be used as
-well. The first few rows of <code>simdata</code> can be viewed as
+<p>We will illustrate the use of the package using a simple simulated
+dataset, <code>simdata</code>, included in the package. For exposition,
+we will assume this dataset represents data from an observational
+vaccine study. In practice, data from other disease settings can be used
+as well. The first few rows of <code>simdata</code> can be viewed as
 follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">simdata</span> <span class="op">&lt;-</span> <span class="fu">as_tibble</span><span class="op">(</span><span class="va">simdata</span><span class="op">)</span> <span class="co">#for prettier printing</span></span>
@@ -104,73 +103,72 @@ follows:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5     1    11     0    <span style="color: #BB0000;">NA</span>   210     0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6     1     7     0    <span style="color: #BB0000;">NA</span>    90     0</span></span></code></pre></div>
 <p>The data contains one row per individual (<code>ID</code>) and a set
-of baseline covariates (<code>x1</code>, <code>x2</code>). There are two
-variables related to an individual’s exposure which are 1) their
+of individual baseline covariates (<code>x1</code>, <code>x2</code>).
+Information on an individual’s exposure is encompassed in 1) their
 vaccination status (<code>V</code>), a binary indicator with values
 <code>1 = vaccinated, 0 = unvaccinated</code> and 2) their time to
-receiving vaccination (<code>D_obs</code>), a numeric value or
-<code>NA</code> for unvaccinated individuals. The data also includes
-right-censored survival outcomes<code>(Y, event)</code> where
-<code>Y</code> represents follow-up time for an outcome (e.g. infection
-or death), and <code>event</code> indicates whether the individual
-experienced the event with values
-<code>1 = event, 0 = censored</code>.</p>
+receiving vaccination (<code>D_obs</code>), a numeric value for
+vaccinated individuals and <code>NA</code> for unvaccinated individuals.
+The data also includes right-censored survival
+outcomes<code>(Y, event)</code> where <code>Y</code> represents
+follow-up time for an outcome (e.g. infection or death), and
+<code>event</code> indicates whether the individual experienced the
+event with values <code>1 = event, 0 = censored</code>.</p>
 <p>We will assume that time to vaccination <code>D_obs</code> and time
 to outcome <code>Y</code> are measured relative to a calendar date of
-study start; this is motivated by the fact that calendar time is often
-an important time scale in vaccine studies due to changing infection
-dynamics. In other settings, relevant time scales may include time since
-enrollment or other meaningful event, or age. Regardless of the choice
-of time scale, the same time origin should be used to define the time to
-exposure and time to outcome variables, as well as the baseline
-covariates.</p>
+study start because calendar time is often an important time scale in
+vaccine studies due to changing infection dynamics. In other settings,
+the relevant time scale may be time since enrollment or other meaningful
+event, or age. Regardless of the choice of time scale, the same time
+origin should be used to define the time to exposure and time to outcome
+variables, as well as the baseline covariates.</p>
 <div class="section level3">
 <h3 id="estimating-cumulative-incidence">Estimating cumulative incidence<a class="anchor" aria-label="anchor" href="#estimating-cumulative-incidence"></a>
 </h3>
 <p>To learn about the real-world effectiveness of an intervention, we
-can try to compare the incidence of failure at a fixed time under the
-active and control exposure. We assume that the exposed group consists
-of initiators (.e.g vaccinated individuals) and that the non-exposed
-group consists of non-initiators (e.g. unvaccinated individuals). A
-challenge in analyzing such data is that the start of follow-up is not
-well-defined for the unexposed group. One way to circumvent this issue
-is to imagine that we can assign individuals in a certain covariate
-group to receive an exposure (or no exposure) on a certain day. In this
-case, the natural start of follow-up is the assigned day for receiving
-the exposure, just as start of follow-up in a randomized trial coincides
-with the day of randomization. This allows us to define cumulative
-incidences of the outcome for each intervention-day and for each
-covariate group. These day- and covariate-specific cumulative incidences
-can then be marginalized (e.g. over the distribution of exposure days
-and covariates among those observed to be exposed) to obtain overall
-cumulative incidence estimates.</p>
+can try to compare the incidence of the endpoint of interest at a fixed
+time after exposure when individuals are assigned to an active or
+control exposure. We will assume that the exposed group consists of
+initiators (e.g vaccinated individuals) and that the non-exposed group
+consists of non-initiators (e.g. unvaccinated individuals). An
+analytical challenge in this setting is that the start of follow-up for
+the unexposed group is not well-defined. One way to circumvent this
+issue is to imagine that we can assign individuals in a certain
+covariate group to receive an exposure (or no exposure) on a certain
+day. In this case, the natural start of follow-up is the assigned day
+for receiving the exposure, just as start of follow-up in a randomized
+trial is the day of randomization. This allows us to define cumulative
+incidences for each intervention-day and for each covariate group. These
+day- and covariate-specific cumulative incidences can then be
+marginalized (e.g. over the distribution of exposure days and covariates
+among those observed to be exposed) to obtain overall cumulative
+incidence estimates.</p>
 <p>We can invoke the <code>nomatch</code> function to compute these
 marginal cumulative incidences. Here, we need to provide several types
 of arguments:</p>
 <ul>
 <li><p><code>data, outcome_time, outcome_status, exposure, exposure_time, covariates</code>:
-First, we need to provide our dataset and the names of the variables in
-the dataset that describe the outcome, exposure, and covariates to
+Primary arguments providing the dataset and the names of the variables
+in the dataset that describe the outcome, exposure, and covariates to
 adjust for.</p></li>
-<li><p><code>immune_lag, eval_times</code>: Then we specify what
-cumulative incidences to compute. The first argument,
-<code>immune_lag</code>, is used to compute cumulative incidences that
-ignore events that occur within <code>immune_lag</code> days; the
-population of interest is defined to be the subset of individuals who
-would remain endpoint-free <code>immune_lag</code> days after exposure.
-This is often used in vaccine studies because the vaccine takes time to
-induce an immune response and become effective. We will set
-<code>immune_lag = 14</code> (2 weeks) for our pretend vaccine study,
-but this can also be set to <code>0</code> when not relevant to the
-setting of interest. The second argument, <code>eval_times</code>,
-specifies the timepoints of interest for evaluating cumulative
-incidence. Here we’ve specified to compute the cumulative incidence of
-infection/severity outcomes occurring within
+<li><p><code>immune_lag, eval_times</code>: Arguments that specify what
+cumulative incidences to compute. The first, <code>immune_lag</code>, is
+used to compute cumulative incidences that ignore events that occur
+within <code>immune_lag</code> days; the population of interest is
+defined to be the subset of individuals who would remain endpoint-free
+<code>immune_lag</code> days after exposure. This is often used in
+vaccine studies because the vaccine takes time to induce an immune
+response and become effective. We will set <code>immune_lag = 14</code>
+(2 weeks) for our pretend vaccine study, but this can also be set to
+<code>0</code> when not relevant to the setting of interest. The second,
+<code>eval_times</code>, specifies the timepoints of interest for
+evaluating cumulative incidence. Here we’ve specified to compute the
+cumulative incidence of infection/severity outcomes occurring within
 <code>30, 60, 90, ..180</code> days after vaccination.</p></li>
-<li><p><code>boot_reps</code>: Since confidence intervals for the
-estimated cumulative incidences and effect measures are based on
-bootstrapping procedures, we need to provide the number of bootstrap
-replications. Note that we use a small number here so the example runs
+<li><p><code>boot_reps</code>: Argument for the number of bootstrap
+replications to use since confidence intervals for the estimated
+cumulative incidences and effect measures are based on bootstrapping
+procedures. Note that we use a small number here so the example runs
 quicly, but <code>boot_reps = 1000</code> is recommended to construct
 reliable confidence intervals for interpretation. By default, Wald-style
 bootstrap confidence intervals and p-values are returned.</p></li>
@@ -179,17 +177,17 @@ bootstrap confidence intervals and p-values are returned.</p></li>
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Compute cumulative incidence </span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nomatch.html">nomatch</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">simdata</span>,</span>
-<span>                  outcome_time <span class="op">=</span> <span class="st">"Y"</span>,</span>
-<span>                  outcome_status <span class="op">=</span> <span class="st">"event"</span>,</span>
-<span>                  exposure <span class="op">=</span> <span class="st">"V"</span>,</span>
-<span>                  exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>, </span>
-<span>                  covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span>,</span>
-<span>                  immune_lag <span class="op">=</span> <span class="fl">14</span>,</span>
-<span>                  eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
-<span>                  boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span>               outcome_time <span class="op">=</span> <span class="st">"Y"</span>,</span>
+<span>               outcome_status <span class="op">=</span> <span class="st">"event"</span>,</span>
+<span>               exposure <span class="op">=</span> <span class="st">"V"</span>,</span>
+<span>               exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>, </span>
+<span>               covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span>,</span>
+<span>               immune_lag <span class="op">=</span> <span class="fl">14</span>,</span>
+<span>               eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
+<span>               boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Time difference of 3.595898 secs</span></span></code></pre></div>
-<p>Here we see the vaccine effectiveness estimates for our simulated
+<span><span class="co">#&gt; Time difference of 3.683838 secs</span></span></code></pre></div>
+<p>We can print the vaccine effectiveness estimates for our simulated
 dataset.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span></span>
@@ -219,7 +217,7 @@ unexposed and <code>cuminc_1</code> for exposed) ) and other effects
 object. These can be examined via <code>fit$estimates</code>.</p>
 <p>If all confounders are adjusted for, the resulting cumulative
 incidence/effect estimates can be interpreted as the cumulative
-incidences/effect that would be observed in a clinical trial in which
+incidences or effect that would be observed in a clinical trial in which
 participants 1) are similar to those observed to be exposed and 2) who
 enroll into the study such that the distribution of enrollments times
 matches the distribution of observed exposure times.</p>
@@ -306,19 +304,18 @@ number of timepoints used in the function call.</p>
 </h4>
 <p>Note that in the plot above, we have plotted the pointwise confidence
 intervals, which are just the usual 95% confidence intervals plotted at
-each timepoint. If instead of inference on each timepoint, we would like
-to make inference on the entire curve, we need to construct simultaneous
-confidence intervals. We can do this using the
-<code>add_simulatenous_ci()</code> function which computes simultaneous
-confidence intervals given an existing fitted object, provided that the
-bootstrap samples were saved in the object
+each timepoint. If we would instead like to make inference on the entire
+curve, we need to construct simultaneous confidence intervals. We can do
+this using the <code>add_simulatenous_ci()</code> function which
+computes simultaneous confidence intervals given an existing fitted
+object, provided that the bootstrap samples were saved in the object
 (i.e. <code>keep_boot_samples = TRUE</code>, the default). This function
 returns the original fitted object updated with simultaneous confidence
 intervals which we now save in a new object.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Compute simultaneous CI</span></span>
 <span><span class="va">fit_with_simul</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_simultaneous_ci.html">add_simultaneous_ci</a></span><span class="op">(</span><span class="va">fit</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span></code></pre></div>
-<p>The simultaneous confidence interals are now printed with the
+<p>The simultaneous confidence interals are now stored in the fitted
 object.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_with_simul</span></span>
@@ -434,15 +431,15 @@ scope, serving only to provide a simple matching comparison.</p>
 <span></span>
 <span></span>
 <span><span class="va">fit_matching</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/matching.html">matching</a></span><span class="op">(</span>matched_data <span class="op">=</span> <span class="va">matched_data</span>,</span>
-<span>                           outcome_time <span class="op">=</span> <span class="st">"Y"</span>,</span>
-<span>                           outcome_status <span class="op">=</span> <span class="st">"event"</span>,</span>
-<span>                           exposure <span class="op">=</span> <span class="st">"V"</span>,</span>
-<span>                           exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>, </span>
-<span>                           immune_lag <span class="op">=</span> <span class="fl">14</span>,</span>
-<span>                           eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
-<span>                           boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> </span>
+<span>                        outcome_time <span class="op">=</span> <span class="st">"Y"</span>,</span>
+<span>                        outcome_status <span class="op">=</span> <span class="st">"event"</span>,</span>
+<span>                        exposure <span class="op">=</span> <span class="st">"V"</span>,</span>
+<span>                        exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>, </span>
+<span>                        immune_lag <span class="op">=</span> <span class="fl">14</span>,</span>
+<span>                        eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
+<span>                        boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Time difference of 1.306314 secs</span></span>
+<span><span class="co">#&gt; Time difference of 1.388343 secs</span></span>
 <span></span>
 <span><span class="va">fit_matching</span></span>
 <span><span class="co">#&gt; </span></span>

@@ -94,16 +94,15 @@
 <ul>
 <li><p>one row per individual (<code>ID</code>)</p></li>
 <li><p>a set of baseline covariates (<code>x1</code>, <code>x2</code>)</p></li>
-<li><p>exposure status (<code>V</code>) with values <code>1 = vaccinated, 0 = unvaccinated</code>. (Note: its currently assumed that the unexposed group does not receive an active comparator)</p></li>
+<li><p>exposure status (<code>V</code>) with values <code>1 = vaccinated, 0 = unvaccinated</code>. (Note: its currently assumed that the unexposed group does not receive an active comparator.)</p></li>
 <li><p>time to vaccination (<code>D_obs</code>); for unvaccinated individuals this is left as <code>NA</code>.</p></li>
 <li>
 <p>right censored survival data <code>(Y, event)</code></p>
 <ul>
 <li>
-<code>Y</code> represents follow-up time for an outcome such as infection, hospitalization or death (<code>Y</code>)</li>
+<code>Y</code> represents follow-up time for an outcome such as infection, hospitalization or death.</li>
 <li>
-<code>event</code> indicates whether individual experienced the event or censoring with values <code>1 = event, 0 = censored</code>
-</li>
+<code>event</code> indicates whether individual experienced the event or censoring with values <code>1 = event, 0 = censored</code>.</li>
 </ul>
 </li>
 </ul>
@@ -111,17 +110,17 @@
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Compute cumulative incidence and effect measures </span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/nomatch.html">nomatch</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">simdata</span>,</span>
-<span>                  outcome_time <span class="op">=</span> <span class="st">"Y"</span>,</span>
-<span>                  outcome_status <span class="op">=</span> <span class="st">"event"</span>,</span>
-<span>                  exposure <span class="op">=</span> <span class="st">"V"</span>,</span>
-<span>                  exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>, </span>
-<span>                  covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span>,</span>
-<span>                  immune_lag <span class="op">=</span> <span class="fl">14</span>,</span>
-<span>                  eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
-<span>                  effect <span class="op">=</span> <span class="st">"vaccine_effectiveness"</span>, </span>
-<span>                  boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span>               outcome_time <span class="op">=</span> <span class="st">"Y"</span>,</span>
+<span>               outcome_status <span class="op">=</span> <span class="st">"event"</span>,</span>
+<span>               exposure <span class="op">=</span> <span class="st">"V"</span>,</span>
+<span>               exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>, </span>
+<span>               covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span>,</span>
+<span>               immune_lag <span class="op">=</span> <span class="fl">14</span>,</span>
+<span>               eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
+<span>               effect <span class="op">=</span> <span class="st">"vaccine_effectiveness"</span>, </span>
+<span>               boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Time difference of 1.533158 secs</span></span>
+<span><span class="co">#&gt; Time difference of 1.455535 secs</span></span>
 <span></span>
 <span><span class="co"># Print main results </span></span>
 <span><span class="co">## - Note by default only the chosen effect measure is printed</span></span>
