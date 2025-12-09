@@ -104,19 +104,19 @@ test_that("valid formulas do not error", {
     )
 })
 
-test_that("Formula for unexposed must contain covariates exactly", {
+test_that("Formula for unexposed throws warning for missing covariates", {
     covars <- c("x1", "x2")
     expo   <- "D_obs"
-    expect_error(
+    expect_warning(
         validate_formulas(
-            formula_unexposed =  as.formula("~ x1 + I(x2^2) + x3"),
+            formula_unexposed =  as.formula("~  I(x2^2)"),
             formula_exposed   = as.formula("~ x1 + I(x2^2) + splines::ns(D_obs, df = 4)"),
             covariates = covars,
             exposure_time = expo),
         regexp = "Formula for unexposed"
     )
     
-    expect_error(
+    expect_warning(
         validate_formulas(
             formula_unexposed =  as.formula("~ x1"),
             formula_exposed   = as.formula("~ x1 + I(x2^2) + splines::ns(D_obs, df = 4)"),
@@ -126,10 +126,10 @@ test_that("Formula for unexposed must contain covariates exactly", {
     )
 })
 
-test_that("Formula for exposed must contain covariates and time to exposure exactly", {
+test_that("Formula for exposed throws warning for missing covariates/time to exposure", {
     covars <- c("x1", "x2")
     expo   <- "D_obs"
-    expect_error(
+    expect_warning(
         validate_formulas(
             formula_unexposed =  as.formula("~ x1 + I(x2^2)"),
             formula_exposed   = as.formula("~ I(x2^2) + splines::ns(D_obs, df = 4)"),
@@ -138,7 +138,7 @@ test_that("Formula for exposed must contain covariates and time to exposure exac
         regexp = "Formula for exposed"
     )
     
-    expect_error(
+    expect_warning(
         validate_formulas(
             formula_unexposed =  as.formula("~ x1 + I(x2^2)"),
             formula_exposed   = as.formula("~ x1 + I(x2^2)"),

@@ -24,14 +24,19 @@ resolve_hazard_formulas <- function(formula_unexposed, formula_exposed, covariat
 validate_formulas <- function(formula_unexposed, formula_exposed, covariates, exposure_time){
  
 
-    if(!setequal(get_rhs_vars(formula_unexposed), covariates)){
-        stop("Formula for unexposed must include all variables in `covariates`")
+    if(any(!covariates %in% get_rhs_vars(formula_unexposed))){
+        warning("Formula for unexposed does not include all variables in `covariates`")
     }
     
-    if(!setequal(get_rhs_vars(formula_exposed), c(covariates, exposure_time))){
-        stop("Formula for exposed must include all variables in `covariates`",
-             "and a term for `exposure_time`")
+    if(any(!covariates %in% get_rhs_vars(formula_exposed))){
+        warning("Formula for exposed does not include all variables in `covariates`")
     }
+    
+    if(!exposure_time %in% get_rhs_vars(formula_exposed)){
+        warning("Formula for exposed does not include a term for `exposure_time`")
+    }
+    
+   
     invisible(NULL)
 }
 
