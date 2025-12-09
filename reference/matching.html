@@ -52,8 +52,7 @@ analysis dataset and performs the analysis for the matched cohort.</p>
 <span>  <span class="va">exposure</span>,</span>
 <span>  <span class="va">exposure_time</span>,</span>
 <span>  <span class="va">immune_lag</span>,</span>
-<span>  <span class="va">eval_times</span>,</span>
-<span>  effect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"risk_ratio"</span>, <span class="st">"vaccine_effectiveness"</span>, <span class="st">"risk_difference"</span><span class="op">)</span>,</span>
+<span>  <span class="va">timepoints</span>,</span>
 <span>  ci_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wald"</span>, <span class="st">"percentile"</span>, <span class="st">"both"</span><span class="op">)</span>,</span>
 <span>  boot_reps <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
@@ -105,21 +104,15 @@ immunity develops (usually 1-2 weeks). For non-vaccine exposures, <code> immune_
 be set to 0 (no delay period for evaluating risk).</p></dd>
 
 
-<dt id="arg-eval-times">eval_times<a class="anchor" aria-label="anchor" href="#arg-eval-times"></a></dt>
+<dt id="arg-timepoints">timepoints<a class="anchor" aria-label="anchor" href="#arg-timepoints"></a></dt>
 <dd><p>Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure and use the same units
 as that used for <code>outcome_time</code> and <code>exposure_time</code> (e.g. days). All values must be greater
 than <code> immune_lag</code> and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., <code>eval_times = (immune_lag + 1):100</code>) can be provided if cumulative
+timepoints (e.g., <code>timepoints = (immune_lag + 1):100</code>) can be provided if cumulative
 incidence curves over time are desired.</p></dd>
-
-
-<dt id="arg-effect">effect<a class="anchor" aria-label="anchor" href="#arg-effect"></a></dt>
-<dd><p>Character. Primary effect measure of interest (a contrast of
-the marginal cumulative incidences). Either
-<code>"risk_ratio"</code>(default), <code>"vaccine_effectiveness"</code>  or <code>"risk_difference"</code>.</p></dd>
 
 
 <dt id="arg-ci-type">ci_type<a class="anchor" aria-label="anchor" href="#arg-ci-type"></a></dt>
@@ -163,7 +156,7 @@ Windows. Default: <code>1</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>vefit</code> containing:</p><dl><dt>estimates</dt>
+    <p>An object of class <code>nomatchfit</code> containing:</p><dl><dt>estimates</dt>
 <dd><p>Named list of matrices containing the cumulative incidence and
 effect estimates.</p><dl><dt><code>cuminc_0</code></dt>
 <dd><p>marginal cumulative incidence under no exposure</p></dd>
@@ -181,7 +174,7 @@ effect estimates.</p><dl><dt><code>cuminc_0</code></dt>
 <dd><p><code>1 - risk_ratio</code></p></dd>
 
 
-</dl><p>Each matrix has one row per value in <code>eval_times</code> and columns including the
+</dl><p>Each matrix has one row per value in <code>timepoints</code> and columns including the
 point estimate (<code>estimate</code>) and, when requested, confidence limits of the form
 (<code>{wald/percentile}_lower</code>, <code>{wald/percentile}_upper</code>).</p></dd>
 
@@ -194,7 +187,7 @@ number of successful bootstrap replications per timepoint.</p></dd>
 
 <dt>boot_samples</dt>
 <dd><p>(If <code>keep_boot_samples = TRUE</code>) Named list of bootstrap draws
-(stored as matrices) for each term. Rows index bootstrap replicates and columns index <code>eval_times</code>.</p></dd>
+(stored as matrices) for each term. Rows index bootstrap replicates and columns index <code>timepoints</code>.</p></dd>
 
 
 </dl></div>
@@ -208,7 +201,7 @@ number of successful bootstrap replications per timepoint.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

@@ -8,7 +8,7 @@ These cumulative incidences are then marginalized to compute overall
 are marginalized over the observed distribution of exposure times and covariates
 among the exposed. The resulting cumulative incidences can be
 summarized as risk ratios (RR = 1 - risk_exposed/risk_unexposed),
-vaccine effectiveness  (VE = 1 - RR), or risk differences (RD = risk_exposed - risk_unexposed)."><meta property="og:description" content="nomatch() estimates marginal cumulative incidences under
+relative risk reduction (1 - RR), or risk differences (RD = risk_exposed - risk_unexposed)."><meta property="og:description" content="nomatch() estimates marginal cumulative incidences under
 exposure and no exposure using a G-computation approach. The method fits two
 conditional hazard models- one for each exposure type- and uses
 these models to predict time- and covariate-specific cumulative incidences.
@@ -17,7 +17,7 @@ These cumulative incidences are then marginalized to compute overall
 are marginalized over the observed distribution of exposure times and covariates
 among the exposed. The resulting cumulative incidences can be
 summarized as risk ratios (RR = 1 - risk_exposed/risk_unexposed),
-vaccine effectiveness  (VE = 1 - RR), or risk differences (RD = risk_exposed - risk_unexposed)."></head><body>
+relative risk reduction (1 - RR), or risk differences (RD = risk_exposed - risk_unexposed)."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -61,7 +61,7 @@ These cumulative incidences are then marginalized to compute overall
 are marginalized over the observed distribution of exposure times and covariates
 among the exposed. The resulting cumulative incidences can be
 summarized as risk ratios (RR = 1 - risk_exposed/risk_unexposed),
-vaccine effectiveness  (VE = 1 - RR), or risk differences (RD = risk_exposed - risk_unexposed).</p>
+relative risk reduction (1 - RR), or risk differences (RD = risk_exposed - risk_unexposed).</p>
     </div>
 
     <div class="section level2">
@@ -74,8 +74,7 @@ vaccine effectiveness  (VE = 1 - RR), or risk differences (RD = risk_exposed - r
 <span>  <span class="va">exposure_time</span>,</span>
 <span>  <span class="va">covariates</span>,</span>
 <span>  <span class="va">immune_lag</span>,</span>
-<span>  <span class="va">eval_times</span>,</span>
-<span>  effect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"risk_ratio"</span>, <span class="st">"vaccine_effectiveness"</span>, <span class="st">"risk_difference"</span><span class="op">)</span>,</span>
+<span>  <span class="va">timepoints</span>,</span>
 <span>  weights_source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observed"</span>, <span class="st">"custom"</span><span class="op">)</span>,</span>
 <span>  custom_weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ci_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wald"</span>, <span class="st">"percentile"</span>, <span class="st">"both"</span><span class="op">)</span>,</span>
@@ -139,21 +138,15 @@ immunity develops (usually 1-2 weeks). For non-vaccine exposures, <code> immune_
 be set to 0 (no delay period for evaluating risk).</p></dd>
 
 
-<dt id="arg-eval-times">eval_times<a class="anchor" aria-label="anchor" href="#arg-eval-times"></a></dt>
+<dt id="arg-timepoints">timepoints<a class="anchor" aria-label="anchor" href="#arg-timepoints"></a></dt>
 <dd><p>Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure and use the same units
 as that used for <code>outcome_time</code> and <code>exposure_time</code> (e.g. days). All values must be greater
 than <code> immune_lag</code> and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., <code>eval_times = (immune_lag + 1):100</code>) can be provided if cumulative
+timepoints (e.g., <code>timepoints = (immune_lag + 1):100</code>) can be provided if cumulative
 incidence curves over time are desired.</p></dd>
-
-
-<dt id="arg-effect">effect<a class="anchor" aria-label="anchor" href="#arg-effect"></a></dt>
-<dd><p>Character. Primary effect measure of interest (a contrast of
-the marginal cumulative incidences). Either
-<code>"risk_ratio"</code>(default), <code>"vaccine_effectiveness"</code>  or <code>"risk_difference"</code>.</p></dd>
 
 
 <dt id="arg-weights-source">weights_source<a class="anchor" aria-label="anchor" href="#arg-weights-source"></a></dt>
@@ -233,7 +226,7 @@ that <code>exposure_time</code> be modeled flexibly (e.g. using splines).</p></d
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>vefit</code> containing:</p><dl><dt>estimates</dt>
+    <p>An object of class <code>nomatchfit</code> containing:</p><dl><dt>estimates</dt>
 <dd><p>Named list of matrices containing the cumulative incidence and
 effect estimates.</p><dl><dt><code>cuminc_0</code></dt>
 <dd><p>marginal cumulative incidence under no exposure</p></dd>
@@ -251,7 +244,7 @@ effect estimates.</p><dl><dt><code>cuminc_0</code></dt>
 <dd><p><code>1 - risk_ratio</code></p></dd>
 
 
-</dl><p>Each matrix has one row per value in <code>eval_times</code> and columns including the
+</dl><p>Each matrix has one row per value in <code>timepoints</code> and columns including the
 point estimate (<code>estimate</code>) and, when requested, confidence limits of the form
 (<code>{wald/percentile}_lower</code>, <code>{wald/percentile}_upper</code>).</p></dd>
 
@@ -273,10 +266,10 @@ number of successful bootstrap replications per timepoint.</p></dd>
 
 <dt>boot_samples</dt>
 <dd><p>(If <code>keep_boot_samples = TRUE</code>) Named list of bootstrap draws
-(stored as matrices) for each term. Rows index bootstrap replicates and columns index <code>eval_times</code>.</p></dd>
+(stored as matrices) for each term. Rows index bootstrap replicates and columns index <code>timepoints</code>.</p></dd>
 
 
-</dl><p>The <code>vefit</code> object has methods for <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, and <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.
+</dl><p>The <code>nomatchfit</code> object has methods for <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, and <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.
 Use <code><a href="add_simultaneous_ci.html">add_simultaneous_ci()</a></code> to add simultaneous confidence intervals.</p>
     </div>
     <div class="section level2">
@@ -296,11 +289,11 @@ incidence estimates.</p>
 <p><strong>Marginalizing weights.</strong> When <code>weights_source = "observed"</code>, the marginalizing weights
 are the empirical distributions of exposure times and covariates among the
 exposed who remain at-risk <code>tau</code> days after exposure. These weights are
-returned in the <code>vefit</code> object under <code>weights</code>. They can also be obtained
+returned in the <code>nomatchfit</code> object under <code>weights</code>. They can also be obtained
 prior to the call to <code>nomatch()</code> by calling <code><a href="get_observed_weights.html">get_observed_weights()</a></code>.</p>
 <p><strong>Confidence intervals.</strong> Wald CIs are constructed on transformed scales:
-\(\text{logit}\) for cumulative incidence; \(\log{RR}\) for risk ratios,
-\(\log{1 - VE}\) for vaccine effectiveness, using bootstrap SEs. These are
+\(\text{logit}\) for cumulative incidence; \(\log{RR}\) for risk ratios/relative risk
+reduction, using bootstrap SEs. These are
 then back-transformed to the original scale. No transformation is used for risk differences.</p>
 <p><strong>Parallelization.</strong> Bootstraps can be parallelized on Unix via <code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">parallel::mclapply()</a></code>
 by providing <code>n_cores</code> argument.</p>
@@ -308,7 +301,7 @@ by providing <code>n_cores</code> argument.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Fit vaccine effectiveness model using simulated data</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Fit effectiveness model using simulated data</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">nomatch</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">simdata</span>,</span></span>
@@ -317,13 +310,13 @@ by providing <code>n_cores</code> argument.</p>
 <span class="r-in"><span>  exposure <span class="op">=</span> <span class="st">"V"</span>,</span></span>
 <span class="r-in"><span>  exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>,</span></span>
 <span class="r-in"><span>  covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  timepoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  immune_lag <span class="op">=</span> <span class="fl">14</span>,</span></span>
 <span class="r-in"><span>  boot_reps <span class="op">=</span> <span class="fl">5</span>,</span></span>
 <span class="r-in"><span>  n_cores <span class="op">=</span> <span class="fl">1</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrapping 5 samples...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Time difference of 1.94763 secs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time difference of 1.800435 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># View basic results</span></span></span>
 <span class="r-in"><span><span class="va">fit</span><span class="op">$</span><span class="va">estimates</span></span></span>
@@ -363,7 +356,7 @@ by providing <code>n_cores</code> argument.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 150 0.7305328  0.6292230  0.8481543 0.07616898 4.035446e-04      5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 180 0.8280065  0.7474679  0.9172230 0.05220997 9.867902e-04      5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $vaccine_effectiveness</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $relative_risk_reduction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      estimate wald_lower wald_upper    wald_se    wald_pval wald_n</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 30  0.4655914  0.3219308  0.5788150 0.12147601 1.267008e-04      5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 60  0.3952484  0.3200516  0.4621291 0.05979658 3.846257e-11      5</span>
@@ -383,7 +376,7 @@ by providing <code>n_cores</code> argument.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

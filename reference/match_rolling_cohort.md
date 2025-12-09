@@ -1,0 +1,110 @@
+# Match exposed and unexposed individuals using rolling cohort design
+
+Creates 1:1 matched pairs of exposed ("cases") and unexposed("controls")
+individuals. Uses a rolling cohort design where controls must be
+unexposed and event-free at the time they are matched to a case.
+
+## Usage
+
+``` r
+match_rolling_cohort(
+  data,
+  outcome_time,
+  exposure,
+  exposure_time,
+  matching_vars,
+  id_name,
+  replace = FALSE,
+  seed = NULL
+)
+```
+
+## Arguments
+
+- data:
+
+  A data frame with one row per individual containing the columns named
+  in `outcome_time`, `exposure`, `exposure_time`, `matching_vars` and
+  `id_name`. Missing values for all columns except `exposure_time` are
+  not allowed.
+
+- outcome_time:
+
+  Name of the follow-up time for the outcome of interest, i.e. time to
+  either the event or right-censoring, whichever occurs first. Time
+  should be measured from a chosen time origin (e.g. study start,
+  enrollment, or age).
+
+- exposure:
+
+  Name of the exposure indicator. The underlying column should be
+  numeric (`1` = exposed during follow-up, `0` = never exposed during
+  follow-up).
+
+- exposure_time:
+
+  Name of the time to exposure, measured on the same time scale as that
+  used for `outcome_time`. Must be a non-missing numeric value exposed
+  individuals and must be set to `NA` for unexposed individuals.
+
+- matching_vars:
+
+  Character vector of variables to use for exact matching.
+
+- id_name:
+
+  Name of unique identifier variable of individuals.
+
+- replace:
+
+  Logical. Allow controls to be reused? Default: `FALSE`
+
+- seed:
+
+  Integer for reproducibility. Default: `NULL`
+
+## Value
+
+A list containing the following:
+
+- matched_data:
+
+  Data frame of matched pairs with original variables plus:
+
+  - `match_index_time`: Time at which individuals were matched
+
+  - `match_type`: "case" or "control"
+
+  - `match_<exposure>`: Treatment at matching
+
+  - `match_id`: Pair identifier
+
+- n_unmatched_cases:
+
+  Number of unmatched exposed individuals
+
+- discarded:
+
+  Logical vector indicating excluded individuals
+
+## Details
+
+For each exposure time, newly exposed individuals are matched to
+eligible controls using exact covariate matching. Controls are eligible
+if unexposed and event-free at that time. Exposed individuals may appear
+in the final matched dataset twice, as a control (when they are not yet
+exposed) and as a case.
+
+## Examples
+
+``` r
+matched_cohort <- match_rolling_cohort(
+  data = simdata,
+  outcome_time =  "Y",
+  exposure = "V",
+  exposure_time = "D_obs",
+  matching_vars = c("x1", "x2"),
+  id_name = "ID",
+  seed = 5678
+)
+```

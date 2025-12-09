@@ -47,7 +47,7 @@ groups based on Kaplan Meier estimation.</p>
 <span>  <span class="va">adata_outcome_name</span>,</span>
 <span>  <span class="va">adata_event_name</span>,</span>
 <span>  <span class="va">adata_trt_name</span>,</span>
-<span>  <span class="va">eval_times</span>,</span>
+<span>  <span class="va">timepoints</span>,</span>
 <span>  keep_models <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -73,14 +73,14 @@ time should be the time to event from vaccination/matched index date</p></dd>
 <dd><p>Character string specifying the treatment variable in <code>adata</code></p></dd>
 
 
-<dt id="arg-eval-times">eval_times<a class="anchor" aria-label="anchor" href="#arg-eval-times"></a></dt>
+<dt id="arg-timepoints">timepoints<a class="anchor" aria-label="anchor" href="#arg-timepoints"></a></dt>
 <dd><p>Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
 be expressed in terms of time since exposure and use the same units
 as that used for <code>outcome_time</code> and <code>exposure_time</code> (e.g. days). All values must be greater
 than <code> immune_lag</code> and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
-timepoints (e.g., <code>eval_times = (immune_lag + 1):100</code>) can be provided if cumulative
+timepoints (e.g., <code>timepoints = (immune_lag + 1):100</code>) can be provided if cumulative
 incidence curves over time are desired.</p></dd>
 
 
@@ -111,7 +111,7 @@ incidence/VE terms and the rows are the requested time points for evaluation.</p
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

@@ -72,7 +72,7 @@ Estimation involves fitting two exposure-specific Cox models which
 adjust for baseline confounders. Predictions from these models are used
 to compute marginal cumulative incidence under interventions of exposure
 and no exposure. Effect measures such as risk differences, risk ratios,
-and vaccine effectiveness are also provided.</p>
+and relative risk reduction are also provided.</p>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -151,7 +151,7 @@ of arguments:</p>
 Primary arguments providing the dataset and the names of the variables
 in the dataset that describe the outcome, exposure, and covariates to
 adjust for.</p></li>
-<li><p><code>immune_lag, eval_times</code>: Arguments that specify what
+<li><p><code>immune_lag, timepoints</code>: Arguments that specify what
 cumulative incidences to compute. The first, <code>immune_lag</code>, is
 used to compute cumulative incidences that ignore events that occur
 within <code>immune_lag</code> days; the population of interest is
@@ -161,7 +161,7 @@ vaccine studies because the vaccine takes time to induce an immune
 response and become effective. We will set <code>immune_lag = 14</code>
 (2 weeks) for our pretend vaccine study, but this can also be set to
 <code>0</code> when not relevant to the setting of interest. The second,
-<code>eval_times</code>, specifies the timepoints of interest for
+<code>timepoints</code>, specifies the timepoints of interest for
 evaluating cumulative incidence. Here we’ve specified to compute the
 cumulative incidence of infection/severity outcomes occurring within
 <code>30, 60, 90, ..180</code> days after vaccination.</p></li>
@@ -183,37 +183,37 @@ bootstrap confidence intervals and p-values are returned.</p></li>
 <span>               exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>, </span>
 <span>               covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span>,</span>
 <span>               immune_lag <span class="op">=</span> <span class="fl">14</span>,</span>
-<span>               eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
+<span>               timepoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>               boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Time difference of 3.683838 secs</span></span></code></pre></div>
-<p>We can print the vaccine effectiveness estimates for our simulated
-dataset.</p>
+<span><span class="co">#&gt; Time difference of 3.47804 secs</span></span></code></pre></div>
+<p>We can print the relative risk reduction (i.e vaccine effectiveness)
+estimates for our simulated dataset.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span>, effect <span class="op">=</span> <span class="st">"relative_risk_reduction"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Risk Ratio Estimates </span></span>
+<span><span class="co">#&gt;  Relative Risk Reduction Estimates </span></span>
 <span><span class="co">#&gt; ================================================== </span></span>
 <span><span class="co">#&gt; Call: nomatch(data = simdata, outcome_time = "Y", outcome_status = "event", </span></span>
 <span><span class="co">#&gt;     exposure = "V", exposure_time = "D_obs", covariates = c("x1", </span></span>
-<span><span class="co">#&gt;         "x2"), immune_lag = 14, eval_times = seq(30, 180, by = 30), </span></span>
+<span><span class="co">#&gt;         "x2"), immune_lag = 14, timepoints = seq(30, 180, by = 30), </span></span>
 <span><span class="co">#&gt;     boot_reps = 10) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Result:</span></span>
 <span><span class="co">#&gt;   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value</span></span>
-<span><span class="co">#&gt; 1        30    0.534              0.314              0.910     0.086340</span></span>
-<span><span class="co">#&gt; 2        60    0.605              0.479              0.764     0.000925</span></span>
-<span><span class="co">#&gt; 3        90    0.603              0.492              0.741     0.000148</span></span>
-<span><span class="co">#&gt; 4       120    0.661              0.547              0.799     0.000448</span></span>
-<span><span class="co">#&gt; 5       150    0.731              0.620              0.861     0.001338</span></span>
-<span><span class="co">#&gt; 6       180    0.828              0.717              0.956     0.018627</span></span>
+<span><span class="co">#&gt; 1        30    0.466             0.0902              0.686     0.086340</span></span>
+<span><span class="co">#&gt; 2        60    0.395             0.2359              0.521     0.000925</span></span>
+<span><span class="co">#&gt; 3        90    0.397             0.2594              0.508     0.000148</span></span>
+<span><span class="co">#&gt; 4       120    0.339             0.2011              0.453     0.000448</span></span>
+<span><span class="co">#&gt; 5       150    0.269             0.1387              0.380     0.001338</span></span>
+<span><span class="co">#&gt; 6       180    0.172             0.0444              0.283     0.018627</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Use summary() for more details</span></span>
 <span><span class="co">#&gt; Use plot() to visualize results</span></span></code></pre></div>
 <p>The cumulative incidence estimates (<code>cuminc_0</code> for
 unexposed and <code>cuminc_1</code> for exposed) ) and other effects
 (<code>risk_difference</code>, <code>risk_ratio</code>, and
-<code>vaccine_effectiveness</code>) are also stored within the fitted
+<code>relative_risk_reduction</code>) are also stored within the fitted
 object. These can be examined via <code>fit$estimates</code>.</p>
 <p>If all confounders are adjusted for, the resulting cumulative
 incidence/effect estimates can be interpreted as the cumulative
@@ -242,7 +242,7 @@ models can be obtained by</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ====================================================================== </span></span>
-<span><span class="co">#&gt; Risk Ratio Analysis Summary</span></span>
+<span><span class="co">#&gt; Analysis Summary</span></span>
 <span><span class="co">#&gt; ====================================================================== </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Method:              nomatch (G-computation) </span></span>
@@ -293,12 +293,12 @@ The weights used for marginalization are returned in the
 <p>We can make a quick panel plot of the cumulative incidence and
 vaccine effectiveness estimates over time using <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.
 Note that if cumulative incidence curves are of interest, it is
-recommended to provide a fine grid of <code>eval_times</code> to produce
+recommended to provide a fine grid of <code>timepoints</code> to produce
 smooth curves. Our example plot will be somewhat crude due to the small
 number of timepoints used in the function call.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
-<p><img src="nomatch_files/figure-html/unnamed-chunk-6-1.png" width="576"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, effect <span class="op">=</span> <span class="st">"relative_risk_reduction"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="nomatch_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" width="576"></p>
 <div class="section level4">
 <h4 id="plotting-simultaneous-confidence-intervals">Plotting simultaneous confidence intervals<a class="anchor" aria-label="anchor" href="#plotting-simultaneous-confidence-intervals"></a>
 </h4>
@@ -315,7 +315,7 @@ intervals which we now save in a new object.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Compute simultaneous CI</span></span>
 <span><span class="va">fit_with_simul</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_simultaneous_ci.html">add_simultaneous_ci</a></span><span class="op">(</span><span class="va">fit</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span></code></pre></div>
-<p>The simultaneous confidence interals are now stored in the fitted
+<p>The simultaneous confidence intervals are now stored in the fitted
 object.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_with_simul</span></span>
@@ -324,7 +324,7 @@ object.</p>
 <span><span class="co">#&gt; ================================================== </span></span>
 <span><span class="co">#&gt; Call: nomatch(data = simdata, outcome_time = "Y", outcome_status = "event", </span></span>
 <span><span class="co">#&gt;     exposure = "V", exposure_time = "D_obs", covariates = c("x1", </span></span>
-<span><span class="co">#&gt;         "x2"), immune_lag = 14, eval_times = seq(30, 180, by = 30), </span></span>
+<span><span class="co">#&gt;         "x2"), immune_lag = 14, timepoints = seq(30, 180, by = 30), </span></span>
 <span><span class="co">#&gt;     boot_reps = 10) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Result:</span></span>
@@ -351,8 +351,8 @@ Note that the simultaneous confidence intervals must be computed before
 plotting; otherwise, the call will error.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Plot simultaneous confidence bands </span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_with_simul</span> , ci_type <span class="op">=</span> <span class="st">"simul"</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="nomatch_files/figure-html/unnamed-chunk-9-1.png" width="576"></p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_with_simul</span> , effect <span class="op">=</span> <span class="st">"relative_risk_reduction"</span>, ci_type <span class="op">=</span> <span class="st">"simul"</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="nomatch_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" width="576"></p>
 <p>The simultaneous confidence intervals indicate that if we were to
 repeatedly construct simultaneous confidence intervals on new samples of
 data, then 95% of the constructed simultaneous confidence bands would
@@ -379,7 +379,7 @@ can be used for plotting.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    30 cuminc_1          0.006<span style="text-decoration: underline;">22</span>    0.004<span style="text-decoration: underline;">19</span>    0.009<span style="text-decoration: underline;">22</span> 0.202     <span style="color: #BB0000;">NA</span>          10</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    30 risk_difference  -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">42</span>   -<span style="color: #BB0000;">0.009</span><span style="color: #BB0000; text-decoration: underline;">81</span>   -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">03</span> 0.002<span style="text-decoration: underline;">24</span>    0.015<span style="text-decoration: underline;">5</span>     10</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    30 risk_ratio        0.534      0.314      0.910   0.271      0.086<span style="text-decoration: underline;">3</span>     10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    30 vaccine_effecti…  0.466      0.090<span style="text-decoration: underline;">2</span>     0.686   0.271      0.086<span style="text-decoration: underline;">3</span>     10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    30 relative_risk_r…  0.466      0.090<span style="text-decoration: underline;">2</span>     0.686   0.271      0.086<span style="text-decoration: underline;">3</span>     10</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    60 cuminc_0          0.037<span style="text-decoration: underline;">9</span>     0.033<span style="text-decoration: underline;">0</span>     0.043<span style="text-decoration: underline;">5</span>  0.073<span style="text-decoration: underline;">7</span>    <span style="color: #BB0000;">NA</span>          10</span></span></code></pre></div>
 <p>For example, we can create a plot that overlays the cumulative
 incidence estimates for the two exposure types as follows:</p>
@@ -397,7 +397,7 @@ incidence estimates for the two exposure types as follows:</p>
 <span>       title <span class="op">=</span> <span class="st">"Cumulative Incidence Curves"</span>, </span>
 <span>       color <span class="op">=</span> <span class="st">"Exposure Group"</span>,</span>
 <span>       fill <span class="op">=</span> <span class="st">"Exposure Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="nomatch_files/figure-html/unnamed-chunk-11-1.png" width="576"></p>
+<p><img src="nomatch_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" width="576"></p>
 </div>
 <div class="section level3">
 <h3 id="comparison-with-matching">Comparison with matching<a class="anchor" aria-label="anchor" href="#comparison-with-matching"></a>
@@ -436,10 +436,10 @@ scope, serving only to provide a simple matching comparison.</p>
 <span>                        exposure <span class="op">=</span> <span class="st">"V"</span>,</span>
 <span>                        exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>, </span>
 <span>                        immune_lag <span class="op">=</span> <span class="fl">14</span>,</span>
-<span>                        eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
+<span>                        timepoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>                        boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Time difference of 1.388343 secs</span></span>
+<span><span class="co">#&gt; Time difference of 1.429927 secs</span></span>
 <span></span>
 <span><span class="va">fit_matching</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -447,7 +447,7 @@ scope, serving only to provide a simple matching comparison.</p>
 <span><span class="co">#&gt; ================================================== </span></span>
 <span><span class="co">#&gt; Call: matching(matched_data = matched_data, outcome_time = "Y", outcome_status = "event", </span></span>
 <span><span class="co">#&gt;     exposure = "V", exposure_time = "D_obs", immune_lag = 14, </span></span>
-<span><span class="co">#&gt;     eval_times = seq(30, 180, by = 30), boot_reps = 10) </span></span>
+<span><span class="co">#&gt;     timepoints = seq(30, 180, by = 30), boot_reps = 10) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Result:</span></span>
 <span><span class="co">#&gt;   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value</span></span>
@@ -463,14 +463,14 @@ scope, serving only to provide a simple matching comparison.</p>
 <span></span>
 <span><span class="co"># Plot matching vs proposed estimator - nomatch tends to have similar point estimates but narrower</span></span>
 <span><span class="co"># confidence intervals</span></span>
-<span><span class="fu"><a href="../reference/compare_ve_fits.html">compare_ve_fits</a></span><span class="op">(</span><span class="va">fit_matching</span>, <span class="va">fit</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Matching"</span>, <span class="st">"nomatch (G-computation)"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="nomatch_files/figure-html/unnamed-chunk-12-1.png" width="576"></p>
+<span><span class="fu"><a href="../reference/compare_ve_fits.html">compare_ve_fits</a></span><span class="op">(</span><span class="va">fit_matching</span>, <span class="va">fit</span>, effect <span class="op">=</span> <span class="st">"relative_risk_reduction"</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Matching"</span>, <span class="st">"nomatch (G-computation)"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="nomatch_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" width="576"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
-<pre><code><span><span class="co">#&gt; R version 4.5.1 (2025-06-13)</span></span>
+<pre><code><span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
 <span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -491,21 +491,21 @@ scope, serving only to provide a simple matching comparison.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] nomatch_0.0.0.9000 dplyr_1.1.4        ggplot2_4.0.0      tibble_3.3.0      </span></span>
+<span><span class="co">#&gt; [1] nomatch_0.0.0.9000 dplyr_1.1.4        ggplot2_4.0.1      tibble_3.3.0      </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] Matrix_1.7-3       gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.1    </span></span>
-<span><span class="co">#&gt;  [5] tidyselect_1.2.1   parallel_4.5.1     jquerylib_0.1.4    splines_4.5.1     </span></span>
+<span><span class="co">#&gt;  [1] Matrix_1.7-4       gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2    </span></span>
+<span><span class="co">#&gt;  [5] tidyselect_1.2.1   parallel_4.5.2     jquerylib_0.1.4    splines_4.5.2     </span></span>
 <span><span class="co">#&gt;  [9] systemfonts_1.3.1  scales_1.4.0       textshaping_1.0.4  ggh4x_0.3.1       </span></span>
-<span><span class="co">#&gt; [13] yaml_2.3.10        fastmap_1.2.0      lattice_0.22-7     R6_2.6.1          </span></span>
+<span><span class="co">#&gt; [13] yaml_2.3.11        fastmap_1.2.0      lattice_0.22-7     R6_2.6.1          </span></span>
 <span><span class="co">#&gt; [17] labeling_0.4.3     generics_0.1.4     knitr_1.50         MASS_7.3-65       </span></span>
 <span><span class="co">#&gt; [21] desc_1.4.3         bslib_0.9.0        pillar_1.11.1      RColorBrewer_1.1-3</span></span>
-<span><span class="co">#&gt; [25] rlang_1.1.6        utf8_1.2.6         cachem_1.1.0       xfun_0.53         </span></span>
-<span><span class="co">#&gt; [29] fs_1.6.6           sass_0.4.10        S7_0.2.0           cli_3.6.5         </span></span>
-<span><span class="co">#&gt; [33] pkgdown_2.1.3      withr_3.0.2        magrittr_2.0.4     digest_0.6.37     </span></span>
-<span><span class="co">#&gt; [37] grid_4.5.1         lifecycle_1.0.4    vctrs_0.6.5        evaluate_1.0.5    </span></span>
+<span><span class="co">#&gt; [25] rlang_1.1.6        utf8_1.2.6         cachem_1.1.0       xfun_0.54         </span></span>
+<span><span class="co">#&gt; [29] fs_1.6.6           sass_0.4.10        S7_0.2.1           cli_3.6.5         </span></span>
+<span><span class="co">#&gt; [33] pkgdown_2.2.0      withr_3.0.2        magrittr_2.0.4     digest_0.6.39     </span></span>
+<span><span class="co">#&gt; [37] grid_4.5.2         lifecycle_1.0.4    vctrs_0.6.5        evaluate_1.0.5    </span></span>
 <span><span class="co">#&gt; [41] glue_1.8.0         farver_2.1.2       ragg_1.5.0         survival_3.8-3    </span></span>
-<span><span class="co">#&gt; [45] rmarkdown_2.30     tools_4.5.1        pkgconfig_2.0.3    htmltools_0.5.8.1</span></span></code></pre>
+<span><span class="co">#&gt; [45] rmarkdown_2.30     tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9</span></span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -518,7 +518,7 @@ scope, serving only to provide a simple matching comparison.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

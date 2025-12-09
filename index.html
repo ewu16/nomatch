@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies Without Matching">
-<meta name="description" content="Implements estimators for a proposed causal estimand of vaccine effectiveness using observational data.">
-<meta property="og:description" content="Implements estimators for a proposed causal estimand of vaccine effectiveness using observational data.">
+<meta name="description" content="Implements estimators of marginal cumulative incidence for binary interventions using observational data.">
+<meta property="og:description" content="Implements estimators of marginal cumulative incidence for binary interventions using observational data.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -69,7 +69,7 @@
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p>This minimal example shows how to use <code>nomatch</code> to obtain cumulative incidences and their derived effect measures such as risk differences (RD), risk ratios (RR), and vaccine effectiveness (VE = 1 - RR).</p>
+<p>This minimal example shows how to use <code>nomatch</code> to obtain cumulative incidences and their derived effect measures such as risk differences (RD), risk ratios (RR), and relative risk reduction (1 - RR).</p>
 <p>We use a simple simulated dataset mimicking data from an observational vaccine study, although the methods apply equally to other disease settings.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -116,32 +116,31 @@
 <span>               exposure_time <span class="op">=</span> <span class="st">"D_obs"</span>, </span>
 <span>               covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span>,</span>
 <span>               immune_lag <span class="op">=</span> <span class="fl">14</span>,</span>
-<span>               eval_times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
-<span>               effect <span class="op">=</span> <span class="st">"vaccine_effectiveness"</span>, </span>
+<span>               timepoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>               boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Time difference of 1.455535 secs</span></span>
+<span><span class="co">#&gt; Time difference of 1.523599 secs</span></span>
 <span></span>
 <span><span class="co"># Print main results </span></span>
-<span><span class="co">## - Note by default only the chosen effect measure is printed</span></span>
+<span><span class="co">## By default shows risk ratios </span></span>
 <span><span class="co">## but all effect measures are computed and stored in the fitted object </span></span>
 <span><span class="va">fit</span>        </span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Vaccine Effectiveness Estimates </span></span>
+<span><span class="co">#&gt;  Risk Ratio Estimates </span></span>
 <span><span class="co">#&gt; ================================================== </span></span>
 <span><span class="co">#&gt; Call: nomatch(data = simdata, outcome_time = "Y", outcome_status = "event", </span></span>
 <span><span class="co">#&gt;     exposure = "V", exposure_time = "D_obs", covariates = c("x1", </span></span>
-<span><span class="co">#&gt;         "x2"), immune_lag = 14, eval_times = seq(30, 180, by = 30), </span></span>
-<span><span class="co">#&gt;     effect = "vaccine_effectiveness", boot_reps = 10) </span></span>
+<span><span class="co">#&gt;         "x2"), immune_lag = 14, timepoints = seq(30, 180, by = 30), </span></span>
+<span><span class="co">#&gt;     boot_reps = 10) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Result:</span></span>
 <span><span class="co">#&gt;   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value</span></span>
-<span><span class="co">#&gt; 1        30    0.466             0.0902              0.686     0.086340</span></span>
-<span><span class="co">#&gt; 2        60    0.395             0.2359              0.521     0.000925</span></span>
-<span><span class="co">#&gt; 3        90    0.397             0.2594              0.508     0.000148</span></span>
-<span><span class="co">#&gt; 4       120    0.339             0.2011              0.453     0.000448</span></span>
-<span><span class="co">#&gt; 5       150    0.269             0.1387              0.380     0.001338</span></span>
-<span><span class="co">#&gt; 6       180    0.172             0.0444              0.283     0.018627</span></span>
+<span><span class="co">#&gt; 1        30    0.534              0.314              0.910     0.086340</span></span>
+<span><span class="co">#&gt; 2        60    0.605              0.479              0.764     0.000925</span></span>
+<span><span class="co">#&gt; 3        90    0.603              0.492              0.741     0.000148</span></span>
+<span><span class="co">#&gt; 4       120    0.661              0.547              0.799     0.000448</span></span>
+<span><span class="co">#&gt; 5       150    0.731              0.620              0.861     0.001338</span></span>
+<span><span class="co">#&gt; 6       180    0.828              0.717              0.956     0.018627</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Use summary() for more details</span></span>
 <span><span class="co">#&gt; Use plot() to visualize results</span></span>
@@ -150,7 +149,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ====================================================================== </span></span>
-<span><span class="co">#&gt; Vaccine Effectiveness Analysis Summary</span></span>
+<span><span class="co">#&gt; Analysis Summary</span></span>
 <span><span class="co">#&gt; ====================================================================== </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Method:              nomatch (G-computation) </span></span>
@@ -256,7 +255,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
