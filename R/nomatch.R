@@ -187,8 +187,8 @@ nomatch <- function(data,
                   exposure,
                   exposure_time,
                   covariates,
-                  immune_lag,
-                  timepoints,
+                  immune_lag = 0,
+                  timepoints = NULL,
                   weights_source = c("observed", "custom"),
                   custom_weights = NULL,
                   ci_type = c("wald", "percentile", "both"),
@@ -213,15 +213,32 @@ nomatch <- function(data,
     tau <- immune_lag
 
     # Validate inputs
-    validate_nomatch_inputs(
+    validate_data_inputs(
         data = data,
-        outcome_time = outcome_time,
-        outcome_status = outcome_status,
-        exposure = exposure,
-        exposure_time = exposure_time,
+        core_args = list(outcome_time = outcome_time,
+                         outcome_status = outcome_status,
+                         exposure = exposure,
+                         exposure_time = exposure_time),
+        covariates = covariates
+    )
+    
+    validate_immune_lag(immune_lag)
+    timepoints <- resolve_timepoints(data, outcome_time, outcome_status, 
+                                     exposure, timepoints, immune_lag)
+    validate_timepoints(timepoints, immune_lag)
+    
+    hazard_formulas <- resolve_hazard_formulas(
+        formula_unexposed = formula_unexposed,
+        formula_exposed = formula_exposed,
         covariates = covariates,
-        immune_lag = tau,
-        timepoints = timepoints
+        exposure_time = exposure_time
+    )
+    
+    validate_formulas(
+        formula_unexposed = hazard_formulas$formula_unexposed,
+        formula_exposed = hazard_formulas$formula_exposed,
+        covariates = covariates,
+        exposure_time = exposure_time
     )
 
      if(identical(weights_source, "custom") ){
@@ -249,21 +266,6 @@ nomatch <- function(data,
          exposure_time = exposure_time,
          tau = tau
          )
-     
-     hazard_formulas <- resolve_hazard_formulas(
-         formula_unexposed = formula_unexposed,
-         formula_exposed = formula_exposed,
-         covariates = covariates,
-         exposure_time = exposure_time
-         )
-     
-     validate_formulas(
-         formula_unexposed = hazard_formulas$formula_unexposed,
-         formula_exposed = hazard_formulas$formula_exposed,
-         covariates = covariates,
-         exposure_time = exposure_time
-        )
-
      
 
      # --------------------------------------------------------------------------

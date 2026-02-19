@@ -49,11 +49,11 @@
 match_rolling_cohort <- function(data, outcome_time, exposure, exposure_time, matching_vars, id_name, replace = FALSE, seed = NULL){
 
     # Check data/inputs
-    validate_match_rolling_cohort_inputs(
+    validate_data_inputs(
         data = data,
-        outcome_time = outcome_time,
-        exposure = exposure,
-        exposure_time = exposure_time,
+        core_args = list(outcome_time = outcome_time,
+                         exposure = exposure,
+                         exposure_time = exposure_time),
         covariates = matching_vars
         )
 

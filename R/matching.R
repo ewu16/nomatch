@@ -37,8 +37,8 @@ matching <- function(matched_data,
                         outcome_status,
                         exposure,
                         exposure_time,
-                        immune_lag,
-                        timepoints,
+                        immune_lag = 0,
+                        timepoints = NULL,
                         ci_type = c("wald", "percentile", "both"),
                         boot_reps = 0,
                         alpha = 0.05,
@@ -52,16 +52,19 @@ matching <- function(matched_data,
 
 
     # Check data/inputs
-    validate_matching_inputs(
+    validate_data_inputs(
         data = matched_data,
-        outcome_time = outcome_time,
-        outcome_status = outcome_status,
-        exposure = exposure,
-        exposure_time = exposure_time,
-        immune_lag = tau,
-        timepoints = timepoints
+        core_args = list(outcome_time = outcome_time,
+                         outcome_status = outcome_status,
+                         exposure = exposure,
+                         exposure_time = exposure_time)
     )
 
+    validate_immune_lag(immune_lag)
+    timepoints <- resolve_timepoints(matched_data, outcome_time, outcome_status, 
+                                     exposure, timepoints, immune_lag)
+    validate_timepoints(timepoints, immune_lag)
+    
     # --------------------------------------------------------------------------
     # 1 - Get original estimate
     # --------------------------------------------------------------------------
