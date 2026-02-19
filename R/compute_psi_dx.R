@@ -76,8 +76,15 @@ predict_from_model_0 <- function(fit_0, exposure_time, t0, tau, newdata){
 
     # Predict and store survival predictions
     pred_0 <- newdata
-    pred_0$surv_0_d_plus_tau <-stats::predict(fit_0, newdata_d_plus_tau, type = "survival")
-    pred_0$surv_0_d_plus_t0 <- stats::predict(fit_0, newdata_d_plus_t0,  type = "survival")
+    if(is.null(stats::coef(fit_0))){
+        pred_0$surv_0_d_plus_tau <- summary(survival::survfit(fit_0), times = newdata_d_plus_tau[[time_var]], extend = TRUE)$surv
+        pred_0$surv_0_d_plus_t0  <- summary(survival::survfit(fit_0), times = newdata_d_plus_t0[[time_var]], extend = TRUE)$surv
+
+    }else{
+        pred_0$surv_0_d_plus_tau <-stats::predict(fit_0, newdata_d_plus_tau, type = "survival")
+        pred_0$surv_0_d_plus_t0 <- stats::predict(fit_0, newdata_d_plus_t0,  type = "survival")
+    }
+ 
     pred_0$psi_0_dx <- 1 - pred_0$surv_0_d_plus_t0/pred_0$surv_0_d_plus_tau
 
     pred_0
@@ -113,7 +120,11 @@ predict_from_model_1 <- function(fit_1, exposure_time, t0, tau, newdata){
     # Predict survivals
     pred_1 <- newdata
     pred_1$surv_1_tau <- 1
-    pred_1$surv_1_t0 <-  stats::predict(fit_1, newdata_t0,  type = "survival")
+    if(is.null(stats::coef(fit_1))){
+        pred_1$surv_1_t0 <-  summary(survival::survfit(fit_1), times = newdata_t0[[time_var]], extend = TRUE)$surv
+    }else{
+        pred_1$surv_1_t0 <-  stats::predict(fit_1, newdata_t0,  type = "survival")
+    }
     pred_1$psi_1_dx <- 1 - pred_1$surv_1_t0/pred_1$surv_1_tau
 
     pred_1

@@ -37,7 +37,7 @@
 #' @export
 #'
 fit_model_0 <- function(data, outcome_time, outcome_status, exposure, exposure_time,
-                         formula_0 = NULL){
+                         formula_0){
 
 
     #Extract covariates
@@ -76,7 +76,7 @@ fit_model_0 <- function(data, outcome_time, outcome_status, exposure, exposure_t
 #' @param tau Delay period so that events before tau are not included.
 #' @export
 fit_model_1 <- function(data, outcome_time, outcome_status, exposure, exposure_time,
-                        tau, formula_1 = NULL, censor_time = NULL){
+                        tau, formula_1, censor_time = NULL){
 
     if(is.null(censor_time)){
         censor_time <- Inf #effectively prevents additional censoring
@@ -130,6 +130,9 @@ safe_coxph <- function(formula, data, ...){
 
 check_coxph <- function(model, model_name){
     coef <- stats::coef(model)
+    
+    # No coefficients to check (e.g. intercept-only model)
+    if(is.null(coef) || length(coef) == 0) return(invisible(NULL))
 
     if(any(is.na(coef))){
         warning(paste0("In ", model_name, ", at least one Cox coefficient estimate is NA.\n"),
@@ -138,8 +141,8 @@ check_coxph <- function(model, model_name){
                 call. = FALSE)
     }
 
-    if(any(abs(coef) >= 10)){
-        large <- abs(coef) >= 10
+    if(any(abs(coef) >= 10, na.rm = TRUE)){
+        large <- !is.na(coef) & abs(coef) >= 10
         ses <- coef(summary(model))[, "se(coef)", drop = FALSE]
         warning(paste0("In ", model_name, ", at least one Cox coefficient estimate is large; estimate may be unstable.\n"),
                 "Terms with large coefficients:\n ",

@@ -97,7 +97,7 @@ get_one_nomatch <- function(data,
     # --------------------------------------------------------------------------
     # 3 - Compute VE
     # --------------------------------------------------------------------------
-    cuminc <- compute_psi_bar_times(fit_0, fit_1, exposure_time, timepoints, tau, gp_list$g_weights, gp_list = gp_list)
+    cuminc <- compute_psi_bar_times(fit_0, fit_1, exposure_time, timepoints, tau, newdata = gp_list$g_weights, gp_list = gp_list)
     rd <- cuminc[, "cuminc_1"] - cuminc[, "cuminc_0"]
     rr <-  cuminc[, "cuminc_1"]/cuminc[, "cuminc_0"]
     ve <- 1 - rr

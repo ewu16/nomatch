@@ -96,15 +96,18 @@ get_observed_gp <- function(data, outcome_time, exposure,
 get_gp <- function(df, outcome_time, exposure, exposure_time, covariates, tau){
     # Single subset operation
     gp_data <- df[(df[[outcome_time]] - df[[exposure_time]]) > tau & df[[exposure]] == 1, ]
-
     if (nrow(gp_data) == 0L) return(list(g_weights = data.frame(), p_weights = data.frame()))
 
     # Create group id and merge back into g
-    group_lookup <- unique(gp_data[covariates])
-    group_lookup <- group_lookup[do.call(order, group_lookup[covariates]), , drop = FALSE]
-    group_lookup$group_id <- seq_len(nrow(group_lookup))
-    gp_data <- merge(gp_data, group_lookup, by = covariates, all.x = TRUE)
-
+    if(is.null(covariates)){
+        gp_data$group_id <- 1
+    }else{
+        group_lookup <- unique(gp_data[covariates])
+        group_lookup <- group_lookup[do.call(order, group_lookup[covariates]), , drop = FALSE]
+        group_lookup$group_id <- seq_len(nrow(group_lookup))
+        gp_data <- merge(gp_data, group_lookup, by = covariates, all.x = TRUE)
+    }
+   
     # Compute g_weights: P(time | covariates)
     xt <- with(gp_data, xtabs(~ group_id + gp_data[[exposure_time]]))
     g_prop <- prop.table(xt, 1)
@@ -124,7 +127,7 @@ get_gp <- function(df, outcome_time, exposure, exposure_time, covariates, tau){
     p_weights <- p_weights[order(p_weights$group_id),]
 
     # Create key for covariate values (only unique combinations)
-    key <- unique(gp_data[, c("group_id", covariates)])
+    key <- unique(gp_data[, c("group_id", covariates), drop = FALSE])
 
     # Single merge for each output
     g_dist_clean <- merge(g_weights, key, by = "group_id")

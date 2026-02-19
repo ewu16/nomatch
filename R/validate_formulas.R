@@ -1,7 +1,7 @@
 resolve_hazard_formulas <- function(formula_unexposed, formula_exposed, covariates, exposure_time) {
-    
     if(is.null(formula_unexposed)){
-        formula_unexposed <- stats::reformulate(covariates)
+        formula_unexposed <- if(is.null(covariates)) (~ 1) else stats::reformulate(covariates)
+
     }else if(!inherits(formula_unexposed, "formula")){
         formula_unexposed <- string_to_formula(formula_unexposed, "formula_unexposed")
     }
@@ -22,8 +22,6 @@ resolve_hazard_formulas <- function(formula_unexposed, formula_exposed, covariat
 
 
 validate_formulas <- function(formula_unexposed, formula_exposed, covariates, exposure_time){
- 
-
     if(any(!covariates %in% get_rhs_vars(formula_unexposed))){
         warning("Formula for unexposed does not include all variables in `covariates`")
     }
@@ -36,7 +34,6 @@ validate_formulas <- function(formula_unexposed, formula_exposed, covariates, ex
         warning("Formula for exposed does not include a term for `exposure_time`")
     }
     
-   
     invisible(NULL)
 }
 
