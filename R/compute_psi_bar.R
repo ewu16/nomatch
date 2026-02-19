@@ -34,6 +34,12 @@ compute_psi_bar_times <- function(fit_0, fit_1, exposure_time, timepoints, tau, 
 #' @keywords internal
 #'
 compute_psi_bar_t0 <- function(fit_0, fit_1, exposure_time, t0, tau, newdata, gp_list){
+    if (t0 <= tau) {
+        # By definition under the immune-lag/principal-stratum estimand
+        return(c(cuminc_0 = 0, cuminc_1 = 0))
+    }
+    
+    # Otherwise compute psi_bar_estimate
     # Step 1: Get conditional risks for all (d, x)
     psi_dx <- compute_psi_dx_t0(fit_0, fit_1, exposure_time, t0, tau, newdata)
 
