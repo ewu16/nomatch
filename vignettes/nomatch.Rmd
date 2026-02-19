@@ -266,7 +266,37 @@ fit_matching
 
 # Plot matching vs proposed estimator - nomatch tends to have similar point estimates but narrower
 # confidence intervals
-compare_ve_fits(fit_matching, fit, effect = "relative_risk_reduction", labels = c("Matching", "nomatch (G-computation)"))
+
+comparison  <- rbind(estimates_to_df(fit) |> mutate(method = "nomatch (G-computation)"),
+                       estimates_to_df(fit_matching)  |> mutate(method = "matching"))
+
+comparison |> 
+  filter(term %in% c("cuminc_0", "cuminc_1", "relative_risk_reduction")) |> 
+  mutate(term_label = factor(term, 
+                             c("cuminc_0", "cuminc_1", "relative_risk_reduction"),
+                             c("Cumulative Incidence:\n Unvaccinated",
+                               "Cumulative Incidence:\n Vaccinated",
+                               "Relative Risk Reduction"))) |> 
+  ggplot(aes(x = t0, y = estimate, color = method, fill = method)) + 
+  geom_line() +
+  geom_ribbon(aes(ymin = wald_lower, ymax = wald_upper), alpha = 0.2, linewidth = 0.1) + 
+  facet_wrap(~term_label, scales = "free") + 
+  ggh4x::facetted_pos_scales(
+    y = list(
+      ggplot2::scale_y_continuous(labels = scales::label_percent(),
+                                  limits = c(0, 0.11)),
+      ggplot2::scale_y_continuous(labels = scales::label_percent(),
+                                  limits = c(0, 0.11)),
+      ggplot2::scale_y_continuous(labels = scales::label_percent(),
+                                  limits = c(0, 0.8))
+    )) + 
+  theme_bw() +
+  theme(strip.background = ggplot2::element_rect(fill = "white", color = "white"),
+         strip.text = ggplot2::element_text(size = 11, colour = "black")) + 
+  labs(x = "Time since vaccination", 
+       y = "Estimate", 
+       color = "Method",
+       fill = "Method")
 ```
 
 
