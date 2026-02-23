@@ -1,22 +1,26 @@
 resolve_hazard_formulas <- function(formula_unexposed, formula_exposed, covariates, exposure_time) {
-    if(is.null(formula_unexposed)){
-        formula_unexposed <- if(is.null(covariates)) (~ 1) else stats::reformulate(covariates)
-
-    }else if(!inherits(formula_unexposed, "formula")){
-        formula_unexposed <- string_to_formula(formula_unexposed, "formula_unexposed")
-    }
-
-    if(is.null(formula_exposed)){
-        d_term <- paste0("splines::ns(", exposure_time, ", df = 4)")
-        formula_exposed <- stats::reformulate(c(covariates, d_term))
-    }else if(!inherits(formula_exposed, "formula")){
-        formula_exposed <- string_to_formula(formula_exposed, "formula_exposed")
+    resolve_formula <- function(f, default, label) {
+        if (is.null(f)) return(default)
+        if (inherits(f, "formula")) return(f)
+        if (is.character(f) && length(f) > 1) return(stats::reformulate(f))
+        string_to_formula(f, label)
     }
     
-    formula_unexposed <- check_lhs(formula_unexposed, "formula_unexposed")
-    formula_exposed <- check_lhs(formula_exposed, "formula_exposed")
+    # default formulas
+    default_unexposed <- if (is.null(covariates)) (~ 1) else stats::reformulate(covariates)
+    d_term <- paste0("splines::ns(", exposure_time, ", df = 4)")
+    default_exposed <- stats::reformulate(c(covariates, d_term))
     
-    list(formula_unexposed = formula_unexposed, formula_exposed = formula_exposed)
+    # resolve
+    formula_unexposed <- resolve_formula(formula_unexposed, default_unexposed, "formula_unexposed")
+    formula_exposed   <- resolve_formula(formula_exposed,   default_exposed,   "formula_exposed")
+    
+    # drop LHS of formulas
+    formula_unexposed <- force_one_sided(formula_unexposed, "formula_unexposed")
+    formula_exposed   <- force_one_sided(formula_exposed,   "formula_exposed")
+    
+    list(formula_unexposed = formula_unexposed,
+         formula_exposed   = formula_exposed)
 }
 
 
@@ -51,6 +55,42 @@ validate_formulas <- function(formula_unexposed, formula_exposed, covariates, ex
     }
     
     invisible(NULL)
+}
+
+
+
+# Helpers for working with formulas ---------------------------------------
+string_to_formula <- function(rhs, label){
+    form_label <- paste0("`", label, "`")
+    
+    if(!(is.character(rhs) && length(rhs) == 1)){
+        stop(form_label, " must be a single string")
+    }
+    
+    rhs_trim <- trimws(rhs)
+    form <- ifelse(grepl("~", rhs_trim, fixed = TRUE), rhs_trim, paste("~", rhs_trim))
+    
+    tryCatch({
+        stats::as.formula(form)
+    }, error = function(e) {stop(form_label, " appears to be invalid.", call. = FALSE)}
+    )
+}
+
+force_one_sided <- function(formula, label){
+    form_label <- paste0("`", label, "`")
+    
+    if(attr(stats::terms(formula), "response") == 1){
+        warning("Left hand side of ", form_label, " is not allowed. Only the right hand side will be used")
+    }
+    stats::update(formula, NULL ~ . )
+}
+
+get_rhs_vars <- function(f) {
+    if (length(f) == 3){
+        all.vars(f[[3]])
+    }else{
+        all.vars(f[[2]])
+    }
 }
 
 

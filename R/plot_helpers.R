@@ -86,15 +86,31 @@ plot_ve_panel <- function(plot_data,
 
   plot_data$term_label <- factor(plot_data$term, terms, term_labels)
 
-
+  timepoints <- unique(plot_data$t0)
+  ntimes <- length(timepoints)
+    
   #Make main plot
   p <- ggplot2::ggplot(plot_data,
           ggplot2::aes(x = .data$t0,
                        y = .data$estimate,
+                       ymin = .data[[lower]],
+                       ymax = .data[[upper]],
                        color = .data$method,
-                       fill = .data$method)) +
-    ggplot2::geom_line()
-
+                       fill = .data$method)) 
+  
+    if(ntimes == 1) {
+      p <- p + 
+        ggplot2::geom_pointrange() +
+        ggplot2::scale_x_continuous(breaks = timepoints)
+     }else{
+       p <- p + 
+         ggplot2::geom_line() +
+         ggplot2::geom_ribbon(ggplot2::aes(ymin = .data[[lower]], ymax = .data[[upper]]),
+                              alpha = if(n_methods > 1) 0.2 else 0.3,
+                              linewidth = if(n_methods > 1) 0.1 else 0, show.legend = FALSE) +
+         #force 0 to be in x-axis
+         ggplot2::scale_x_continuous(limits = c(0, NA)) 
+      }
 
   # For panel plot
   ## Calculate shared y-limits for cumulative incidence
@@ -114,14 +130,6 @@ plot_ve_panel <- function(plot_data,
     )
 
 
-  # Add confidence interval bands
-  if (has_ci) {
-    p <- p +
-      ggplot2::geom_ribbon(ggplot2::aes(ymin = .data[[lower]], ymax = .data[[upper]]),
-                           alpha = if(n_methods > 1) 0.2 else 0.3,
-                           linewidth = if(n_methods > 1) 0.1 else 0, show.legend = FALSE)
-  }
-
   # Add color scales if appropriate, otherwise use default scales
   if (n_methods == length(colors)) {
     p <- p +
@@ -135,7 +143,8 @@ plot_ve_panel <- function(plot_data,
                  simul = "simultaneous")
 
   caption <- ifelse(has_ci,
-                    paste("\nShaded areas represent",  paste0((1 - alpha) * 100, "%"),
+                    paste("\n", ifelse(ntimes == 1, "Error bars", "Shaded areas"),"represent", 
+                          paste0((1 - alpha) * 100, "%"),
                           ci_labels[ci_type], "confidence intervals."),
                     "\nPoint estimates only (no confidence intervals computed/requested).")
 

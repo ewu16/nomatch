@@ -250,7 +250,7 @@ nomatch <- function(data,
 
          # Format weights to improve efficiency of internal calls
          custom_gp_list <- canonicalize_weights(
-             weights = weights,
+             weights = custom_weights,
              exposure_time  = exposure_time,
              covariates    = covariates
          )

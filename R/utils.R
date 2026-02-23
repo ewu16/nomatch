@@ -71,6 +71,20 @@ capture_warnings <- function(expr){
     list(result = result, warnings = w)
 }
 
+check_reserved_vars <- function(vars, reserved_vars, vars_label) {
+    conflicts <- intersect(reserved_vars, vars)
+    if (length(conflicts) > 0) {
+        stop(
+            paste(vars_label, " contain reserved variable names: "),
+            paste(conflicts, collapse = ", "),
+            "\nPlease rename these variables before fitting the model.",
+            call. = FALSE
+        )
+    }
+    invisible(NULL)
+}
+
+
 
 get_basic_descriptives_nomatch <- function(data, outcome_time, outcome_status, exposure, exposure_time, tau){
     n <- nrow(data)

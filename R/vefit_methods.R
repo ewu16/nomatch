@@ -245,19 +245,24 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
 #' )
 #' plot(fit)
 #'
-plot.nomatchfit <- function(x, effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"), ci_type = NULL, color = "#0072B2", ...) {
+plot.nomatchfit <- function(x, 
+                            effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"), 
+                            ci_type = NULL,
+                            color = "#0072B2", ...) {
 
     effect <- match.arg(effect)
 
-    if(length(x$timepoints) < 2){
-        message("Only one evaluation time supplied; returning point estimate(s) instead of a plot")
-        est_df <- estimates_to_df(x$estimates)
-        print(est_df)
-        return(invisible(est_df))
-    }
+    # if(length(x$timepoints) < 2){
+    #     message("Only one evaluation time supplied; returning point estimate(s) instead of a plot")
+    #     est_df <- estimates_to_df(x$estimates)
+    #     print(est_df)
+    #     return(invisible(est_df))
+    # }
+    
 
     ci_type <- validate_confint_type(x, ci_type)
-    plot_data <- estimates_to_df(x$estimates)
+    plot_data  <- estimates_to_df(x$estimates)
+
     plot_data$method <- "dummy"
     alpha <- x$alpha
     plot_ve_panel(plot_data, ci_type, alpha, colors = color,

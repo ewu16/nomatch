@@ -14,11 +14,12 @@
 validate_data_inputs <- function(data, core_args, covariates = NULL) {
     validate_data_str(data)
     validate_column_args(core_args, covariates)
+    validate_cols_exist(data, core_args, covariates)
     
     outcome_time <- core_args$outcome_time
     exposure <- core_args$exposure
     exposure_time <- core_args$exposure_time
-    outcome_status <- core_args$covariates 
+    outcome_status <- core_args$outcome_status
     
     validate_outcome_time(data, outcome_time)
     validate_exposure_args(data, exposure, exposure_time)
@@ -37,7 +38,9 @@ validate_data_str <- function(data){
 
 
 validate_column_args <- function(core_args, covariates = NULL){
-    # core_args should be a named list 
+    if(!is.list(core_args) || is.null(names(core_args))){
+        stop("`core_args` must be a named list")
+    }
     # Check that elements of core_args are a single string
     not_single_string <- !vapply(core_args, \(x) is.character(x) && length(x) == 1, logical(1))
     if (any(not_single_string)) {
@@ -59,7 +62,7 @@ validate_cols_exist <- function(data, core_args, covariates = NULL){
         cols <- all_args[[i]]
         missing_cols <- setdiff(cols, names(data))
         if(length(missing_cols) > 0) {
-            stop("Missing '", paste(names(all_args)[i]), "' column(s) in data: ", paste(missing_cols, collapse = ", "), call. = FALSE)
+            stop("Missing `", paste(names(all_args)[i]), "` column(s) in data: ", paste(missing_cols, collapse = ", "), call. = FALSE)
         }
     })
 }
@@ -70,6 +73,11 @@ validate_outcome_time <- function(data, outcome_time){
     if (anyNA(data[[outcome_time]])) {
         stop("Missing values in `outcome_time` are not supported. Please remove these observations.")
     }
+    
+    if (!is.numeric(data[[outcome_time]])) {
+        stop("Outcome time variable '", outcome_time, "' must be numeric.")
+    }
+    
     if (any(data[[outcome_time]] < 0)) {
         stop("Outcome time variable '", outcome_time, "' must be non-negative.")
     }
@@ -82,7 +90,7 @@ validate_outcome_status <- function(data, outcome_status){
         stop("Missing values in `outcome_status` are not supported. Please remove these observations.")
     }
     if (!all(data[[outcome_status]] %in% c(0,1))) {
-        stop("Outcome status variable '", outcome_status, "' must be coded 0/1.")
+        stop("Outcome status variable '", outcome_status, "' must be coded as 0/1 numeric.")
     }
     invisible(NULL)
 }
@@ -93,11 +101,15 @@ validate_exposure_args <- function(data, exposure, exposure_time){
         stop("Missing values in <exposure> are not supported. Please remove these observations.")
     }
     if (!all(data[[exposure]] %in% c(0,1))) {
-        stop("Exposure variable '", exposure, "' must be coded 0/1.")
+        stop("Exposure variable '", exposure, "' must be coded as 0/1 numeric.")
     }
     
     # Check exposure_time
     et <- data[[exposure_time]]
+    if (!is.numeric(et)) {
+        stop("Exposure time variable '", exposure_time, "' must be numeric.")
+    }
+    
     if (any(et[!is.na(et)] < 0)) {
         stop("Exposure time variable '", exposure_time, "' must be non-negative.")
     }
@@ -111,9 +123,9 @@ validate_exposure_args <- function(data, exposure, exposure_time){
 
 validate_covariates <- function(data, covariates){
     if(!is.null(covariates) && sum(is.na(data[, covariates])) > 0){
-        stop("Missing values in covariates '",
-             paste(covariates, collapse = ","), "' are not supported.",
-             "Please remove these observations")
+        stop("Missing values in covariates ",
+             paste(paste0("'", covariates, "'"), collapse = ", "), "' are not supported. ",
+             "Please remove these observations.")
     }
     invisible(NULL)
 }

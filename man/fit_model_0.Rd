@@ -12,7 +12,7 @@ fit_model_0(
   outcome_status,
   exposure,
   exposure_time,
-  formula_0 = NULL
+  formula_0
 )
 
 fit_model_1(
@@ -22,7 +22,7 @@ fit_model_1(
   exposure,
   exposure_time,
   tau,
-  formula_1 = NULL,
+  formula_1,
   censor_time = NULL
 )
 }

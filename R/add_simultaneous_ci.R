@@ -68,7 +68,8 @@ add_simultaneous_ci <- function(object, seed = NULL){
   if (is.null(object$boot_samples)) {
     stop("Object must contain bootstrap samples. ",
          "Rerun with keep_boot_samples = TRUE",
-         call. = FALSE)
+         call. = 
+           FALSE)
   }
 
 

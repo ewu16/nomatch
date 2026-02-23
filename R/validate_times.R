@@ -23,7 +23,7 @@ resolve_timepoints <- function(data, outcome_time, outcome_status, exposure, tim
                  "The default `timepoints` is therefore not valid. Please choose a smaller `immune_lag` or manually specify
                  `timepoints` so that the maximum timepoint > `immune_lag` .")
         }
-        timepoints <- seq_len(max_follow_up)
+        timepoints <- seq_len(max_follow_up)[seq_len(max_follow_up) > immune_lag]
     }else{
         if(anyDuplicated(timepoints) > 0){
             warning("Non-unique timepoints were provided. Using only unique timepoint values.")

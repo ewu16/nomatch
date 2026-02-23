@@ -79,7 +79,8 @@ fit <- nomatch(data = simdata,
                exposure_time = "D_obs", 
                covariates = c("x1", "x2"),
                immune_lag = 14,
-               timepoints = seq(30, 180, by = 30),
+               timepoints = 30,
+               #timepoints = seq(30, 180, by = 30),
                boot_reps = 10)
 
 # Print main results 
