@@ -44,7 +44,7 @@ matching <- function(matched_data,
                         alpha = 0.05,
                         keep_models = TRUE,
                         keep_boot_samples = TRUE,
-                        n_cores = 1){
+                        seed = NULL){
 
     call <- match.call()
     ci_type <- match.arg(ci_type)
@@ -98,7 +98,7 @@ matching <- function(matched_data,
         pt_est             = original$pt_estimates,
         alpha              = alpha,
         keep_boot_samples  = keep_boot_samples,
-        n_cores            = n_cores
+        seed               = seed
     )
     ci_est <- boot$ci_estimates
     boot_samples <- boot$boot_samples

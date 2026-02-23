@@ -13,15 +13,17 @@ BugReports: https://github.com/ewu16/nomatch/issues
 Depends: 
     R (>= 2.10)
 Imports: 
-    ggh4x, 
+    furrr,
+    ggh4x,
     ggplot2,
     MASS,
-    rlang, 
+    rlang,
     scales,
     stats,
     survival
 Suggests: 
     dplyr,
+    future,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),

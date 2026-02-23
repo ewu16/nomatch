@@ -81,9 +81,6 @@
 #'@param keep_boot_samples Logical; return bootstrap samples? Default:
 #'  `TRUE`. Must be set to `TRUE` if user plans to use [add_simultaneous_ci()]
 #'  to obtain simultaneous confidence intervals.
-#'@param n_cores Integer; parallel cores for bootstrapping passed to
-#'  `parallel::mclapply` as `mc.cores`. On Unix-like OS only; not available on
-#'  Windows. Default: `1`.
 #'  
 #'@param formula_unexposed A character specification of the right-hand side of the formula 
 #' to use for fitting the hazard model for the unexposed. The set of variables in the formula
@@ -94,10 +91,10 @@
 #' must contain the variables in `covariates` and `exposure_time`. It is recommended
 #' that `exposure_time` be modeled flexibly (e.g. using splines). 
 #' 
-#'@param n_cores Integer; parallel cores for bootstrapping passed to
-#'  `parallel::mclapply` as `mc.cores`. On Unix-like OS only; not available on
-#'  Windows. Default: `1`.
-#'
+#' @param seed Integer seed for reproducible bootstrap results. Default: NULL.
+#'   Parallelism is controlled externally via [future::plan()]. For example,
+#'   to use 4 cores: `future::plan(future::multisession, workers = 4)`.
+#'   If no plan is set, bootstraps run sequentially.
 #'
 #'@return An object of class `nomatchfit` containing:
 #' \describe{
@@ -157,8 +154,18 @@
 #' reduction, using bootstrap SEs. These are
 #'then back-transformed to the original scale. No transformation is used for risk differences.
 #'
-#' **Parallelization.** Bootstraps can be parallelized on Unix via [parallel::mclapply()]
-#'by providing `n_cores` argument.
+#' **Parallelization.** Bootstraps can be parallelized using the `future` 
+#' framework. Set a parallel plan before calling `nomatch()`: e.g.
+#' 
+#' ```r
+#' future::plan(future::multisession, workers = 4)
+#' fit <- nomatch(..., boot_reps = 1000, seed = 42)
+#' future::plan(future::sequential)  # reset when done
+#' ```
+#' 
+#' If no plan is set, bootstraps run sequentially. `multisession` works on all operating systems 
+#' and is recommended for most users. See the [future package documentation](https://future.futureverse.org) 
+#' for additional plans and details on setup. 
 #'
 #'@export
 #'
@@ -175,7 +182,7 @@
 #'   timepoints = seq(30, 180, by = 30),
 #'   immune_lag = 14,
 #'   boot_reps = 5,
-#'   n_cores = 1
+#'   seed = NULL
 #' )
 #'
 #' # View basic results
@@ -196,7 +203,7 @@ nomatch <- function(data,
                   alpha = 0.05,
                   keep_models = TRUE,
                   keep_boot_samples = TRUE,
-                  n_cores = 1,
+                  seed = NULL,
                   formula_unexposed = NULL,
                   formula_exposed = NULL
                   ){
@@ -298,7 +305,7 @@ nomatch <- function(data,
          pt_est             = original$pt_estimates,
          alpha              = alpha,
          keep_boot_samples  = keep_boot_samples,
-         n_cores            = n_cores
+         seed               = seed
      )
 
      ci_est <-boot$ci_estimates

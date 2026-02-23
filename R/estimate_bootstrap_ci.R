@@ -37,7 +37,7 @@ estimate_bootstrap_ci <- function(one_boot_function,
                                   pt_est = NULL,
                                   alpha = 0.05,
                                   keep_boot_samples = TRUE,
-                                  n_cores = 1){
+                                  seed = NULL){
 
     if(boot_reps == 0){
         return(NULL)
@@ -49,30 +49,28 @@ estimate_bootstrap_ci <- function(one_boot_function,
     # --------------------------------------------------------------------------
     # 1. Run bootstrap
     # --------------------------------------------------------------------------
-    cat("Bootstrapping", boot_reps, "samples...\n")
+    message(paste("Bootstrapping", boot_reps, "samples...\n"))
     start <- Sys.time()
-
-    boot_list <- parallel::mclapply(1:boot_reps, \(i){
-        set.seed(i)
+    
+    boot_list <- furrr::future_map(1:boot_reps, \(i){
         old <- options(warn = 1); on.exit(options(old), add = TRUE)
         boot_out <- tryCatch({
             output <- utils::capture.output(
-                boot_est<- do.call(one_boot_function, one_boot_args),
+                boot_est <- do.call(one_boot_function, one_boot_args),
                 type = "message"
             )
-            list(result = boot_est,
-                 output = output)
+            list(result = boot_est, output = output)
         }, error = function(e){
-            list(result = NULL,
-                 output = utils::capture.output(print(e)))
+            list(result = NULL, output = utils::capture.output(print(e)))
         })
-    }, mc.cores = n_cores)
-
+    }, .options = furrr::furrr_options(seed = seed))
+    
+    
     #store the bootstrap index number for checking logs
     names(boot_list) <- seq_along(boot_list)
 
     end <- Sys.time()
-    print(end - start)
+    message("Bootstrap completed in ", format(difftime(end, start), digits = 3, ns = 2))
 
     # Check for errors
     results  <- lapply(boot_list, \(x) x$result)

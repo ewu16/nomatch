@@ -17,7 +17,7 @@ matching(
   alpha = 0.05,
   keep_models = TRUE,
   keep_boot_samples = TRUE,
-  n_cores = 1
+  seed = NULL
 )
 }
 \arguments{
@@ -81,9 +81,10 @@ Default: \code{TRUE}.}
 \code{TRUE}. Must be set to \code{TRUE} if user plans to use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}}
 to obtain simultaneous confidence intervals.}
 
-\item{n_cores}{Integer; parallel cores for bootstrapping passed to
-\code{parallel::mclapply} as \code{mc.cores}. On Unix-like OS only; not available on
-Windows. Default: \code{1}.}
+\item{seed}{Integer seed for reproducible bootstrap results. Default: NULL.
+Parallelism is controlled externally via \code{\link[future:plan]{future::plan()}}. For example,
+to use 4 cores: \code{future::plan(future::multisession, workers = 4)}.
+If no plan is set, bootstraps run sequentially.}
 }
 \value{
 An object of class \code{nomatchfit} containing:

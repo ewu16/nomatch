@@ -47,8 +47,7 @@ fit <- nomatch(
  covariates = c("x1", "x2"),
  timepoints = seq(30, 180, by = 30),
  immune_lag = 14,
- boot_reps = 5,
- n_cores = 2
+ boot_reps = 5
 )
 plot(fit)
 

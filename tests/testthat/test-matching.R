@@ -13,14 +13,42 @@ test_that("matching() returns a nomatchfit with correct structure", {
 })
 
 test_that("matching() results match gold standard", {
-    set.seed(1234)
+    # matched_data_gold <- readRDS(test_path("fixtures", "gold_matched_data.rds"))
+    # matched_data <- match_rolling_cohort(simdata, "Y", "V", "D_obs", 
+    #                                      c("x1","x2"), "ID", seed = 123)$matched_data
     fit <-  matching(matched_data, "Y", "event", "V", "D_obs",
                      immune_lag = 14, timepoints = seq(30, 180, 30), 
-                     ci_type = "both", boot_reps = 5)
+                     ci_type = "both", boot_reps = 5, seed = 1234)
     gold_standard <- readRDS(test_path("fixtures", "gold_matching.rds"))
     expect_equal(fit$estimates, gold_standard$estimates)
 })
 
+test_that("matching() is reproducible under fixed seed", {
+    fit1 <- matching(matched_data, "Y", "event", "V", "D_obs",
+                     immune_lag = 14, timepoints = seq(30, 180, 30),
+                     boot_reps = 5, seed = 42)
+    fit2 <- matching(matched_data, "Y", "event", "V", "D_obs",
+                     immune_lag = 14, timepoints = seq(30, 180, 30),
+                     boot_reps = 5, seed = 42)
+    expect_identical(fit1$estimates, fit2$estimates)
+    
+    future::plan(future::multisession, workers = 2)
+    fit3 <- matching(matched_data, "Y", "event", "V", "D_obs",
+                     immune_lag = 14, timepoints = seq(30, 180, 30),
+                     boot_reps = 5, seed = 42)
+    future::plan(future::sequential)
+    expect_identical(fit1$estimates, fit3$estimates)
+})
+
+test_that("matching() gives different results with different seeds", {
+    fit1 <- matching(matched_data, "Y", "event", "V", "D_obs",
+                     immune_lag = 14, timepoints = seq(30, 180, 30),
+                     boot_reps = 5, seed = 42)
+    fit2 <- matching(matched_data, "Y", "event", "V", "D_obs",
+                     immune_lag = 14, timepoints = seq(30, 180, 30),
+                     boot_reps = 5, seed = 99)
+    expect_false(identical(fit1$estimates, fit2$estimates))
+})
 
 
 # Confidence intervals ----------------------------------------------------

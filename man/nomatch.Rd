@@ -21,7 +21,7 @@ nomatch(
   alpha = 0.05,
   keep_models = TRUE,
   keep_boot_samples = TRUE,
-  n_cores = 1,
+  seed = NULL,
   formula_unexposed = NULL,
   formula_exposed = NULL
 )
@@ -120,9 +120,10 @@ Default: \code{TRUE}.}
 \code{TRUE}. Must be set to \code{TRUE} if user plans to use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}}
 to obtain simultaneous confidence intervals.}
 
-\item{n_cores}{Integer; parallel cores for bootstrapping passed to
-\code{parallel::mclapply} as \code{mc.cores}. On Unix-like OS only; not available on
-Windows. Default: \code{1}.}
+\item{seed}{Integer seed for reproducible bootstrap results. Default: NULL.
+Parallelism is controlled externally via \code{\link[future:plan]{future::plan()}}. For example,
+to use 4 cores: \code{future::plan(future::multisession, workers = 4)}.
+If no plan is set, bootstraps run sequentially.}
 
 \item{formula_unexposed}{A character specification of the right-hand side of the formula
 to use for fitting the hazard model for the unexposed. The set of variables in the formula
@@ -200,8 +201,17 @@ prior to the call to \code{nomatch()} by calling \code{get_observed_weights()}.
 reduction, using bootstrap SEs. These are
 then back-transformed to the original scale. No transformation is used for risk differences.
 
-\strong{Parallelization.} Bootstraps can be parallelized on Unix via \code{\link[parallel:mclapply]{parallel::mclapply()}}
-by providing \code{n_cores} argument.
+\strong{Parallelization.} Bootstraps can be parallelized using the \code{future}
+framework. Set a parallel plan before calling \code{nomatch()}: e.g.
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{future::plan(future::multisession, workers = 4)
+fit <- nomatch(..., boot_reps = 1000, seed = 42)
+future::plan(future::sequential)  # reset when done
+}\if{html}{\out{</div>}}
+
+If no plan is set, bootstraps run sequentially. \code{multisession} works on all operating systems
+and is recommended for most users. See the \href{https://future.futureverse.org}{future package documentation}
+for additional plans and details on setup.
 }
 \examples{
 # Fit effectiveness model using simulated data
@@ -216,7 +226,7 @@ fit <- nomatch(
   timepoints = seq(30, 180, by = 30),
   immune_lag = 14,
   boot_reps = 5,
-  n_cores = 1
+  seed = NULL
 )
 
 # View basic results
