@@ -161,7 +161,7 @@ test_that("resolve_hazard_formulas() returns formulas without LHS", {
     expect_warning(
     fm <- resolve_hazard_formulas(
         formula_unexposed =  as.formula("y1 ~ x1 + I(x2^2)"),
-        formula_exposed   = as.formula(" y2 ~ x1 + I(x2^2) + splines::ns(D_obs, df = 4)"),
+        formula_exposed   = as.formula(" ~ x1 + I(x2^2) + splines::ns(D_obs, df = 4)"),
         covariates = covars,
         exposure_time = expo
     ), 

@@ -49,9 +49,12 @@ test_that("errors when id_name is not unique", {
 test_that("errors when reserved variable name already exists in data", {
     dat <- make_matchable_data()
     dat$match_id <- 999
+    dat$match_index_time <- 999
+    dat$match_type <- 999
+    dat$match_V <- 999
     expect_error(
         match_rolling_cohort(dat, "Y", "V", "D_obs", "x1", "ID"),
-        "reserved variable", ignore.case = TRUE
+        "conflict with internal", ignore.case = TRUE
     )
 })
 
@@ -147,6 +150,9 @@ test_that("with replace = TRUE, control IDs may repeat", {
 })
 
 
+
+
+
 # Edge cases --------------------------------------------------------------
 test_that("warns and returns empty matched_data when no matches possible", {
     dat <- make_unmatchable_data()
@@ -156,6 +162,10 @@ test_that("warns and returns empty matched_data when no matches possible", {
     )
     expect_equal(nrow(out$matched_data), 0)
 })
+
+
+
+
 
 
 # Reproducability ---------------------------------------------------------

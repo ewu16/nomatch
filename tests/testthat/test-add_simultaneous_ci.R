@@ -42,9 +42,23 @@ test_that("add_simultaneous_ci() errors when only one timepoint", {
                  "more than 1 timepoint|>=\\s*2", ignore.case = TRUE)
 })
 
-test_that("add_simultaneous_ci() errors when no boot samples", {
+test_that("add_simultaneous_ci() errors when no or too few boot samples", {
     fit_no_boot <- suppressWarnings(nomatch(simdata, "Y","event","V","D_obs", c("x1","x2"),
                              immune_lag = 14, timepoints = seq(30,180,30), boot_reps = 0))
+    expect_error(add_simultaneous_ci(fit_no_boot),
+                 "bootstrap|boot", ignore.case = TRUE)
+    
+    fit_no_boot <- suppressWarnings(nomatch(simdata, "Y","event","V","D_obs", c("x1","x2"),
+                                            immune_lag = 14, timepoints = seq(30,180,30), boot_reps = 1))
+    expect_error(add_simultaneous_ci(fit_no_boot),
+                 "bootstrap|boot", ignore.case = TRUE)
+})
+
+
+test_that("add_simultaneous_ci() errors when  boot samples not returned", {
+    fit_no_boot <- suppressWarnings(nomatch(simdata, "Y","event","V","D_obs", c("x1","x2"),
+                                            immune_lag = 14, timepoints = seq(30,180,30), boot_reps = 10,
+                                            keep_boot_samples = FALSE))
     expect_error(add_simultaneous_ci(fit_no_boot),
                  "bootstrap|boot", ignore.case = TRUE)
 })

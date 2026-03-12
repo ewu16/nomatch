@@ -49,6 +49,7 @@ test_that("validate_timepoints() enforces structure, relationships", {
     expect_error(validate_timepoints(timepoints = numeric(0), immune_lag = 14), "length > 0", ignore.case = TRUE)
     expect_error(validate_timepoints(timepoints = c(NA, 60), immune_lag = 14), "no missing values", ignore.case = TRUE)
     expect_error(validate_timepoints(timepoints = c(7, 14), immune_lag = 14), "must be > `immune_lag`", ignore.case = TRUE)
+    expect_error(validate_timepoints(timepoints = -5, immune_lag = 14), "non-negative", ignore.case = TRUE)
 })
 
 

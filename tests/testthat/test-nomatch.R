@@ -144,6 +144,65 @@ test_that("nomatch() works with covariates = NULL", {
 })
 
 
+test_that("individuals with exposure_time > outcome_time are treated as unexposed", {
+    # Setup: take the simulated data and corrupt ~50% of exposed individuals
+    # by shifting their exposure time to AFTER their event time
+    dat <- simdata
+    set.seed(123)
+    late_exposure <- rbinom(n = sum(dat$V == 1), size = 1, prob = 0.5)
+    dat$D_obs[dat$V == 1] <- ifelse(late_exposure,  
+                                    dat$D_obs[dat$V == 1] + dat$Y[dat$V == 1],  # push exposure past event
+                                    dat$D_obs[dat$V == 1])
+    tau <- 14
+    fit <- nomatch(dat, "Y", "event", "V", "D_obs",
+                   covariates = c("x1"), immune_lag = tau,
+                   timepoints = seq(30, 90, 30), boot_reps = 0)
+    
+    # Verify that model_1 and weights only include individuals 
+    # who were exposed before their event 
+    n_valid_exposed <- sum(dat$V == 1 & dat$Y > dat$D_obs + tau)
+    expect_equal(n_valid_exposed, fit$model_1$n)
+    expect_equal(mean(dat$x1[dat$V == 1 & dat$Y > dat$D_obs + tau]),
+                 fit$weights$p_weights$prob[fit$weights$p_weights$x1 == 1])
+    
+    # Reclassifying individuals with exposure_time > outcome time as unexposed
+    # should produce identical results since only interested in exposures
+    # that happen prior to first event 
+    dat2 <- dat
+    dat2$V[dat$V == 1]    <- ifelse(late_exposure, 0, 1)          # recode as unexposed
+    dat2$D_obs[dat$V == 1] <- ifelse(late_exposure, NA, dat2$D_obs[dat$V == 1])  # clear their exposure time
+    fit2 <- nomatch(dat2, "Y", "event", "V", "D_obs",
+                    covariates = c("x1"), immune_lag = tau,
+                    timepoints = seq(30, 90, 30), boot_reps = 0)
+    
+    fit$call <- fit2$call <- NULL
+    expect_equal(fit, fit2)
+})
+
+
+test_that("nomatch() works with timepoint = 0 but not timepoint < 0", {
+    expect_no_error(
+        suppressWarnings(
+        fit <- nomatch(simdata, "Y", "event", "V", "D_obs", c("x1", "x2"),
+            immune_lag = 14, timepoints = 0:20)
+        )
+    )
+    df <- estimates_to_df(fit)
+    at_tau <- df[df$t0 <= 14 & df$term %in% c("cuminc_0", "cuminc_1"), ]
+    expect_true(all(at_tau$estimate == 0))
+    
+    
+    expect_error(
+        nomatch(simdata, "Y", "event", "V", "D_obs", c("x1", "x2"),
+                   immune_lag = 14, timepoints = -5:20)
+    )
+})
+
+
+
+
+
+
 # Key failure modes -------------------------------------------------------
 test_that("nomatch() fails loudly on bad inputs", {
     # Inconsistent exposure status and exposure time
@@ -155,4 +214,55 @@ test_that("nomatch() fails loudly on bad inputs", {
         "non-missing", ignore.case = TRUE
     )
 })
+
+test_that("nomatch() fails for reserved vars", {
+    dat <- simdata
+    names(dat)[names(dat) %in% c("x1",  "Y", "event")]  <- c("event",  "outcome_time", "outcome_status")
+    
+    expect_error(
+        nomatch(dat, "outcome_time", "outcome_status", "V", "D_obs", covariates = c("event", "x2"),
+                immune_lag = 14, timepoints = 30),
+        "conflict with internal", ignore.case = TRUE
+    )
+    
+    dat <- simdata
+    names(dat)[names(dat) %in% c("x2",  "Y", "event")]  <- c("T1",  "outcome_time", "outcome_status")
+    
+    expect_error(
+        nomatch(dat, "outcome_time", "outcome_status", "V", "D_obs", covariates = c("x1", "T1"),
+                immune_lag = 14, timepoints = 30),
+        "conflict with internal", ignore.case = TRUE
+    )
+})
+
+test_that("nomatch() fails when no events", {
+    dat <- simdata
+    dat$event <- 0
+    expect_error(
+        nomatch(dat, "Y", "event", "V", "D_obs", c("x1", "x2"),
+                immune_lag = 14, timepoints = 30),
+        "no events", ignore.case = TRUE
+    )
+    
+    dat <- simdata
+    dat$event[dat$V == 1] <- 0
+    expect_error(
+        nomatch(dat, "Y", "event", "V", "D_obs", c("x1", "x2"),
+                immune_lag = 14, timepoints = 30),
+        "no events", ignore.case = TRUE
+    )
+})
+
+test_that("nomatch() fails when no individuals to fit the exposed model ", {
+    dat <- simdata
+    dat$Y[dat$V == 1] <- dat$D_obs[dat$V==1] + 1
+    expect_error(
+        nomatch(dat, "Y", "event", "V", "D_obs", c("x1", "x2"),
+                immune_lag = 14, timepoints = 30),
+        "no eligible individuals", ignore.case = TRUE
+    )
+})
+
+
+
 

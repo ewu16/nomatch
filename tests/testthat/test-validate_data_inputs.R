@@ -158,7 +158,7 @@ test_that("validate_exposure_args() checks exposure coding, time sign, and consi
     
     # non-NA time for unexposed
     dat <- simdata; dat$D_obs[dat$V == 0][1] <- 9
-    expect_error(validate_exposure_args(dat, "V", "D_obs"), "All unexposed individuals must have NA", ignore.case = TRUE)
+    expect_error(validate_exposure_args(dat, "V", "D_obs"), "All unexposed individuals must have .* NA", ignore.case = TRUE)
 })
 
 
