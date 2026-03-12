@@ -21,7 +21,7 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting

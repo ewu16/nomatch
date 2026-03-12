@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_one_nomatch.R
 \name{get_one_nomatch}
 \alias{get_one_nomatch}
-\title{Internal function to compute cumulative incidence and effect measures}
+\title{Internal function to compute cumulative incidence and effectiveness measures}
 \usage{
 get_one_nomatch(
   data,
@@ -24,7 +24,7 @@ get_one_nomatch(
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
 named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
-\code{covariates}. Missing values for all columns except \code{exposure_time} are not allowed.}
+\code{covariates}. Missing values in any of these columns except \code{exposure_time} are not allowed.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
@@ -38,7 +38,7 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
@@ -52,7 +52,12 @@ as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All v
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
-incidence curves over time are desired.}
+incidence curves over time are desired. By default, the sequence from \code{immune_lag + 1} to
+the maximum event time in the exposed group, by units of 1, is used.}
+
+\item{formula_0}{One-sided (right-hand-side) formula for model 0.}
+
+\item{formula_1}{One-sided (right-hand-side) formula for model 1.}
 
 \item{censor_time}{Time after exposure at which exposed
 individuals are administratively censored during model fitting. Default:
@@ -73,10 +78,6 @@ One of:
 \item \code{"observed"} (default): estimate weights from the observed data;
 \item \code{"custom"}: use user-specified weights provided via \code{custom_weights} argument;
 }}
-
-\item{return_matching}{Logical; return matched datasets? Default is
-TRUE if \code{weights_source = "matched"}. When \code{weights_source != "matched"}, this is
-automatically set to \code{FALSE}.}
 }
 \value{
 List with components:
@@ -91,14 +92,6 @@ one column per measure (\code{cuminc_0}, \code{cuminc_1}, \code{risk_ratio},\cod
 This is an internal function that performs the actual estimation
 of cumulative incidences and derived effect measures
 using the G-computation style approach. It is called by \code{\link[=nomatch]{nomatch()}} and \code{\link[=one_boot_nomatch]{one_boot_nomatch()}}.
-Users should typically call these functions rather than calling this function directly.
-For historical reasons, this function handles more complex inputs than
-exposed in the \code{nomatch()} interface. In particular, it includes
-an options to
-\itemize{
-\item set censor time in hazard model for the exposed
-\item weight by the weights from a matched dataset and
-\item provide hazard model formulas or prefit objects
-}
+Users should typically call \code{\link[=nomatch]{nomatch()}} rather than calling this function directly.
 }
 \keyword{internal}

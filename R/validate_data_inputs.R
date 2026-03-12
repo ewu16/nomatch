@@ -115,7 +115,7 @@ validate_exposure_args <- function(data, exposure, exposure_time){
     }
     exposed <- data[[exposure]] == 1
     if (any(is.na(et[exposed])))       stop("All exposed individuals must have non-missing ", exposure_time, ".")
-    if (any(!is.na(et[!exposed])))     stop("All unexposed individuals must have NA ", exposure_time, ".")
+    if (any(!is.na(et[!exposed])))     stop("All unexposed individuals must have ", exposure_time, " set to NA.")
     
     invisible(NULL)
 }

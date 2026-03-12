@@ -2,7 +2,8 @@
 % Please edit documentation in R/get_one_matching.R
 \name{get_one_matching}
 \alias{get_one_matching}
-\title{Compute VE point estimate in matched data set}
+\title{Internal function to compute cumulative incidence and effectiveness measures
+for a matched dataset}
 \usage{
 get_one_matching(
   matched_data,
@@ -17,7 +18,8 @@ get_one_matching(
 )
 }
 \arguments{
-\item{matched_data}{A data frame for the matched cohort created using \code{\link[=match_rolling_cohort]{match_rolling_cohort()}}.}
+\item{matched_data}{A data frame for the matched cohort created using
+\code{\link[=match_rolling_cohort]{match_rolling_cohort()}}.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
@@ -31,7 +33,7 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
 \item{timepoints}{Numeric vector specifying the timepoints at which to compute
@@ -41,17 +43,21 @@ as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All v
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
-incidence curves over time are desired.}
+incidence curves over time are desired. By default, the sequence from \code{immune_lag + 1} to
+the maximum event time in the exposed group, by units of 1, is used.}
 
-\item{keep_models}{Logical; return the two fitted hazard models used to compute
-cumulative incidences?
-Default: \code{TRUE}.}
+\item{keep_models}{Logical; return the fitted Kaplan Meier object used to
+compute cumulative incidences? Default: \code{TRUE}}
+
+\item{keep_adata}{Logical; return the matched analysis dataset? Default: TRUE}
 }
 \value{
-The object returned by \code{\link[=compute_km_ve]{compute_km_ve()}}
+The object returned by \code{\link[=compute_km_ve]{compute_km_ve()}} with the matched analysis
+dataset, \code{matched_adata}, attached, if requested.
 }
 \description{
-First, creates the analysis matched data set based on \code{matched_data}.
-Then computes Kaplan Meier estimates of cumulative incidence  on the analysis data set.
+First, creates the analysis matched data set based on
+\code{matched_data}. Then computes Kaplan Meier estimates of cumulative incidence
+in the matched analysis data set.
 }
 \keyword{internal}

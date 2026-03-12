@@ -19,8 +19,7 @@ compute_psi_bar_times(
 
 \item{fit_1}{A fitted model returned from \code{\link[=fit_model_1]{fit_model_1()}}}
 
-\item{exposure_time}{Name of the time-to-exposure variable  in \code{newdata}.
-Used to compute \eqn{\psi_0(t_0; d,x)} where \eqn{d + \tau} and \eqn{d + t_0} are needed.}
+\item{exposure_time}{Name of the time-to-exposure variable  in \code{newdata}.}
 
 \item{timepoints}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
@@ -29,7 +28,8 @@ as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All v
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
-incidence curves over time are desired.}
+incidence curves over time are desired. By default, the sequence from \code{immune_lag + 1} to
+the maximum event time in the exposed group, by units of 1, is used.}
 
 \item{tau}{Delay period. Internally used argument equivalent to user facing argument \code{immune_lag}}
 
@@ -45,7 +45,7 @@ Must include:
 \item \code{prob_g}: probability of exposure time given the covariates
 \item all variables in \code{covariates}
 }
-\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}. Must include:\
+\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}. Must include:
 \itemize{
 \item \code{group_id}: covariate group identifier
 \item \code{prob_p}: marginal probability of each covariate group
@@ -60,7 +60,7 @@ A matrix of estimates where the columns are the terms \code{cuminc_0} and \code{
 and the rows are the time points of interest.
 }
 \description{
-Wrapper that computes cumulative incidences at multiple
+Wrapper that computes marginal cumulative incidences at multiple
 timepoints. Calls \code{compute_psi_bar_t0()} internally for each timepoint.
 Models are fitted once before calling this function to allow efficient evaluation
 at multiple timepoints without refitting.
@@ -70,3 +70,4 @@ This function expects models already fitted via \code{\link[=fit_model_0]{fit_mo
 \code{\link[=fit_model_1]{fit_model_1()}}. It performs G-computation by predicting and marginalizing over
 conditional risks.
 }
+\keyword{internal}

@@ -1,9 +1,9 @@
-#'  Compute one bootstrap replicate of matching-based VE point estimate
+#'  Compute one bootstrap replicate of matching analysis method
 #'
 #' @inheritParams get_one_matching
 #'
-#' @return  A matrix of bootstrapped estimates where the the columns of the matrix are the cumulative
-#'  incidence/VE terms and the rows are the requested time points for evaluation.
+#' @return  The `pt_estimates` component returned by [get_one_matching()],
+#'   for a bootstrap sample.
 #'
 #' @keywords internal
 #'

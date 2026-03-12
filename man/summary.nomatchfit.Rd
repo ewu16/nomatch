@@ -2,7 +2,7 @@
 % Please edit documentation in R/vefit_methods.R
 \name{summary.nomatchfit}
 \alias{summary.nomatchfit}
-\title{Summary method for effectiveness fits}
+\title{Summary method for \code{nomatchfit} objects}
 \usage{
 \method{summary}{nomatchfit}(object, digits = 4, show_models = FALSE, ...)
 }
@@ -20,5 +20,7 @@ Invisibly returns the input object \code{object}. Called primarily for its side 
 of printing a detailed summary to the console.
 }
 \description{
-Summarizes how effectiveness estimates were obtained
+Summarizes how effectiveness estimates were obtained including
+analysis method, key parameters, and descriptives to aid
+in understanding the analysis.
 }

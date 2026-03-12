@@ -1,24 +1,24 @@
 #' Estimate observed distributions of exposure times and covariates
 #'
 #' @description Computes two empirical probability distributions which are used to marginalize
-#' time- and covariate- specific cumulative incidences:
-#' - \eqn{g(d \mid x)}: the distribution of exposure times within each covariate subgroup
+#' exposure time- and covariate- specific cumulative incidences:
+#' - \eqn{g(d|x)}: the distribution of exposure times within each covariate subgroup
 #' of exposed individuals who remain at risk `immune_lag` days after exposure.
 #' - \eqn{p(x)}: the distribution of covariates among exposed individuals
 #' who remain at risk `immune_lag` days after exposure.
 #'
-#' Called internally by [nomatch()]. Provides an example of the
+#' Called internally by [nomatch()]. Provides an example of the required
 #' structure for user-specified `custom_weights`.
 #'
 #' @inheritParams  nomatch
 #'
 #' @return A list with two data frames:
-#' - `g_weights`: covariate-conditional exposure time  probabilities (\eqn{g(d \mid x)})
+#' - `g_weights`: covariate-conditional exposure time  probabilities (\eqn{g(d|x)})
 #' - `p_weights`: covariate probabilities (\eqn{p(x)})
 #'
 #'   Each data frame includes all variables in `covariates`, and a `prob` column
 #'   with empirical probabilities.
-#'   `g_weights` additionally includes a `<exposure_time>` column for exposure times.
+#'   `g_weights` additionally includes an `<exposure_time>` column for exposure times.
 #'
 #'
 #' @export

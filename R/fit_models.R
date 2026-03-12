@@ -4,37 +4,36 @@
 #'
 #' @description `fit_model_0()` fits a Cox model to estimate risk for unexposed
 #' individuals on the original time scale. Includes all individuals, censoring
-#' exposed individuals at their time of exposure. By default, model is adjusted for by
-#' `<covariates>`, included as simple linear terms.
+#' exposed individuals at their time of exposure. By default, the model is adjusted for by
+#' `<covariates>`, included as main effect linear terms.
 #'
 #' `fit_model_1()` fits a Cox model to estimate risk for exposed individuals on
 #' the time scale of time since exposure. Includes exposed individuals who
-#' remain at risk `tau` days after exposure. Individuals are additionally
+#' remain at risk `immune_lag (tau)` days after exposure. Individuals are additionally
 #' censored at `censor_time` days after exposure to avoid extrapolation beyond
-#' the time period of interest. By default, model is adjusted for
-#' `<covariates>`, included as simple linear terms, and exposure time is included as a
+#' the time period of interest. By default, the model is adjusted for
+#' `<covariates>`, included as main-effect linear terms, and exposure time is included as a
 #' natural cubic spline with 4 degrees of freedom.
 #'
 #' @inheritParams nomatch
-#' @param formula_0 Optional right hand side of the formula for model 0. By default, uses `covariates`.
+#' @param formula_0 One-sided (right-hand-side) formula for model 0.
 #'
-#' @param formula_1 Optional right hand side of the formula for model 1. By default, uses `covariates`
-#'   plus natural spline of vaccination day (4 df).
-#'
+#' @param formula_1 One-sided (right-hand-side) formula for model 1. 
+#' 
 #' @param censor_time Time after exposure at which exposed
 #'   individuals are censored during model fitting to prevent extrapolation. By default,
 #'   no censoring is applied.
 #'
 #' @return A fitted `coxph` object with additional component `$data` containing
 #'   the analysis dataset used for fitting:
-#' - For `fit_model_0()`: includes the survival tuple `(Y`, `event`)  and
-#' covariates adjusted for in model, where `Y` is the time from time origin
+#' - For `fit_model_0()`: `$data` includes the survival tuple `(Y`, `event`)  and
+#' covariates adjusted for in the model, where `Y` is the time from time origin
 #' to first of endpoint, censoring or exposure time (for exposed individuals).
-#' - For `fit_model_1()`: includes the survival tuple `(T1`, `event`), `<exposure_time>`,
-#' and covariates adjusted for in model, where `T1` is the time from exposure to
+#' - For `fit_model_1()`: `$data` includes the survival tuple `(T1`, `event`), `<exposure_time>`,
+#' and covariates adjusted for in the model, where `T1` is the time from exposure to
 #' endpoint or censoring, with additional censoring by `censor_time`. Only includes
 #' exposed individuals at risk `tau` days after exposure.
-#' @export
+#' @keywords internal 
 #'
 fit_model_0 <- function(data, outcome_time, outcome_status, exposure, exposure_time,
                          formula_0){
@@ -43,7 +42,7 @@ fit_model_0 <- function(data, outcome_time, outcome_status, exposure, exposure_t
     #Extract covariates
     covars <- stats::get_all_vars(formula_0, data)
 
-    check_reserved_vars(covars, c("Y", "event"), "Model covariates")
+    check_reserved_vars(names(covars), c("Y", "event"))
 
     #Extract column values
     outcome <- data[[outcome_time]]
@@ -74,7 +73,7 @@ fit_model_0 <- function(data, outcome_time, outcome_status, exposure, exposure_t
 
 #' @rdname fit_model_0
 #' @param tau Delay period so that events before tau are not included.
-#' @export
+#' @keywords internal 
 fit_model_1 <- function(data, outcome_time, outcome_status, exposure, exposure_time,
                         tau, formula_1, censor_time = NULL){
 
@@ -86,7 +85,7 @@ fit_model_1 <- function(data, outcome_time, outcome_status, exposure, exposure_t
     covars <- stats::get_all_vars(formula_1, data)
 
     # Check for name conflicts for variables that will be added
-    check_reserved_vars(covars, c("T1", "event"), "Model covariates")
+    check_reserved_vars(names(covars), c("T1", "event"))
 
     #Extract column values
     outcome <- data[[outcome_time]]
@@ -107,6 +106,11 @@ fit_model_1 <- function(data, outcome_time, outcome_status, exposure, exposure_t
     data_full <- cbind(T1, event, covars)
     #for model_1, only include those vaccinated and at risk tau days after vaccination
     data_1 <- subset(data_full, V == 1 & T1 > tau)
+    
+    if (nrow(data_1) == 0) {
+        stop("In model for exposed, no eligible individuals at risk `immune_lag` days after exposure. ",
+             "Check `immune_lag` and data.", call. = FALSE)
+    }
 
     #Fit model
     formula_1_with_response <- stats::update(formula_1, survival::Surv(T1, event) ~ .)
@@ -129,6 +133,16 @@ safe_coxph <- function(formula, data, ...){
 }
 
 check_coxph <- function(model, model_name){
+    #catch if no events 
+    if (!is.null(model$nevent) && model$nevent == 0) {
+        stop(
+            "In ", model_name, ", no events were observed. ",
+            "Cannot fit or predict from this model. ",
+            call. = FALSE
+        )
+    }
+    
+    
     coef <- stats::coef(model)
     
     # No coefficients to check (e.g. intercept-only model)
@@ -154,10 +168,5 @@ check_coxph <- function(model, model_name){
    invisible(NULL)
 }
 
-# diagnose_coxph_warnings <- function(model){
-#     cat("N total:", model$n, "\n")
-#     cat("N event:", model$nevent, "\n")
-#     covars <- stats::get_all_vars(model$formula, model$data)
-#
-# }
+
 

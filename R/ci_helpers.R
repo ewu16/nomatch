@@ -12,10 +12,9 @@
 #'   to return ("wald", "percentile", "both")
 #' @param alpha  Significance level used to compute confidence intervals.
 #'   Confidence intervals have nominal level `1 - alpha`.
-#' @param transform If `ci_type = "wald"`, a character string indicating the scale on which
-#' to compute Wald confidence intervals that are then transformed back to the original scale.
-#' Options are `logit` for the transformation log(x/(1-x)) or `log_ve` for the transformation
-#' log(1-x).
+#' @param transform A named list with entries `fwd, lower, upper` where `fwd` is
+#' a function for the transformation and `lower` and `upper` are functions
+#' computing the lower and upper confidence interval limit on the original scale. 
 #' @param z_star If `ci_type = "wald"`, a specific critical value used to
 #' to compute Wald confidence intervals (assumed to be positive). If used, `alpha` argument is ignored.
 #'

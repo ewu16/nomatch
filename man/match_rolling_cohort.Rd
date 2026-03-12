@@ -18,7 +18,7 @@ match_rolling_cohort(
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
 named in \code{outcome_time}, \code{exposure}, \code{exposure_time}, \code{matching_vars} and
-\code{id_name}. Missing values for all columns except \code{exposure_time} are not allowed.}
+\code{id_name}. Missing values in any column except \code{exposure_time} are not allowed.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
@@ -29,16 +29,19 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
 \item{matching_vars}{Character vector of variables to use for exact matching.}
 
 \item{id_name}{Name of unique identifier variable of individuals.}
 
-\item{replace}{Logical. Allow controls to be reused? Default: \code{FALSE}}
+\item{replace}{Logical. Allow controls to be reused? Default: \code{FALSE}. If \code{TRUE},
+allows controls to be matched with exposed individuals at different timepoints, but not to
+multiple exposed individuals within the same timepoint.}
 
-\item{seed}{Integer for reproducibility. Default: \code{NULL}}
+\item{seed}{Integer seed for reproducible matching results. Can be useful because
+when there are multiple eligible controls to be matched, controls are randomly chosen. Default: \code{NULL}}
 }
 \value{
 A list containing the following:
@@ -47,24 +50,27 @@ A list containing the following:
 \itemize{
 \item \code{match_index_time}: Time at which individuals were matched
 \item \code{match_type}: "case" or "control"
-\item \verb{match_<exposure>}: Treatment at matching
+\item \verb{match_<exposure>}: Exposure at time of matching
 \item \code{match_id}: Pair identifier
 }
+Data provides the matched pairs and matching information, but no other
+changes are made to the original data associated with each individual.
 }
 \item{n_unmatched_cases}{Number of unmatched exposed individuals}
-\item{discarded}{Logical vector indicating excluded individuals}
+\item{discarded}{Logical vector indicating which rows in the original data are
+excluded from the matched dataset}
 }
 }
 \description{
 Creates 1:1 matched pairs of exposed ("cases") and
-unexposed("controls") individuals. Uses a rolling cohort design where
-controls must be unexposed and event-free at the time they are matched to
-a case.
+unexposed ("controls") individuals. Uses a rolling cohort design where
+individuals who become exposed are matched with an eligible control, defined
+as individuals who are unexposed and at-risk at the time of matching.
 }
 \details{
 For each exposure time, newly exposed individuals are matched
-to eligible controls using exact covariate matching. Controls are eligible if
-unexposed and event-free at that time. Exposed individuals may appear in
+to eligible controls using exact covariate matching. Controls are eligible if they are
+unexposed and event-free at the time of matching. Exposed individuals may appear in
 the final matched dataset twice, as a control (when they are not yet exposed) and as a case.
 }
 \examples{

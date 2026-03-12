@@ -21,7 +21,7 @@ returns the bootstrap estimates}
 
 \item{one_boot_args}{List of arguments to pass to \code{one_boot_function}}
 
-\item{ci_type}{Method for constructing bootstrap confidence intervals. One of
+\item{ci_type}{Method for constructing pointwise bootstrap confidence intervals. One of
 \code{"wald"}, \code{"percentile"}, or \code{"both"}.
 \itemize{
 \item \code{"wald"} (default): Computes Wald-style intervals using bootstrap standard errors.
@@ -33,7 +33,7 @@ See \strong{Confidence intervals} section for details.
 \item{boot_reps}{Number of bootstrap replicates for confidence intervals.
 Recommended to use at least 1000 for publication-quality results. Use
 smaller values (e.g., 10-100) for initial exploration. Default: \code{0} (no
-bootstrapping).}
+bootstrapping). Bootstrap procedure can be parallelizaed- see \strong{Parallelization} section for details.}
 
 \item{pt_est}{A matrix of point estimates, with columns corresponding to
 cumulative incidence and effect measures, and rows representing evaluation
@@ -47,10 +47,7 @@ when \code{ci_type = "percentile"}.}
 \code{TRUE}. Must be set to \code{TRUE} if user plans to use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}}
 to obtain simultaneous confidence intervals.}
 
-\item{seed}{Integer seed for reproducible bootstrap results. Default: NULL.
-Parallelism is controlled externally via \code{\link[future:plan]{future::plan()}}. For example,
-to use 4 cores: \code{future::plan(future::multisession, workers = 4)}.
-If no plan is set, bootstraps run sequentially.}
+\item{seed}{Integer seed for reproducible bootstrap results. Default: \code{NULL}.}
 }
 \value{
 A list containing the following:

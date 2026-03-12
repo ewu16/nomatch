@@ -1,6 +1,6 @@
 Package: nomatch
 Title: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies
-        Without Matching
+        Without Using Matching
 Version: 0.0.0.9000
 Authors@R: 
     person("Emily", "Wu", , "emily.wu2@emory.edu", role = c("aut", "cre"),
@@ -11,7 +11,7 @@ License: MIT + file LICENSE
 URL: https://ewu16.github.io/nomatch/, https://github.com/ewu16/nomatch
 BugReports: https://github.com/ewu16/nomatch/issues
 Depends: 
-    R (>= 2.10)
+    R (>= 4.1.0)
 Imports: 
     furrr,
     ggh4x,

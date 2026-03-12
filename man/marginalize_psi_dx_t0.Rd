@@ -2,7 +2,7 @@
 % Please edit documentation in R/marginalize_psi_dx.R
 \name{marginalize_psi_dx_t0}
 \alias{marginalize_psi_dx_t0}
-\title{Marginalize conditional cumulative incidences}
+\title{Marginalize time- and covariate- specific cumulative incidences}
 \usage{
 marginalize_psi_dx_t0(psi_dx, gp_list = NULL, show_intermediates = FALSE)
 }
@@ -10,7 +10,7 @@ marginalize_psi_dx_t0(psi_dx, gp_list = NULL, show_intermediates = FALSE)
 \item{psi_dx}{A data frame with conditional risk predictions containing:
 \itemize{
 \item \verb{<covariates>}: all covariate columns
-\item \verb{<exposure_time>}: vaccination day column
+\item \verb{<exposure_time>}: exposure time column
 \item \code{psi_0_dx}: cumulative incidence under no vaccine,\eqn{\psi_0(t_0; d, x)}
 \item \code{psi_1_dx}: cumulative incidence  under vaccine,\eqn{\psi_1(t_0; d, x)}
 }
@@ -27,7 +27,7 @@ Must include:
 \item \code{prob_g}: probability of exposure time given the covariates
 \item all variables in \code{covariates}
 }
-\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}. Must include:\
+\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}. Must include:
 \itemize{
 \item \code{group_id}: covariate group identifier
 \item \code{prob_p}: marginal probability of each covariate group
@@ -58,7 +58,7 @@ When \code{show_intermediates = TRUE}, a list containing both overall results (a
 and group-specific results (as a data frame).
 }
 \description{
-Averages day- and covariate-specific cumulative incidences from \code{\link[=compute_psi_dx_t0]{compute_psi_dx_t0()}}
+Averages time- and covariate-specific cumulative incidences from \code{\link[=compute_psi_dx_t0]{compute_psi_dx_t0()}}
 to produce overall cumulative incidences under each exposure. By default, performs
 a simple average. If weights are provided for in \code{gp_list}, performs a weighted
 average.
@@ -69,3 +69,4 @@ average.
 \item \code{canonicalize_weights()} for creating \code{gp_list}
 }
 }
+\keyword{internal}

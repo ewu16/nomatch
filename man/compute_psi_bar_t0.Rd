@@ -2,7 +2,10 @@
 % Please edit documentation in R/compute_psi_bar.R
 \name{compute_psi_bar_t0}
 \alias{compute_psi_bar_t0}
-\title{Compute overall cumulative incidences at a single timepoint}
+\title{Compute overall cumulative incidences at a single timepoint. Internally calls
+\code{\link[=compute_psi_dx_t0]{compute_psi_dx_t0()}} to predict time and covariate-specific cumulative incidences
+and \link{marginalize_psi_dx_t0} to marginalize these cumulative incidences over
+the selected weight functions for time and covariates.}
 \usage{
 compute_psi_bar_t0(fit_0, fit_1, exposure_time, t0, tau, newdata, gp_list)
 }
@@ -11,8 +14,7 @@ compute_psi_bar_t0(fit_0, fit_1, exposure_time, t0, tau, newdata, gp_list)
 
 \item{fit_1}{A fitted model returned from \code{\link[=fit_model_1]{fit_model_1()}}}
 
-\item{exposure_time}{Name of the time-to-exposure variable  in \code{newdata}.
-Used to compute \eqn{\psi_0(t_0; d,x)} where \eqn{d + \tau} and \eqn{d + t_0} are needed.}
+\item{exposure_time}{Name of the time-to-exposure variable  in \code{newdata}.}
 
 \item{t0}{Time since exposure at which to evaluate cumulative incidence.}
 
@@ -30,7 +32,7 @@ Must include:
 \item \code{prob_g}: probability of exposure time given the covariates
 \item all variables in \code{covariates}
 }
-\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}. Must include:\
+\item \strong{p_weights} Data frame of covariate probabilities \eqn{p(x)}. Must include:
 \itemize{
 \item \code{group_id}: covariate group identifier
 \item \code{prob_p}: marginal probability of each covariate group
@@ -44,6 +46,9 @@ Default is \code{NULL} in which case each row of \code{psi_dx} gets equal weight
 Named numeric vector with \code{cuminc_0}, \code{cuminc_1}
 }
 \description{
-Compute overall cumulative incidences at a single timepoint
+Compute overall cumulative incidences at a single timepoint. Internally calls
+\code{\link[=compute_psi_dx_t0]{compute_psi_dx_t0()}} to predict time and covariate-specific cumulative incidences
+and \link{marginalize_psi_dx_t0} to marginalize these cumulative incidences over
+the selected weight functions for time and covariates.
 }
 \keyword{internal}

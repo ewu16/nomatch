@@ -29,7 +29,7 @@ fit_model_1(
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
 named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
-\code{covariates}. Missing values for all columns except \code{exposure_time} are not allowed.}
+\code{covariates}. Missing values in any of these columns except \code{exposure_time} are not allowed.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
@@ -43,15 +43,14 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
-\item{formula_0}{Optional right hand side of the formula for model 0. By default, uses \code{covariates}.}
+\item{formula_0}{One-sided (right-hand-side) formula for model 0.}
 
 \item{tau}{Delay period so that events before tau are not included.}
 
-\item{formula_1}{Optional right hand side of the formula for model 1. By default, uses \code{covariates}
-plus natural spline of vaccination day (4 df).}
+\item{formula_1}{One-sided (right-hand-side) formula for model 1.}
 
 \item{censor_time}{Time after exposure at which exposed
 individuals are censored during model fitting to prevent extrapolation. By default,
@@ -61,11 +60,11 @@ no censoring is applied.}
 A fitted \code{coxph} object with additional component \verb{$data} containing
 the analysis dataset used for fitting:
 \itemize{
-\item For \code{fit_model_0()}: includes the survival tuple \verb{(Y}, \code{event})  and
-covariates adjusted for in model, where \code{Y} is the time from time origin
+\item For \code{fit_model_0()}: \verb{$data} includes the survival tuple \verb{(Y}, \code{event})  and
+covariates adjusted for in the model, where \code{Y} is the time from time origin
 to first of endpoint, censoring or exposure time (for exposed individuals).
-\item For \code{fit_model_1()}: includes the survival tuple \verb{(T1}, \code{event}), \verb{<exposure_time>},
-and covariates adjusted for in model, where \code{T1} is the time from exposure to
+\item For \code{fit_model_1()}: \verb{$data} includes the survival tuple \verb{(T1}, \code{event}), \verb{<exposure_time>},
+and covariates adjusted for in the model, where \code{T1} is the time from exposure to
 endpoint or censoring, with additional censoring by \code{censor_time}. Only includes
 exposed individuals at risk \code{tau} days after exposure.
 }
@@ -73,14 +72,15 @@ exposed individuals at risk \code{tau} days after exposure.
 \description{
 \code{fit_model_0()} fits a Cox model to estimate risk for unexposed
 individuals on the original time scale. Includes all individuals, censoring
-exposed individuals at their time of exposure. By default, model is adjusted for by
-\verb{<covariates>}, included as simple linear terms.
+exposed individuals at their time of exposure. By default, the model is adjusted for by
+\verb{<covariates>}, included as main effect linear terms.
 
 \code{fit_model_1()} fits a Cox model to estimate risk for exposed individuals on
 the time scale of time since exposure. Includes exposed individuals who
-remain at risk \code{tau} days after exposure. Individuals are additionally
+remain at risk \code{immune_lag (tau)} days after exposure. Individuals are additionally
 censored at \code{censor_time} days after exposure to avoid extrapolation beyond
-the time period of interest. By default, model is adjusted for
-\verb{<covariates>}, included as simple linear terms, and exposure time is included as a
+the time period of interest. By default, the model is adjusted for
+\verb{<covariates>}, included as main-effect linear terms, and exposure time is included as a
 natural cubic spline with 4 degrees of freedom.
 }
+\keyword{internal}

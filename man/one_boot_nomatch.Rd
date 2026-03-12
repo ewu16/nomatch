@@ -21,7 +21,7 @@ one_boot_nomatch(
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
 named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
-\code{covariates}. Missing values for all columns except \code{exposure_time} are not allowed.}
+\code{covariates}. Missing values in any of these columns except \code{exposure_time} are not allowed.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
@@ -35,7 +35,7 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
@@ -49,7 +49,12 @@ as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All v
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
-incidence curves over time are desired.}
+incidence curves over time are desired. By default, the sequence from \code{immune_lag + 1} to
+the maximum event time in the exposed group, by units of 1, is used.}
+
+\item{formula_0}{One-sided (right-hand-side) formula for model 0.}
+
+\item{formula_1}{One-sided (right-hand-side) formula for model 1.}
 }
 \value{
 The \code{pt_estimates} component returned by \code{\link[=get_one_nomatch]{get_one_nomatch()}},

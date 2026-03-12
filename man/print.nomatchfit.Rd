@@ -2,7 +2,7 @@
 % Please edit documentation in R/vefit_methods.R
 \name{print.nomatchfit}
 \alias{print.nomatchfit}
-\title{Print method for effectiveness fits}
+\title{Print method for \code{nomatchfit} objects}
 \usage{
 \method{print}{nomatchfit}(
   x,
@@ -16,7 +16,7 @@
 
 \item{digits}{Integer indicating the number of decimal places to display. Default is 3.}
 
-\item{effect}{The effect measure to output.  Either
+\item{effect}{The effect measure to print.  Either
 \code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or \code{"risk_difference"}.}
 
 \item{...}{Additional arguments (currently ignored).}
@@ -26,5 +26,5 @@ Invisibly returns the input object \code{x}. Called primarily for its side effec
 of printing a summary to the console.
 }
 \description{
-Prints a concise summary of effectiveness estimates from a fitted model.
+Prints a concise summary of the effectiveness estimates from a fitted model.
 }

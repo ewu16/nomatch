@@ -1,21 +1,24 @@
-#' Add simultaneous confidence intervals to effectiveness fit
+#' Add simultaneous confidence intervals to `nomatchfit` object 
 #'
 #' @description Computes simultaneous confidence intervals, which maintain the
-#' specified coverage level across all evaluation timepoints jointly. This is
+#' specified coverage level for the parameter of interest
+#' across all evaluation timepoints jointly. This is
 #' useful for making inferences about the entire cumulative incidence or
-#' effectiveness curve.
+#' effectiveness curve. The simultaneous confidence intervals returned contrast with the pointwise confidence intervals 
+#' automatically returned with a `nomatchfit` object when `boot_reps > 0`. 
 #'
 #' @param object An object of class `nomatchfit` created by [nomatch()] or
 #'   [matching()]. Must
 #'   * contain evaluations at at least 2 timepoints (`length(object$timepoints)  > = 2`),
-#'   * contain bootstrap samples (`keep_boot_samples = TRUE` when fitting).
+#'   * contain more than one bootstrap replicate (`boot_reps` > 1)
+#'   * contain non-null bootstrap samples (`keep_boot_samples = TRUE` when fitting).
 #' @param seed Integer seed  to ensure reproducible critical values for
 #'   simultaneous confidence intervals (relied on random number generation).
 #'   Default is `NULL` (no seed set).
 #'
 #' @return The original `nomatchfit` object with the following modifications:
 #'   \describe{
-#'    \item{estimates}{Each matrix gets additional columns describing the simultaneous confidence interval bounds and construction:
+#'    \item{estimates}{The matrix for each term in the `estimates` list  gets additional columns describing the simultaneous confidence interval bounds and construction:
 #'    `simul_lower`, `simul_upper`, `simul_n`}
 #'     \item{simul_z_star}{Named vector containing the critical values used for each term}
 #'     \item{simul_excluded_timepoints}{Named list containing a vector of timepoints excluded
@@ -40,8 +43,8 @@
 #'   covariates = c("x1", "x2"),
 #'   timepoints = seq(30, 180, by = 30),
 #'   immune_lag = 14,
-#'   boot_reps = 100,
-#'   keep_boot_samples = TRUE
+#'   boot_reps = 100,         # must be > 1
+#'   keep_boot_samples = TRUE # must be set to TRUE (default)
 #' )
 #'
 #' # Add simultaneous CIs
@@ -65,9 +68,9 @@ add_simultaneous_ci <- function(object, seed = NULL){
          call. = FALSE)
   }
 
-  if (is.null(object$boot_samples)) {
+  if (is.null(object$boot_samples) | object$boot_reps <= 1) {
     stop("Object must contain bootstrap samples. ",
-         "Rerun with keep_boot_samples = TRUE",
+         "Rerun with boot_reps > 1 and keep_boot_samples = TRUE",
          call. = 
            FALSE)
   }

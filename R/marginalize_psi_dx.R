@@ -1,14 +1,14 @@
-#' Marginalize conditional cumulative incidences
+#' Marginalize time- and covariate- specific cumulative incidences
 #'
 #' @description
-#' Averages day- and covariate-specific cumulative incidences from [compute_psi_dx_t0()]
+#' Averages time- and covariate-specific cumulative incidences from [compute_psi_dx_t0()]
 #' to produce overall cumulative incidences under each exposure. By default, performs
 #' a simple average. If weights are provided for in `gp_list`, performs a weighted
 #' average.
 #'
 #' @param psi_dx A data frame with conditional risk predictions containing:
 #'   - `<covariates>`: all covariate columns
-#'   - `<exposure_time>`: vaccination day column
+#'   - `<exposure_time>`: exposure time column
 #'   - `psi_0_dx`: cumulative incidence under no vaccine,\eqn{\psi_0(t_0; d, x)}
 #'   - `psi_1_dx`: cumulative incidence  under vaccine,\eqn{\psi_1(t_0; d, x)}
 #'
@@ -23,7 +23,7 @@
 #'   - `prob_g`: probability of exposure time given the covariates
 #'   - all variables in `covariates`
 #'
-#' -  **p_weights** Data frame of covariate probabilities \eqn{p(x)}. Must include:\
+#' -  **p_weights** Data frame of covariate probabilities \eqn{p(x)}. Must include:
 #'    - `group_id`: covariate group identifier
 #'    - `prob_p`: marginal probability of each covariate group
 #'    -  all variables in `covariates`
@@ -50,8 +50,7 @@
 #' - [compute_psi_dx_t0()] for generating `psi_dx` input
 #' - `canonicalize_weights()` for creating `gp_list`
 #'
-#' @export
-#'
+#' @keywords internal
 marginalize_psi_dx_t0 <- function(psi_dx, gp_list = NULL, show_intermediates = FALSE){
 
    if(is.null(gp_list)){
@@ -103,39 +102,4 @@ marginalize_psi_dx_t0 <- function(psi_dx, gp_list = NULL, show_intermediates = F
 
 }
 
-
-# marginalize_psi_dx_t0 <- function(psi_dx, gp_list){
-#    #check if there are any missing covariate groups in psi_dx
-#    # missing_groups <- setdiff(
-#    #    unique(gp_list$g_weights$group_id),
-#    #    unique(psi_dx$group_id)
-#    # )
-#    # if (length(missing_groups) > 0) {
-#    #    stop("psi_dx missing predictions for groups: ",
-#    #         paste(missing_groups, collapse = ", "))
-#    # }
-#    psi_dx$dummy <- 1
-#    psi_dx <- merge(gp_list$g_weights, psi_dx, all.x = TRUE, all.y = FALSE)
-#    stopifnot("psi_dx missing predictions needed for marginalization" = !any(is.na(psi_dx$dummy)))
-#
-#
-#    # Step 1: Marginalize over days within each covariate group g(d|x)
-#    # results in psi_0(x), psi_1(x) for each covariage group x
-#    psi_x <- stats::aggregate(
-#       cbind(
-#          weighted_cuminc_0 = psi_dx$psi_0_dx * psi_dx$prob_g,
-#          weighted_cuminc_1 = psi_dx$psi_1_dx * psi_dx$prob_g
-#       ) ~ group_id,
-#       data = psi_dx,
-#       FUN = sum,
-#       na.action = stats::na.pass
-#    )
-#
-#    # Step 2: Marginalize over covariate groups p(x)
-#    psi_x <- merge(psi_x, gp_list$p_weights)
-#    overall_cuminc_0 <- stats::weighted.mean(psi_x$weighted_cuminc_0, psi_x$prob_p)
-#    overall_cuminc_1 <- stats::weighted.mean(psi_x$weighted_cuminc_1, psi_x$prob_p)
-#
-#    c("cuminc_0" = overall_cuminc_0, "cuminc_1" = overall_cuminc_1)
-# }
 

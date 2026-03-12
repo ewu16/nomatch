@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_one_matching.R
 \name{compute_km_ve}
 \alias{compute_km_ve}
-\title{Get the marginal cumulative incidence in the treated and untreated
+\title{Get the marginal cumulative incidence in the exposed and unexposed
 groups based on Kaplan Meier estimation.}
 \usage{
 compute_km_ve(
@@ -15,10 +15,10 @@ compute_km_ve(
 )
 }
 \arguments{
-\item{adata}{A data frame that represents the analysis data set of a clinical trial.}
+\item{adata}{A data frame that represents the analysis data set}
 
 \item{adata_outcome_name}{Character string specifying the time to event variable in \code{adata}. The
-time should be the time to event from vaccination/matched index date}
+time should be the time to event from exposure or matching}
 
 \item{adata_event_name}{Character string specifying the event variable in \code{adata}}
 
@@ -31,22 +31,22 @@ as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All v
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
-incidence curves over time are desired.}
+incidence curves over time are desired. By default, the sequence from \code{immune_lag + 1} to
+the maximum event time in the exposed group, by units of 1, is used.}
 
-\item{keep_models}{Logical; return the two fitted hazard models used to compute
-cumulative incidences?
-Default: \code{TRUE}.}
+\item{keep_models}{Logical; return the fitted Kaplan Meier object used to
+compute cumulative incidences? Default: \code{TRUE}}
 }
 \value{
 A list containing the following:
 \describe{
 \item{estimates}{A matrix of estimates. The columns of the matrix are the cumulative
-incidence/VE terms and the rows are the requested time points for evaluation.}
-\item{models}{If \code{keep_models = TRUE}, the models used to compute risk and VE}
+incidence/effectiveness terms and the rows are the requested timepoints for evaluation.}
+\item{models}{If \code{keep_models = TRUE}, the fitted Kaplan Meier object}
 }
 }
 \description{
-Get the marginal cumulative incidence in the treated and untreated
+Get the marginal cumulative incidence in the exposed and unexposed
 groups based on Kaplan Meier estimation.
 }
 \keyword{internal}

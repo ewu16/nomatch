@@ -16,7 +16,6 @@
 #' @param fit_0 A fitted model returned from [fit_model_0()]
 #' @param fit_1 A fitted model returned from [fit_model_1()]
 #' @param exposure_time Name of the time-to-exposure variable  in `newdata`.
-#'   Used to compute \eqn{\psi_0(t_0; d,x)} where \eqn{d + \tau} and \eqn{d + t_0} are needed.
 #' @param tau Delay period. Internally used argument equivalent to user facing argument `immune_lag`
 #' @param t0  Time since exposure at which to evaluate cumulative incidence.
 #' @param newdata New data at which to do predictions.
@@ -25,10 +24,9 @@
 #' cumulative incidences and component survival probabilities:
 #' - `psi_0_dx`, `surv_0_d_plus_tau`, `surv_0_d_plus_t0`
 #' - `psi_1_dx`, `surv_1_tau`, `surv_1_t0`
-
 #' @seealso [predict_from_model_0()], [predict_from_model_1()]
-#' @export
-#'
+#' @keywords internal 
+
 compute_psi_dx_t0 <- function(fit_0, fit_1, exposure_time, t0, tau, newdata){
     #check new data argument
     pred_0 <- predict_from_model_0(fit_0, exposure_time, t0, tau, newdata)
@@ -56,10 +54,6 @@ compute_psi_dx_t0 <- function(fit_0, fit_1, exposure_time, t0, tau, newdata){
 #'  -  `predict_from_model_1()`: `surv_1_tau`, `surv_1_t0`, and `psi_1_dx`
 #'
 #' @keywords internal
-#' @export
-#'
-
-
 predict_from_model_0 <- function(fit_0, exposure_time, t0, tau, newdata){
     surv_vars <- all.vars(stats::formula(fit_0)[[2]])
     time_var <- surv_vars[1]
@@ -92,7 +86,6 @@ predict_from_model_0 <- function(fit_0, exposure_time, t0, tau, newdata){
 
 #' @rdname predict_from_model_0
 #' @keywords internal
-#' @export
 predict_from_model_1 <- function(fit_1, exposure_time, t0, tau, newdata){
     surv_vars <- all.vars(stats::formula(fit_1)[[2]])
     time_var <- surv_vars[1]

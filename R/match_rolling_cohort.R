@@ -1,24 +1,27 @@
 #' Match exposed and unexposed individuals using rolling cohort design
 #'
 #' @description Creates 1:1 matched pairs of exposed ("cases") and
-#' unexposed("controls") individuals. Uses a rolling cohort design where
-#' controls must be unexposed and event-free at the time they are matched to
-#' a case.
+#' unexposed ("controls") individuals. Uses a rolling cohort design where 
+#' individuals who become exposed are matched with an eligible control, defined
+#' as individuals who are unexposed and at-risk at the time of matching.  
 #'
 #' @details For each exposure time, newly exposed individuals are matched
-#' to eligible controls using exact covariate matching. Controls are eligible if
-#' unexposed and event-free at that time. Exposed individuals may appear in
+#' to eligible controls using exact covariate matching. Controls are eligible if they are 
+#' unexposed and event-free at the time of matching. Exposed individuals may appear in
 #' the final matched dataset twice, as a control (when they are not yet exposed) and as a case.
 #'
 #'
 #' @inheritParams nomatch
 #' @param data A data frame with one row per individual containing the columns
 #'  named in `outcome_time`, `exposure`, `exposure_time`, `matching_vars` and
-#'  `id_name`. Missing values for all columns except `exposure_time` are not allowed.
+#'  `id_name`. Missing values in any column except `exposure_time` are not allowed.
 #' @param id_name Name of unique identifier variable of individuals.
 #' @param matching_vars Character vector of variables to use for exact matching.
-#' @param replace Logical. Allow controls to be reused? Default: `FALSE`
-#' @param seed Integer for reproducibility. Default: `NULL`
+#' @param replace Logical. Allow controls to be reused? Default: `FALSE`. If `TRUE`, 
+#' allows controls to be matched with exposed individuals at different timepoints, but not to 
+#' multiple exposed individuals within the same timepoint. 
+#' @param seed Integer seed for reproducible matching results. Can be useful because
+#' when there are multiple eligible controls to be matched, controls are randomly chosen. Default: `NULL`
 
 
 #' @return A list containing the following:
@@ -27,12 +30,15 @@
 #'       \itemize{
 #'       \item `match_index_time`: Time at which individuals were matched
 #'       \item `match_type`: "case" or "control"
-#'       \item `match_<exposure>`: Treatment at matching
+#'       \item `match_<exposure>`: Exposure at time of matching
 #'       \item `match_id`: Pair identifier
 #'     }
+#'     Data provides the matched pairs and matching information, but no other
+#'     changes are made to the original data associated with each individual.
 #'    }
 #'   \item{n_unmatched_cases}{Number of unmatched exposed individuals}
-#'   \item{discarded}{Logical vector indicating excluded individuals}
+#'   \item{discarded}{Logical vector indicating which rows in the original data are
+#'   excluded from the matched dataset}
 #' }
 #'
 #' @export
@@ -64,7 +70,7 @@ match_rolling_cohort <- function(data, outcome_time, exposure, exposure_time, ma
     # Check for name conflicts for variables that will be added
     reserved_vars <- c("match_index_time", "match_type", paste0("match_", exposure), "match_id")
 
-    check_reserved_vars(names(data), reserved_vars, "Names in data")
+    check_reserved_vars(names(data), reserved_vars)
 
 
     #set seed for reproducibility due to random matching
@@ -77,7 +83,7 @@ match_rolling_cohort <- function(data, outcome_time, exposure, exposure_time, ma
     n_pairs_counter <- 0 #keep track of how many pairs have been matched
 
     #exposed serve as "cases" for matching, unexposed are "controls"
-    cases <- subset(data, data[[exposure]] == 1)
+    cases <- subset(data, data[[exposure]] == 1 & data[[outcome_time]] > data[[exposure_time]])
     observed_ds <- sort(unique(data[[exposure_time]]))
 
     #loop through observed vaccination timepoints- each newly exposed person is eligible for matching

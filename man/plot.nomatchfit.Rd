@@ -13,29 +13,34 @@
 )
 }
 \arguments{
-\item{x}{An object of class \code{nomatchfit} created by \code{\link[=nomatch]{nomatch()}} or \code{\link[=matching]{matching()}}.}
+\item{x}{An object of class \code{nomatchfit} created by \code{\link[=nomatch]{nomatch()}} or
+\code{\link[=matching]{matching()}}.}
 
-\item{effect}{The effect measure to plot next to the cumulative incidence plots.
-Either \code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or \code{"risk_difference"}.}
+\item{effect}{The effect measure to plot next to the cumulative incidence
+plots. Either \code{"risk_ratio"}(default), \code{"relative_risk_reduction"}  or
+\code{"risk_difference"}.}
 
-\item{ci_type}{Character string specifying the type of confidence interval band to plot. By default,
-\code{"wald"} if available, otherwise set to \code{"percentile"} or \code{none}.
-One of \verb{"wald", "percentile", "simul"}, or \code{"none"}. Must choose a \code{ci_type} whose lower
-and upper bounds are already computed in \code{estimates} component of \code{x}.}
+\item{ci_type}{Character string specifying the type of confidence interval
+band to plot, one of \verb{"wald", "percentile", "simul"}, or \code{"none"}.  Must
+choose a \code{ci_type} whose lower and upper bounds are already computed in
+\code{estimates} component of \code{x}. Uses \code{"wald"} by default if available.}
 
-\item{color}{Aesthetic value to map data values to. Default: \code{"#0072B2"} (blue)}
+\item{color}{Aesthetic value to map data values to. Default: \code{"#0072B2"}
+(blue)}
 
 \item{...}{Additional arguments (currently ignored).}
 }
 \value{
-a ggplot2 object with three faceted panels (for cumulative incidences and the chosen effect measure)
+a ggplot2 object with three faceted panels (for cumulative incidences
+and the chosen effect measure)
 }
 \description{
-Create a panel plot of cumulative incidence and effectiveness estimates across all evaluation time points.
+Create a panel plot of cumulative incidence and effectiveness
+estimates across all evaluation time points.
 }
 \details{
-For cumulative incidence panels, y-axis limits are shared across methods to
-facilitate comparison. The VE panel uses free y-axis scaling.
+The two cumulative incidence panels share y-axis limits. The effect
+measure panel has its own independent y-axis scaling.
 }
 \examples{
 fit <- nomatch(

@@ -19,10 +19,13 @@ library(tibble)
 
 > A matching alternative for more efficiently evaluating effectiveness of interventions using observational data
 
+---
 
 ## Description
 
-The `nomatch` package uses a G-computation style estimator to compute effectiveness of binary interventions from observational cohort studies following the target trial emulation framework. The proposed estimator tends to produce similar point estimates as matching-based estimators but can be more efficient.
+The `nomatch` package uses a G-computation style estimator to compute the effectiveness of a binary intervention in observational cohort studies that use the target trial emulation approach. The proposed estimator tends to produce similar point estimates as matching-based estimators but can be more efficient.
+
+---
 
 ## Installation
 
@@ -33,45 +36,40 @@ You can install the development version of `nomatch` with:
 devtools::install_github("ewu16/nomatch")
 ```
 
+---
+
 ## Example
 
 This minimal example shows how to use `nomatch` to obtain cumulative incidences and 
-their derived effect measures such as risk differences (RD), risk ratios (RR), and relative risk reduction (1 - RR).
+their derived effect measures such as risk differences (RD), risk ratios (RR), and relative risk reductions (1 - RR).
 
-We use a simple simulated dataset mimicking data from an observational vaccine study,
-although the methods apply equally to other disease settings. 
+We use a simple simulated dataset based on an observational vaccine study,
+although data from other disease settings can be used. 
 
 ```{r example, fig.width = 8, fig.height = 4}
 
-#Load package
+# Load package
 library(nomatch)
 
-# Example data
+# View example data
 simdata <- as_tibble(simdata) #for prettier printing 
-
-#View data
 head(simdata)
 ```
 
-Note that the dataset contains the following:
+The dataset contains the following:
 
 -  one row per individual (`ID`)
-
 -  a set of baseline covariates (`x1`, `x2`)
-
--  exposure status (`V`) with values `1 = vaccinated, 0 = unvaccinated`. (Note: its currently
-assumed that the unexposed group does not receive an active comparator.) 
-
+-  exposure status (`V`) with values `1 = vaccinated, 0 = unvaccinated`. 
 -  time to vaccination (`D_obs`); for unvaccinated individuals this is left as `NA`. 
-
 - right censored survival data `(Y, event)` 
    - `Y` represents follow-up time for an outcome such as infection, hospitalization or death.
    - `event` indicates whether individual experienced the event or censoring with values `1 = event, 0 = censored`.
 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 
-# Compute cumulative incidence and effect measures 
+# Use nomatch to compute cumulative incidence and effect estimates 
 fit <- nomatch(data = simdata,
                outcome_time = "Y",
                outcome_status = "event",
@@ -79,26 +77,23 @@ fit <- nomatch(data = simdata,
                exposure_time = "D_obs", 
                covariates = c("x1", "x2"),
                immune_lag = 14,
-               timepoints = 30,
-               #timepoints = seq(30, 180, by = 30),
+               timepoints = seq(30, 180, by = 30),
                boot_reps = 10)
 
-# Print main results 
-## By default shows risk ratios 
-## but all effect measures are computed and stored in the fitted object 
+# Examine object produced by nomatch - shows risk ratio estimates by default 
 fit        
 
-# View additional details about the analytic approach 
-summary(fit)
-
-# Plot cumulative incidence and effect measures over time 
+# Plot cumulative incidence and effect estimates
 plot(fit) 
 ```
 
+---
 
 ## Issues
 
 If you encounter any bugs or have any specific feature requests, please [file an issue](https://github.com/ewu16/nomatch/issues).
+
+---
 
 ## Citation
 
@@ -112,10 +107,9 @@ toBibtex(c)
 ```
  @Manual{,
    title = {nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies
-             Without Matching},
+             Without Using Matching},
    author = {Emily Wu},
-   year = {2025},
-   note = {R package version 0.0.0.9000, 
+   year = {2026},
    https://github.com/ewu16/nomatch},
    url = {https://ewu16.github.io/nomatch/},
  }

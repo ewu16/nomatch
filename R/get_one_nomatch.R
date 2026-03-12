@@ -1,19 +1,14 @@
-#' Internal function to compute cumulative incidence and effect measures
+#' Internal function to compute cumulative incidence and effectiveness measures
 #'
 #' @description This is an internal function that performs the actual estimation
 #' of cumulative incidences and derived effect measures
 #' using the G-computation style approach. It is called by [nomatch()] and [one_boot_nomatch()].
-#' Users should typically call these functions rather than calling this function directly.
-#' For historical reasons, this function handles more complex inputs than
-#' exposed in the `nomatch()` interface. In particular, it includes
-#' an options to
-#' - set censor time in hazard model for the exposed
-#' - weight by the weights from a matched dataset and
-#' - provide hazard model formulas or prefit objects
-#'
+#' Users should typically call [nomatch()] rather than calling this function directly.
 #'
 #' @inheritParams nomatch
-#'
+#' @param formula_0 One-sided (right-hand-side) formula for model 0.
+#' @param formula_1 One-sided (right-hand-side) formula for model 1. 
+#' 
 #' @param censor_time Time after exposure at which exposed
 #'   individuals are administratively censored during model fitting. Default:
 #'   `max(timepoints)`. This limits estimation to the observed  period of interest and
@@ -25,9 +20,6 @@
 #'   * `"custom"`: use user-specified weights provided via `custom_weights` argument;
 #' @param return_gp_list Logical; return marginalizing weights? Default is
 #'   TRUE.
-#' @param return_matching Logical; return matched datasets? Default is
-#'   TRUE if `weights_source = "matched"`. When `weights_source != "matched"`, this is
-#'   automatically set to `FALSE`.
 #'
 ##' @return List with components:
 #' \describe{
@@ -38,7 +30,6 @@
 #' }
 #'
 #' @keywords internal
-#' @export
 
 get_one_nomatch <- function(data,
                        outcome_time,
@@ -123,5 +114,4 @@ get_one_nomatch <- function(data,
     return(out)
 
 }
-
 

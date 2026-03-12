@@ -1,7 +1,7 @@
 #' Compute overall cumulative incidences at multiple timepoints
 #'
 #' @description
-#' Wrapper that computes cumulative incidences at multiple
+#' Wrapper that computes marginal cumulative incidences at multiple
 #' timepoints. Calls `compute_psi_bar_t0()` internally for each timepoint.
 #' Models are fitted once before calling this function to allow efficient evaluation
 #' at multiple timepoints without refitting.
@@ -16,8 +16,7 @@
 #' [fit_model_1()]. It performs G-computation by predicting and marginalizing over
 #' conditional risks.
 #'
-#' @export
-#'
+#' @keywords internal
 compute_psi_bar_times <- function(fit_0, fit_1, exposure_time, timepoints, tau, newdata, gp_list){
     out <- sapply(timepoints, \(t){
         compute_psi_bar_t0(fit_0, fit_1, exposure_time, t0 = t, tau, newdata, gp_list)
@@ -26,13 +25,15 @@ compute_psi_bar_times <- function(fit_0, fit_1, exposure_time, timepoints, tau, 
     t(out)
 }
 
-#' Compute overall cumulative incidences at a single timepoint
+#' Compute overall cumulative incidences at a single timepoint. Internally calls
+#'  [compute_psi_dx_t0()] to predict time and covariate-specific cumulative incidences 
+#'  and [marginalize_psi_dx_t0] to marginalize these cumulative incidences over 
+#'  the selected weight functions for time and covariates. 
 #'
 #' @inheritParams compute_psi_dx_t0
 #' @inheritParams  marginalize_psi_dx_t0
 #' @return Named numeric vector with `cuminc_0`, `cuminc_1`
 #' @keywords internal
-#'
 compute_psi_bar_t0 <- function(fit_0, fit_1, exposure_time, t0, tau, newdata, gp_list){
     if (t0 <= tau) {
         # By definition under the immune-lag/principal-stratum estimand

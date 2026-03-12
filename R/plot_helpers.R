@@ -1,36 +1,10 @@
-#' Internal plotting function for VE panel plots
-#'
-#' @description
-#' Creates a three-panel plot showing cumulative incidence (no vaccine),
-#' cumulative incidence (vaccine), and effectiveness over time.
-#' This function handles both single method and comparison plots.
-#'
+#' Internal plotting function for effect panel plots
+#' @inheritParams plot.nomatchfit 
 #' @param plot_data A data frame containing estimates to plot. Must include
 #'   columns: `t0` (time), `estimate`, `term` (one of "cuminc_0", "cuminc_1", "relative_risk_reduction"),
 #'   `<ci_type>_lower`, `<ci_type>_upper`, and `method`
-#' @param ci_type Character string specifying the type of confidence interval.
-#'   One of "wald", "percentile", "simul", or "none"
-#' @param alpha Numeric significance level for confidence intervals (e.g., 0.05 for 95% CIs).
-#' @param effect The effect measure to plot next to the cumulative incidence plots. 
-#' Either `"risk_ratio"`(default), `"relative_risk_reduction"`  or `"risk_difference"`.
-#' @param colors Character vector of colors. Length should match the number of
-#'   unique methods in `plot_data`. If `NULL` or length doesn't match, ggplot2's
-#'   default colors are used.
-#'
-#' @return A ggplot2 object with three faceted panels.
-#'
-#' @details
-#' This is an internal helper function used by `plot.nomatchfit()` and `compare_ve_fits()`.
-#' The function automatically detects whether it's plotting a single method or
-#' comparing multiple methods based on the `method` column in `plot_data`.
-#'
-#' For cumulative incidence panels, y-axis limits are shared to facilitate comparison.
-#' The VE panel uses free y-axis scaling.
-#'
 #' @keywords internal
-#' @noRd
-
-plot_ve_panel <- function(plot_data,
+plot_effect_panel <- function(plot_data,
                            ci_type,
                            alpha,
                            effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"),
@@ -184,7 +158,7 @@ plot_ve_panel <- function(plot_data,
 }
 
 
-#' Validate and normalize CI type for plotting
+#' Validate and normalize confidence interval type for plotting
 #'
 #' @param object A nomatchfit object
 #' @param ci_type Character string or NULL

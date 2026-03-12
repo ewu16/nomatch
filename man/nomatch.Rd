@@ -29,7 +29,7 @@ nomatch(
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
 named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
-\code{covariates}. Missing values for all columns except \code{exposure_time} are not allowed.}
+\code{covariates}. Missing values in any of these columns except \code{exposure_time} are not allowed.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
@@ -43,7 +43,7 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
@@ -57,7 +57,7 @@ the time after vaccination when immunity is still building. Time must be
 measured in the same units as that used for \code{outcome_time} and \code{exposure_time}  (e.g. days)
 and should reflect the biological understanding of when vaccine-induced
 immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
-be set to 0 (no delay period for evaluating risk).}
+be set to 0 (no delay period for evaluating risk). Default: 0,}
 
 \item{timepoints}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
@@ -66,36 +66,39 @@ as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All v
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
-incidence curves over time are desired.}
+incidence curves over time are desired. By default, the sequence from \code{immune_lag + 1} to
+the maximum event time in the exposed group, by units of 1, is used.}
 
 \item{weights_source}{Character string specifying the type of marginalizing weights
-to use. Either:
+to use for marginalization. Either:
 \itemize{
 \item \code{"observed"} (default): use  the empirical
-distribution of exposure times and covariates among the exposed as the marginalizing weights. This
-provides close alignment with the weights implicitly used in matching.
+distribution of exposure times and covariates among the exposed as the marginalizing weights. If \code{immune_lag > 0},
+this is the distribution of exposure times and covariates among the exposed who remain at-risk \code{immune_lag} days after exposure.
+These weights provide close alignment with the weights implicitly used in matching.
 \item \code{"custom"}: use the user-specified weights provided in the \code{custom_weights} argument.
+See \strong{Marginalizing weights} section for more details.
 }}
 
-\item{custom_weights}{a \code{list(g_weights, p_weights)} providing weights for
+\item{custom_weights}{a named \code{list(g_weights, p_weights)} providing weights for
 marginalizing the time- and covariate-specific cumulative incidences. Must
 have the following format:
 \itemize{
-\item \code{g_weights}: data frame with columns
+\item \code{g_weights}: data frame with the following columns:
 \itemize{
-\item all variables in \code{covariates}
+\item columns named after each variable in \code{covariates}
 \item \code{exposure_time} (time of exposure),
 \item \code{prob} (probability of exposure at the given time within the covariate-group;
 should sum to 1 within each covariate-group)
 }
-\item \code{p_weights}: data frame with columns
+\item \code{p_weights}: data frame with the following columns:
 \itemize{
-\item all variables in \code{covariates}
+\item columns named after each variable in \code{covariates}
 \item \code{prob} (probability of covariate-group; should sum to 1 over all covariate groups.)
 }
 }}
 
-\item{ci_type}{Method for constructing bootstrap confidence intervals. One of
+\item{ci_type}{Method for constructing pointwise bootstrap confidence intervals. One of
 \code{"wald"}, \code{"percentile"}, or \code{"both"}.
 \itemize{
 \item \code{"wald"} (default): Computes Wald-style intervals using bootstrap standard errors.
@@ -107,7 +110,7 @@ See \strong{Confidence intervals} section for details.
 \item{boot_reps}{Number of bootstrap replicates for confidence intervals.
 Recommended to use at least 1000 for publication-quality results. Use
 smaller values (e.g., 10-100) for initial exploration. Default: \code{0} (no
-bootstrapping).}
+bootstrapping). Bootstrap procedure can be parallelizaed- see \strong{Parallelization} section for details.}
 
 \item{alpha}{Significance level for confidence intervals (Confidence level =
 100*(1-alpha)\%). Default: \code{0.05}.}
@@ -120,45 +123,55 @@ Default: \code{TRUE}.}
 \code{TRUE}. Must be set to \code{TRUE} if user plans to use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}}
 to obtain simultaneous confidence intervals.}
 
-\item{seed}{Integer seed for reproducible bootstrap results. Default: NULL.
-Parallelism is controlled externally via \code{\link[future:plan]{future::plan()}}. For example,
-to use 4 cores: \code{future::plan(future::multisession, workers = 4)}.
-If no plan is set, bootstraps run sequentially.}
+\item{seed}{Integer seed for reproducible bootstrap results. Default: \code{NULL}.}
 
-\item{formula_unexposed}{A character specification of the right-hand side of the formula
-to use for fitting the hazard model for the unexposed. The set of variables in the formula
-must be identical to the set of variables in \code{covariates}.}
+\item{formula_unexposed, formula_exposed}{Optional specification of the right-hand side of the formula
+to use for fitting the hazard model for the unexposed and exposed groups, respectively.
+Each accepts one of the following:
+\itemize{
+\item a one-sided formula object (e.g. \code{~ x1 + x2})
+\item a string representation of a formula (e.g. \code{"x1 + x2"} or \code{"~ x1 + x2"}),
+or a character vector of term names (e.g. \code{c("x1", "x2")}).
+}
 
-\item{formula_exposed}{A character specification of the right-hand side of the formula
-to use for fitting the hazard model for the exposed. The set of variables in the formula
-must contain the variables in \code{covariates} and \code{exposure_time}. It is recommended
-that \code{exposure_time} be modeled flexibly (e.g. using splines).}
+The set of variables included in these formulas must be included in \code{covariates}.
+In \code{formula_exposed}, it is strongly recommended to model \code{exposure_time} flexibly (e.g. with a spline).
+
+By default, \code{formula_unexposed} is a main-effects formula using all \code{covariates}
+and \code{formula_exposed} is a main-effects formula using all \code{covariates} and a natural cubic spline of \code{exposure_time} (4 df).
+
+See \strong{Modeling} section for details.}
 }
 \value{
 An object of class \code{nomatchfit} containing:
 \describe{
 \item{estimates}{Named list of matrices containing the cumulative incidence and
-effect estimates.
+effect estimates:
 \describe{
 \item{\code{cuminc_0}}{ marginal cumulative incidence under no exposure}
 \item{\code{cuminc_1}}{ marginal cumulative incidence under exposure}
 \item{\code{risk_difference}}{ \code{cuminc_1 - cuminc_0}}
 \item{\code{risk_ratio}}{ \code{cuminc_1/cuminc_0}}
-\item{\code{vaccine_effectivess}}{ \code{1 - risk_ratio}}
+\item{\code{relative_risk_reduction}}{ \code{1 - risk_ratio}}
 }
-Each matrix has one row per value in \code{timepoints} and columns including the
-point estimate (\code{estimate}) and, when requested, confidence limits of the form
-(\verb{\{wald/percentile\}_lower}, \verb{\{wald/percentile\}_upper}). }
+Each matrix has one row per value in \code{timepoints} and columns for the
+point estimate (\code{estimate}) and confidence limits
+(\verb{\{wald/percentile\}_lower}, \verb{\{wald/percentile\}_upper}), when applicable.}
+
+\item{model_0}{(If \code{keep_models = TRUE}) Fitted hazard model for the unexposed group.
+See \strong{Modeling} section for details.}
+\item{model_1}{(If \code{keep_models = TRUE}) Fitted hazard model for the exposed group.
+See \strong{Modeling} section for details.}
+
 \item{weights}{List with dataframes \code{g_weights}, \code{p_weights} specifying
 the marginalizing weights used for averaging over exposure times and covariates.}
-\item{model_0}{Fitted hazard model for the unexposed group.
-See \strong{Modeling} section for details.}
-\item{model_1}{Fitted hazard model for the exposed group.
-See \strong{Modeling} section for details.}
 \item{n_success_boot}{Integer vector indicating the
 number of successful bootstrap replications per timepoint.}
-\item{boot_samples}{(If \code{keep_boot_samples = TRUE}) Named list of bootstrap draws
-(stored as matrices) for each term. Rows index bootstrap replicates and columns index \code{timepoints}.}
+\item{boot_samples}{(If \code{keep_boot_samples = TRUE}) Named list containing the \code{original} bootstrap
+estimates and, if Wald confidence intervals are used, the \code{transformed} bootstrap draws, which are the same
+bootstrap estimates on the scales used for inference. Both \code{original} and \code{transformed} are named lists
+containing the bootstrap estimates for each term. The bootstrap estimates for each term are stored
+as matrices, with rows indexing bootstrap replicates and columns indexing \code{timepoints}.}
 }
 
 The \code{nomatchfit} object has methods for \code{\link[=print]{print()}}, \code{\link[=summary]{summary()}}, and \code{\link[=plot]{plot()}}.
@@ -167,9 +180,9 @@ Use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}} to add simultaneou
 \description{
 \code{nomatch()} estimates marginal cumulative incidences under
 exposure and no exposure using a G-computation approach. The method fits two
-conditional hazard models- one for each exposure type- and uses
+conditional hazard models- one for the exposed group and one for the unexposed group- and uses
 these models to predict time- and covariate-specific cumulative incidences.
-These cumulative incidences are then marginalized to compute overall
+These time- and covariate-specific cumulative incidences are then marginalized to compute overall
 (marginal) cumulative incidences. By default, the cumulative incidences
 are marginalized over the observed distribution of exposure times and covariates
 among the exposed. The resulting cumulative incidences can be
@@ -180,26 +193,31 @@ relative risk reduction (1 - RR), or risk differences (RD = risk_exposed - risk_
 \strong{Modeling.} Two Cox proportional hazards models are fit to estimate
 exposure-specific cumulative incidences. For the unexposed model, the outcome is modeled
 on the original time scale and includes all individuals, with exposed individuals
-censored at their time of exposure. For the exposed model, the outcome is modeled in
-terms of time since exposure among individuals who were
-exposed and who remained at risk \code{tau} days after exposure. Both models adjust for
-the specified covariates to help control for confounding. The second model
+censored at their time of exposure. For the exposed model, the outcome is modeled on the time scale
+of time since exposure and includes individuals who were
+exposed and who remained at risk \code{immune_lag} days after exposure. By default, both models adjust for
+the specified covariates as linear, main-effect terms to help control for confounding. The second model
 also flexibly adjusts for exposure time (by default, as a natural cubic spline with 4
-degrees of freedom) to capture time-varying background risk. Predicted risks
-from both models are then marginalized over the specified
-exposure-time and covariate distributions to obtain G-computation style cumulative
+degrees of freedom) to capture time-varying background risk. Custom formulas specifiying the
+right hand side of the formulas to be used in these models can be provided through the optional arguments \code{formula_unexposed} and
+\code{formula_exposed}.
+Predicted risks from both models are then marginalized over the specified exposure-time and covariate weights to obtain G-computation style cumulative
 incidence estimates.
 
 \strong{Marginalizing weights.} When \code{weights_source = "observed"}, the marginalizing weights
 are the empirical distributions of exposure times and covariates among the
-exposed who remain at-risk \code{tau} days after exposure. These weights are
+exposed who remain at-risk \code{immune_lag} days after exposure. These weights are
 returned in the \code{nomatchfit} object under \code{weights}. They can also be obtained
 prior to the call to \code{nomatch()} by calling \code{get_observed_weights()}.
 
-\strong{Confidence intervals.} Wald CIs are constructed on transformed scales:
-\eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios/relative risk
-reduction, using bootstrap SEs. These are
-then back-transformed to the original scale. No transformation is used for risk differences.
+\strong{Confidence intervals.} Wald and percentile confidence intervals are constructed
+for cumulative incidence and effectiveness parameters at each timepoint.
+The Wald pointwise confidence intervals are constructed on transformed scales:
+\eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios, and \eqn{\log{1 - RR}} for relative risk
+reduction, using bootstrap standard errors. These confidence intervals are
+then back-transformed to the original scale. Identity transformation is used for risk differences.
+To obtain simultaneous confidence intervals, use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}} after
+saving the original fit.
 
 \strong{Parallelization.} Bootstraps can be parallelized using the \code{future}
 framework. Set a parallel plan before calling \code{nomatch()}: e.g.
@@ -214,7 +232,7 @@ and is recommended for most users. See the \href{https://future.futureverse.org}
 for additional plans and details on setup.
 }
 \examples{
-# Fit effectiveness model using simulated data
+# Fit nomatch using simulated data
 
 fit <- nomatch(
   data = simdata,
@@ -223,10 +241,10 @@ fit <- nomatch(
   exposure = "V",
   exposure_time = "D_obs",
   covariates = c("x1", "x2"),
-  timepoints = seq(30, 180, by = 30),
+  timepoints = seq(30, 90, by = 30),
   immune_lag = 14,
   boot_reps = 5,
-  seed = NULL
+  seed = 123
 )
 
 # View basic results

@@ -55,6 +55,7 @@ estimates_to_df <- function(x, collapse = TRUE){
     }
 }
 
+# Other random helpers  --------------------------------------------------------
 
 #' Helper to save warning calls when a function is called
 #'
@@ -71,13 +72,15 @@ capture_warnings <- function(expr){
     list(result = result, warnings = w)
 }
 
-check_reserved_vars <- function(vars, reserved_vars, vars_label) {
+check_reserved_vars <- function(vars, reserved_vars) {
+    if(!is.character(vars)) stop("vars must be a character vector")
+    if(!is.character(reserved_vars)) stop("reserved_vars must be a character vector")
     conflicts <- intersect(reserved_vars, vars)
     if (length(conflicts) > 0) {
         stop(
-            paste(vars_label, " contain reserved variable names: "),
-            paste(conflicts, collapse = ", "),
-            "\nPlease rename these variables before fitting the model.",
+            "The following variable name(s) conflict with internal variable names: ",
+            paste(conflicts, collapse = ", "), ". ",
+            "Please rename these in your data.",
             call. = FALSE
         )
     }
@@ -113,6 +116,7 @@ get_basic_descriptives_matching <- function(matched_data, matched_adata,  outcom
 
     exposure_times <- matched_adata$match_index_time[matched_adata[[paste0("match_", exposure)]] == 1]
 
+
     list(n_matched = n_matched,
          n_matched_analysis = n_matched_analysis,
          n_events = n_events,
@@ -126,9 +130,9 @@ check_pt_estimates <- function(pt_estimates){
     both_zero <- which(pt_estimates[, "cuminc_0"] == 0 & pt_estimates[, "cuminc_1"] == 0 &
                            is.nan(pt_estimates[, "risk_ratio"]))
     if(length(both_zero) > 0){
-        warning("Cumulative incidences in unexposed and exposed groups are both zero, ",
-                "resulting in undefined (NaN) \n risk ratios/VE estimates at the following timepoints: ",
-                paste(names(both_zero), collapse = ", "))
+        warning("Cumulative incidences in unexposed and exposed groups are both 0, ",
+                "resulting in undefined (NaN) \n risk ratios/relative risk reduction estimates at the following timepoints: ",
+                paste(names(both_zero), collapse = ", "),  call. = FALSE)
     }
 
     unexposed_zero <- which(pt_estimates[, "cuminc_0"] == 0 & pt_estimates[, "cuminc_1"] > 0 &
@@ -136,8 +140,8 @@ check_pt_estimates <- function(pt_estimates){
 
     if(length(unexposed_zero) > 0){
         warning("Cumulative incidence in unexposed group is zero, ",
-                "resulting in undefined (NaN) \n risk ratios/VE estimates at the following timepoints: ",
-                paste(names(both_zero), collapse = ", "))
+                "resulting in undefined (NaN) \n risk ratios/relative risk reduction estimates at the following timepoints: ",
+                paste(names(both_zero), collapse = ", "), call. = FALSE)
     }
     invisible(NULL)
 }

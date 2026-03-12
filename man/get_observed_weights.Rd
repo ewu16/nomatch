@@ -16,7 +16,7 @@ get_observed_weights(
 \arguments{
 \item{data}{A data frame with one row per individual containing the columns
 named in \code{outcome_time}, \code{outcome_status}, \code{exposure}, \code{exposure_time}, and
-\code{covariates}. Missing values for all columns except \code{exposure_time} are not allowed.}
+\code{covariates}. Missing values in any of these columns except \code{exposure_time} are not allowed.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
@@ -27,7 +27,7 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
 \item{covariates}{Character vector of covariates to adjust for when fitting
@@ -41,30 +41,30 @@ the time after vaccination when immunity is still building. Time must be
 measured in the same units as that used for \code{outcome_time} and \code{exposure_time}  (e.g. days)
 and should reflect the biological understanding of when vaccine-induced
 immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
-be set to 0 (no delay period for evaluating risk).}
+be set to 0 (no delay period for evaluating risk). Default: 0,}
 }
 \value{
 A list with two data frames:
 \itemize{
-\item \code{g_weights}: covariate-conditional exposure time  probabilities (\eqn{g(d \mid x)})
+\item \code{g_weights}: covariate-conditional exposure time  probabilities (\eqn{g(d|x)})
 \item \code{p_weights}: covariate probabilities (\eqn{p(x)})
 
 Each data frame includes all variables in \code{covariates}, and a \code{prob} column
 with empirical probabilities.
-\code{g_weights} additionally includes a \verb{<exposure_time>} column for exposure times.
+\code{g_weights} additionally includes an \verb{<exposure_time>} column for exposure times.
 }
 }
 \description{
 Computes two empirical probability distributions which are used to marginalize
-time- and covariate- specific cumulative incidences:
+exposure time- and covariate- specific cumulative incidences:
 \itemize{
-\item \eqn{g(d \mid x)}: the distribution of exposure times within each covariate subgroup
+\item \eqn{g(d|x)}: the distribution of exposure times within each covariate subgroup
 of exposed individuals who remain at risk \code{immune_lag} days after exposure.
 \item \eqn{p(x)}: the distribution of covariates among exposed individuals
 who remain at risk \code{immune_lag} days after exposure.
 }
 
-Called internally by \code{\link[=nomatch]{nomatch()}}. Provides an example of the
+Called internally by \code{\link[=nomatch]{nomatch()}}. Provides an example of the required
 structure for user-specified \code{custom_weights}.
 }
 \examples{

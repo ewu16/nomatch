@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_simultaneous_ci.R
 \name{add_simultaneous_ci}
 \alias{add_simultaneous_ci}
-\title{Add simultaneous confidence intervals to effectiveness fit}
+\title{Add simultaneous confidence intervals to \code{nomatchfit} object}
 \usage{
 add_simultaneous_ci(object, seed = NULL)
 }
@@ -11,7 +11,8 @@ add_simultaneous_ci(object, seed = NULL)
 \code{\link[=matching]{matching()}}. Must
 \itemize{
 \item contain evaluations at at least 2 timepoints (\verb{length(object$timepoints)  > = 2}),
-\item contain bootstrap samples (\code{keep_boot_samples = TRUE} when fitting).
+\item contain more than one bootstrap replicate (\code{boot_reps} > 1)
+\item contain non-null bootstrap samples (\code{keep_boot_samples = TRUE} when fitting).
 }}
 
 \item{seed}{Integer seed  to ensure reproducible critical values for
@@ -21,7 +22,7 @@ Default is \code{NULL} (no seed set).}
 \value{
 The original \code{nomatchfit} object with the following modifications:
 \describe{
-\item{estimates}{Each matrix gets additional columns describing the simultaneous confidence interval bounds and construction:
+\item{estimates}{The matrix for each term in the \code{estimates} list  gets additional columns describing the simultaneous confidence interval bounds and construction:
 \code{simul_lower}, \code{simul_upper}, \code{simul_n}}
 \item{simul_z_star}{Named vector containing the critical values used for each term}
 \item{simul_excluded_timepoints}{Named list containing a vector of timepoints excluded
@@ -30,9 +31,11 @@ from the simultaneous bands for each term  due to insufficient bootstrap samples
 }
 \description{
 Computes simultaneous confidence intervals, which maintain the
-specified coverage level across all evaluation timepoints jointly. This is
+specified coverage level for the parameter of interest
+across all evaluation timepoints jointly. This is
 useful for making inferences about the entire cumulative incidence or
-effectiveness curve.
+effectiveness curve. The simultaneous confidence intervals returned contrast with the pointwise confidence intervals
+automatically returned with a \code{nomatchfit} object when \code{boot_reps > 0}.
 }
 \details{
 Critical values are computed using the bootstrap covariance
@@ -51,8 +54,8 @@ fit <- nomatch(
   covariates = c("x1", "x2"),
   timepoints = seq(30, 180, by = 30),
   immune_lag = 14,
-  boot_reps = 100,
-  keep_boot_samples = TRUE
+  boot_reps = 100,         # must be > 1
+  keep_boot_samples = TRUE # must be set to TRUE (default)
 )
 
 # Add simultaneous CIs

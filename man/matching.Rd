@@ -21,7 +21,8 @@ matching(
 )
 }
 \arguments{
-\item{matched_data}{A data frame for the matched cohort created using \code{\link[=match_rolling_cohort]{match_rolling_cohort()}}.}
+\item{matched_data}{A data frame for the matched cohort created using
+\code{\link[=match_rolling_cohort]{match_rolling_cohort()}}.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
@@ -35,7 +36,7 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
 \item{immune_lag}{Non-negative numeric value specifying the time after exposure (sometimes denoted by \code{tau}) that
@@ -45,7 +46,7 @@ the time after vaccination when immunity is still building. Time must be
 measured in the same units as that used for \code{outcome_time} and \code{exposure_time}  (e.g. days)
 and should reflect the biological understanding of when vaccine-induced
 immunity develops (usually 1-2 weeks). For non-vaccine exposures, \code{ immune_lag} can
-be set to 0 (no delay period for evaluating risk).}
+be set to 0 (no delay period for evaluating risk). Default: 0,}
 
 \item{timepoints}{Numeric vector specifying the timepoints at which to compute
 cumulative incidence and the derived effect measures. The timepoints should
@@ -54,9 +55,10 @@ as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All v
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
-incidence curves over time are desired.}
+incidence curves over time are desired. By default, the sequence from \code{immune_lag + 1} to
+the maximum event time in the exposed group, by units of 1, is used.}
 
-\item{ci_type}{Method for constructing bootstrap confidence intervals. One of
+\item{ci_type}{Method for constructing pointwise bootstrap confidence intervals. One of
 \code{"wald"}, \code{"percentile"}, or \code{"both"}.
 \itemize{
 \item \code{"wald"} (default): Computes Wald-style intervals using bootstrap standard errors.
@@ -68,40 +70,45 @@ See \strong{Confidence intervals} section for details.
 \item{boot_reps}{Number of bootstrap replicates for confidence intervals.
 Recommended to use at least 1000 for publication-quality results. Use
 smaller values (e.g., 10-100) for initial exploration. Default: \code{0} (no
-bootstrapping).}
+bootstrapping). Bootstrap procedure can be parallelizaed- see \strong{Parallelization} section for details.}
 
 \item{alpha}{Significance level for confidence intervals (Confidence level =
 100*(1-alpha)\%). Default: \code{0.05}.}
 
-\item{keep_models}{Logical; return the two fitted hazard models used to compute
-cumulative incidences?
-Default: \code{TRUE}.}
+\item{keep_models}{Logical; return the fitted Kaplan Meier object used to
+compute cumulative incidences? Default: \code{TRUE}}
 
 \item{keep_boot_samples}{Logical; return bootstrap samples? Default:
 \code{TRUE}. Must be set to \code{TRUE} if user plans to use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}}
 to obtain simultaneous confidence intervals.}
 
-\item{seed}{Integer seed for reproducible bootstrap results. Default: NULL.
-Parallelism is controlled externally via \code{\link[future:plan]{future::plan()}}. For example,
-to use 4 cores: \code{future::plan(future::multisession, workers = 4)}.
-If no plan is set, bootstraps run sequentially.}
+\item{seed}{Integer seed for reproducible bootstrap results. Default: \code{NULL}.}
 }
 \value{
 An object of class \code{nomatchfit} containing:
 \describe{
+\item{matched_adata}{The analytic dataset used for the matching analysis, often
+a subset of the original matched dataset when \code{immune_lag > 0}. The data frame
+consists of the original variables in \code{matched_data} plus:
+\describe{
+\item{\verb{match_<outcome_status>}}{Event indicator for the outcome in the matched analysis}
+\item{\verb{match_<outcome_time>}}{Follow-up time for outcome of interest in the matched analysis, relative to original time-origin}
+\item{\code{match_T}}{Follow-up time for outcome of interest in the matched analysis, relative to time of matching}
+}
+}
 \item{estimates}{Named list of matrices containing the cumulative incidence and
-effect estimates.
+effect estimates:
 \describe{
 \item{\code{cuminc_0}}{ marginal cumulative incidence under no exposure}
 \item{\code{cuminc_1}}{ marginal cumulative incidence under exposure}
 \item{\code{risk_difference}}{ \code{cuminc_1 - cuminc_0}}
 \item{\code{risk_ratio}}{ \code{cuminc_1/cuminc_0}}
-\item{\code{vaccine_effectivess}}{ \code{1 - risk_ratio}}
+\item{\code{relative_risk_reduction}}{ \code{1 - risk_ratio}}
 }
-Each matrix has one row per value in \code{timepoints} and columns including the
-point estimate (\code{estimate}) and, when requested, confidence limits of the form
-(\verb{\{wald/percentile\}_lower}, \verb{\{wald/percentile\}_upper}). }
-\item{models}{Fitted Kaplan Meier}
+Each matrix has one row per value in \code{timepoints} and columns for the
+point estimate (\code{estimate}) and confidence limits
+(\verb{\{wald/percentile\}_lower}, \verb{\{wald/percentile\}_upper}), when applicable.}
+\item{models}{Fitted Kaplan Meier object}
 \item{n_success_boot}{Integer vector indicating the
 number of successful bootstrap replications per timepoint.}
 \item{boot_samples}{(If \code{keep_boot_samples = TRUE}) Named list of bootstrap draws
@@ -109,7 +116,67 @@ number of successful bootstrap replications per timepoint.}
 }
 }
 \description{
-This function is the main function for estimating cumulative incidence
-in a matched dataset based on Kaplan Meier estimation. It creates the
-analysis dataset and performs the analysis for the matched cohort.
+This function is the main function for estimating cumulative
+incidence in a matched dataset based on Kaplan Meier estimation. It creates
+the analysis dataset and performs the analysis for the matched cohort.
+}
+\details{
+\strong{Matching analysis}: To create
+the matched analysis dataset, both individuals in the matched pair are
+censored when the control receives the exposure, and matched pairs in which
+either individual experiences the event or censoring with  \code{immune_lag} days
+of matching is excluded. Cumulative
+incidence in the matched analysis dataset is estimated using Kaplan Meier
+stratified only on exposure group.
+
+\strong{Confidence intervals.} Wald and percentile confidence intervals are constructed
+for cumulative incidence and effectiveness parameters at each timepoint.
+The Wald pointwise confidence intervals are constructed on transformed scales:
+\eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios, and \eqn{\log{1 - RR}} for relative risk
+reduction, using bootstrap standard errors. These confidence intervals are
+then back-transformed to the original scale. Identity transformation is used for risk differences.
+To obtain simultaneous confidence intervals, use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}} after
+saving the original fit.
+
+\strong{Parallelization.} Bootstraps can be parallelized using the \code{future}
+framework. Set a parallel plan before calling \code{matching()}: e.g.
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{future::plan(future::multisession, workers = 4)
+fit <- matching(..., boot_reps = 1000, seed = 42)
+future::plan(future::sequential)  # reset when done
+}\if{html}{\out{</div>}}
+
+If no plan is set, bootstraps run sequentially. \code{multisession} works on all
+operating systems and is recommended for most users. See the \href{https://future.futureverse.org}{future package documentation} for additional plans and
+details on setup.
+}
+\examples{
+# Perform matching analysis on simulated data
+
+# Create matched data
+matched_cohort <- match_rolling_cohort(
+  data = simdata,
+  outcome_time =  "Y",
+  exposure = "V",
+  exposure_time = "D_obs",
+  matching_vars = c("x1", "x2"),
+  id_name = "ID",
+  seed = 5678
+)
+
+# Analyze matched data
+fit_matching <- matching(
+  matched_data = matched_cohort$matched_data,
+  outcome_time = "Y",
+  outcome_status = "event",
+  exposure = "V",
+  exposure_time = "D_obs",
+  timepoints = seq(30, 90, by = 30),
+  immune_lag = 14,
+  boot_reps = 5,
+  seed = 123
+)
+
+# View basic results
+fit_matching
 }

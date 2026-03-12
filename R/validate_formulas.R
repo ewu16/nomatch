@@ -1,3 +1,6 @@
+#' Internal functions for helping to validate and/or resolve formula input 
+#' @keywords internal
+#' @noRd
 resolve_hazard_formulas <- function(formula_unexposed, formula_exposed, covariates, exposure_time) {
     resolve_formula <- function(f, default, label) {
         if (is.null(f)) return(default)

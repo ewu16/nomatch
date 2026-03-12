@@ -1,11 +1,11 @@
-#' Print method for effectiveness fits
+#' Print method for `nomatchfit` objects
 #'
 #' @description
-#' Prints a concise summary of effectiveness estimates from a fitted model.
+#' Prints a concise summary of the effectiveness estimates from a fitted model.
 #'
 #' @param x An object of class `nomatchfit` created by [nomatch()] or [matching()].
 #' @param digits Integer indicating the number of decimal places to display. Default is 3.
-#' @param effect The effect measure to output.  Either
+#' @param effect The effect measure to print.  Either
 #'  `"risk_ratio"`(default), `"relative_risk_reduction"`  or `"risk_difference"`.
 #' @param ... Additional arguments (currently ignored).
 #'
@@ -74,9 +74,11 @@ print.nomatchfit <- function(x, digits = 3, effect = c("risk_ratio", "risk_diffe
     invisible(x)
 }
 
-#' Summary method for effectiveness fits
+#' Summary method for `nomatchfit` objects
 #' @description
-#' Summarizes how effectiveness estimates were obtained
+#' Summarizes how effectiveness estimates were obtained including 
+#' analysis method, key parameters, and descriptives to aid
+#' in understanding the analysis.
 #'
 #' @param object An object of class `nomatchfit` created by [nomatch()] or [matching()].
 #' @param digits Integer indicating the number of decimal places to display. Default is 4.
@@ -93,7 +95,7 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
     cat("\n")
     cat(strrep("=", 70), "\n")
     cat("Analysis Summary\n")
-    cat(strrep("=", 70), "\n\n")
+    cat(strrep("=", 70), "\n")
 
     # ---- Key Parameters ----
     cat("Method:             ", object$method, "\n")
@@ -106,8 +108,6 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
             cat("Adjusted for:       ", paste(object$covariates, collapse = ", "), "\n")
         }
     }
-
-
 
     # ---- Bootstrap Info (if applicable) ----
     if (object$boot_reps > 0) {
@@ -122,7 +122,6 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
 
 
     if(object$method ==  "nomatch (G-computation)"){
-        cat("\n")
         cat(strrep("-", 70), "\n")
         cat("Sample:\n")
         cat(strrep("-", 70), "\n")
@@ -149,7 +148,7 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
             cat(strrep("-", 70), "\n")
             cat("Model for unexposed:\n")
             cat(strrep("-", 70), "\n")
-            cat("N =", object$model_0$n, "| Number of events =", object$model_0$nevent, "\n\n")
+            cat("N =", object$model_0$n, "| Number of events =", object$model_0$nevent, "\n")
             if(show_models){
                 print(round(stats::coef(summary(object$model_0)), 3))
             }else{
@@ -160,7 +159,7 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
             cat(strrep("-", 70), "\n")
             cat("Model for exposed:\n")
             cat(strrep("-", 70), "\n")
-            cat("N =", object$model_1$n, "| Number of events =", object$model_1$nevent, "\n\n")
+            cat("N =", object$model_1$n, "| Number of events =", object$model_1$nevent, "\n")
             if(show_models){
                 print(round(stats::coef(summary(object$model_1)), 3))
 
@@ -208,24 +207,27 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
 
 #' Plot method for nomatchfit objects
 #'
-#' @description
-#' Create a panel plot of cumulative incidence and effectiveness estimates across all evaluation time points.
+#' @description Create a panel plot of cumulative incidence and effectiveness
+#'   estimates across all evaluation time points.
 #'
 #'
-#' @param x An object of class `nomatchfit` created by [nomatch()] or [matching()].
-#' @param effect The effect measure to plot next to the cumulative incidence plots. 
-#' Either `"risk_ratio"`(default), `"relative_risk_reduction"`  or `"risk_difference"`.
-#' @param ci_type Character string specifying the type of confidence interval band to plot. By default,
-#'   `"wald"` if available, otherwise set to `"percentile"` or `none`.
-#'   One of `"wald", "percentile", "simul"`, or `"none"`. Must choose a `ci_type` whose lower
-#'   and upper bounds are already computed in `estimates` component of `x`.
-#' @param color Aesthetic value to map data values to. Default: `"#0072B2"` (blue)
+#' @param x An object of class `nomatchfit` created by [nomatch()] or
+#'   [matching()].
+#' @param effect The effect measure to plot next to the cumulative incidence
+#'   plots. Either `"risk_ratio"`(default), `"relative_risk_reduction"`  or
+#'   `"risk_difference"`.
+#' @param ci_type Character string specifying the type of confidence interval
+#'   band to plot, one of `"wald", "percentile", "simul"`, or `"none"`.  Must
+#'   choose a `ci_type` whose lower and upper bounds are already computed in
+#'   `estimates` component of `x`. Uses `"wald"` by default if available.
+#' @param color Aesthetic value to map data values to. Default: `"#0072B2"`
+#'   (blue)
 #' @param ... Additional arguments (currently ignored).
-#' @return a ggplot2 object with three faceted panels (for cumulative incidences and the chosen effect measure)
+#' @return a ggplot2 object with three faceted panels (for cumulative incidences
+#'   and the chosen effect measure)
 #'
-#' @details
-#' For cumulative incidence panels, y-axis limits are shared across methods to
-#' facilitate comparison. The VE panel uses free y-axis scaling.
+#' @details The two cumulative incidence panels share y-axis limits. The effect
+#'   measure panel has its own independent y-axis scaling.
 #'
 #' @importFrom rlang .data
 #' @export
@@ -243,28 +245,19 @@ summary.nomatchfit <- function(object, digits = 4, show_models = FALSE,...) {
 #'  boot_reps = 5
 #' )
 #' plot(fit)
-#'
+#' 
 plot.nomatchfit <- function(x, 
                             effect = c("risk_ratio", "risk_difference", "relative_risk_reduction"), 
                             ci_type = NULL,
                             color = "#0072B2", ...) {
 
     effect <- match.arg(effect)
-
-    # if(length(x$timepoints) < 2){
-    #     message("Only one evaluation time supplied; returning point estimate(s) instead of a plot")
-    #     est_df <- estimates_to_df(x$estimates)
-    #     print(est_df)
-    #     return(invisible(est_df))
-    # }
-    
-
     ci_type <- validate_confint_type(x, ci_type)
     plot_data  <- estimates_to_df(x$estimates)
 
     plot_data$method <- "dummy"
     alpha <- x$alpha
-    plot_ve_panel(plot_data, ci_type, alpha, colors = color,
+    plot_effect_panel(plot_data, ci_type, alpha, colors = color,
                   effect = effect,
                   trt_0_label = paste(x$exposure, "= 0"),
                   trt_1_label = paste(x$exposure, "= 1"))

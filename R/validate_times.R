@@ -1,10 +1,8 @@
-#' Internal functions for helping to validate input
+#' Internal functions for helping to validate and/or resolve input on immune_lag
+#' and timepoints
 #'
 #' @keywords internal
 #' @noRd
-
-
-
 
 # Parameter checks --------------------------------------------------------
 validate_immune_lag <- function(immune_lag){
@@ -19,7 +17,7 @@ resolve_timepoints <- function(data, outcome_time, outcome_status, exposure, tim
     if(is.null(timepoints)){
         max_follow_up <- max(data[[outcome_time]][data[[exposure]] == 1 & data[[outcome_status]] == 1])
         if(max_follow_up <= immune_lag){
-            stop("Maximum follow-up time among exposed events (", max_follow_up, ") is <= `immune_lag` (", immune_lag, "). ",
+            stop("Maximum event time among exposed (", max_follow_up, ") is <= `immune_lag` (", immune_lag, "). ",
                  "The default `timepoints` is therefore not valid. Please choose a smaller `immune_lag` or manually specify
                  `timepoints` so that the maximum timepoint > `immune_lag` .")
         }
@@ -37,6 +35,8 @@ resolve_timepoints <- function(data, outcome_time, outcome_status, exposure, tim
 validate_timepoints <- function(timepoints, immune_lag){
     if (!is.numeric(timepoints) || length(timepoints) < 1 || anyNA(timepoints))
         stop("`timepoints` must be a numeric vector with length > 0 and no missing values.", call. = FALSE)
+    if(any(timepoints < 0))
+        stop("`timepoints` must be non-negative.")
     if (max(timepoints) <= immune_lag)
         stop("The maximum timepoint must be > `immune_lag` (", immune_lag, ") because the exposed hazard is fit using data censored at the maximum timepoint.", call. = FALSE)
     invisible(NULL)

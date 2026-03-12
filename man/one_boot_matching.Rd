@@ -2,7 +2,7 @@
 % Please edit documentation in R/one_boot_matching.R
 \name{one_boot_matching}
 \alias{one_boot_matching}
-\title{Compute one bootstrap replicate of matching-based VE point estimate}
+\title{Compute one bootstrap replicate of matching analysis method}
 \usage{
 one_boot_matching(
   matched_data,
@@ -21,7 +21,8 @@ one_boot_matching(
 )
 }
 \arguments{
-\item{matched_data}{A data frame for the matched cohort created using \code{\link[=match_rolling_cohort]{match_rolling_cohort()}}.}
+\item{matched_data}{A data frame for the matched cohort created using
+\code{\link[=match_rolling_cohort]{match_rolling_cohort()}}.}
 
 \item{outcome_time}{Name of the follow-up time for the outcome of interest, i.e.
 time to either the event or right-censoring, whichever occurs first. Time should
@@ -35,7 +36,7 @@ be numeric (\code{1} = exposed during follow-up, \code{0} = never exposed during
 follow-up).}
 
 \item{exposure_time}{Name of the time to exposure, measured on the same time scale
-as that used for \code{outcome_time}. Must be a non-missing numeric value exposed individuals
+as that used for \code{outcome_time}. Must be a non-missing numeric value for exposed individuals
 and must be set to \code{NA} for unexposed individuals.}
 
 \item{timepoints}{Numeric vector specifying the timepoints at which to compute
@@ -45,13 +46,14 @@ as that used for \code{outcome_time} and \code{exposure_time} (e.g. days). All v
 than \code{ immune_lag} and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., \code{timepoints = (immune_lag + 1):100}) can be provided if cumulative
-incidence curves over time are desired.}
+incidence curves over time are desired. By default, the sequence from \code{immune_lag + 1} to
+the maximum event time in the exposed group, by units of 1, is used.}
 }
 \value{
-A matrix of bootstrapped estimates where the the columns of the matrix are the cumulative
-incidence/VE terms and the rows are the requested time points for evaluation.
+The \code{pt_estimates} component returned by \code{\link[=get_one_matching]{get_one_matching()}},
+for a bootstrap sample.
 }
 \description{
-Compute one bootstrap replicate of matching-based VE point estimate
+Compute one bootstrap replicate of matching analysis method
 }
 \keyword{internal}

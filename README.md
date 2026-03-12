@@ -6,13 +6,17 @@
 > A matching alternative for more efficiently evaluating effectiveness
 > of interventions using observational data
 
+------------------------------------------------------------------------
+
 ## Description
 
 The `nomatch` package uses a G-computation style estimator to compute
-effectiveness of binary interventions from observational cohort studies
-following the target trial emulation framework. The proposed estimator
-tends to produce similar point estimates as matching-based estimators
-but can be more efficient.
+the effectiveness of a binary intervention in observational cohort
+studies that use the target trial emulation approach. The proposed
+estimator tends to produce similar point estimates as matching-based
+estimators but can be more efficient.
+
+------------------------------------------------------------------------
 
 ## Installation
 
@@ -23,25 +27,24 @@ You can install the development version of `nomatch` with:
 devtools::install_github("ewu16/nomatch")
 ```
 
+------------------------------------------------------------------------
+
 ## Example
 
 This minimal example shows how to use `nomatch` to obtain cumulative
 incidences and their derived effect measures such as risk differences
-(RD), risk ratios (RR), and relative risk reduction (1 - RR).
+(RD), risk ratios (RR), and relative risk reductions (1 - RR).
 
-We use a simple simulated dataset mimicking data from an observational
-vaccine study, although the methods apply equally to other disease
-settings.
+We use a simple simulated dataset based on an observational vaccine
+study, although data from other disease settings can be used.
 
 ``` r
 
-#Load package
+# Load package
 library(nomatch)
 
-# Example data
+# View example data
 simdata <- as_tibble(simdata) #for prettier printing 
-
-#View data
 head(simdata)
 #> # A tibble: 6 × 7
 #>      ID    x1    x2     V D_obs     Y event
@@ -54,21 +57,14 @@ head(simdata)
 #> 6     6     1     7     0    NA    90     0
 ```
 
-Note that the dataset contains the following:
+The dataset contains the following:
 
 - one row per individual (`ID`)
-
 - a set of baseline covariates (`x1`, `x2`)
-
 - exposure status (`V`) with values `1 = vaccinated, 0 = unvaccinated`.
-  (Note: its currently assumed that the unexposed group does not receive
-  an active comparator.)
-
 - time to vaccination (`D_obs`); for unvaccinated individuals this is
   left as `NA`.
-
 - right censored survival data `(Y, event)`
-
   - `Y` represents follow-up time for an outcome such as infection,
     hospitalization or death.
   - `event` indicates whether individual experienced the event or
@@ -76,7 +72,7 @@ Note that the dataset contains the following:
 
 ``` r
 
-# Compute cumulative incidence and effect measures 
+# Use nomatch to compute cumulative incidence and effect estimates 
 fit <- nomatch(data = simdata,
                outcome_time = "Y",
                outcome_status = "event",
@@ -86,12 +82,8 @@ fit <- nomatch(data = simdata,
                immune_lag = 14,
                timepoints = seq(30, 180, by = 30),
                boot_reps = 10)
-#> Bootstrapping 10 samples...
-#> Time difference of 1.523599 secs
 
-# Print main results 
-## By default shows risk ratios 
-## but all effect measures are computed and stored in the fitted object 
+# Examine object produced by nomatch - shows risk ratio estimates by default 
 fit        
 #> 
 #>  Risk Ratio Estimates 
@@ -103,70 +95,30 @@ fit
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value
-#> 1        30    0.534              0.314              0.910     0.086340
-#> 2        60    0.605              0.479              0.764     0.000925
-#> 3        90    0.603              0.492              0.741     0.000148
-#> 4       120    0.661              0.547              0.799     0.000448
-#> 5       150    0.731              0.620              0.861     0.001338
-#> 6       180    0.828              0.717              0.956     0.018627
+#> 1        30    0.534              0.392              0.729     3.30e-03
+#> 2        60    0.605              0.500              0.731     4.49e-05
+#> 3        90    0.603              0.496              0.735     7.66e-05
+#> 4       120    0.661              0.548              0.798     4.24e-04
+#> 5       150    0.731              0.617              0.865     1.77e-03
+#> 6       180    0.828              0.719              0.953     1.65e-02
 #> 
 #> Use summary() for more details
 #> Use plot() to visualize results
 
-# View additional details about the analytic approach 
-summary(fit)
-#> 
-#> ====================================================================== 
-#> Analysis Summary
-#> ====================================================================== 
-#> 
-#> Method:              nomatch (G-computation) 
-#> Evaluation times:    30, 60, 90, 120, 150, 180  
-#> Immune lag:          14 
-#> Adjusted for:        x1, x2 
-#> 
-#> Bootstrap:           10 replicates
-#> Confidence level:    95 %
-#> Successful samples:  10-10  (range across timepoints)
-#> 
-#> ---------------------------------------------------------------------- 
-#> Sample:
-#> ---------------------------------------------------------------------- 
-#> N total: 10000 
-#> Number of events: 1007 
-#> 
-#> N exposed: 4112 
-#> N exposed at-risk <immune_lag> days after exposure: 4045 
-#> 
-#> Distribution of exposure times among at-risk <immune_lag> days after exposure:
-#>  Range:  1 - 194 |  Median (IQR):  18 (11 - 32) |  Mean:  25.5
-#> 
-#> ---------------------------------------------------------------------- 
-#> Model for unexposed:
-#> ---------------------------------------------------------------------- 
-#> N = 10000 | Number of events = 664 
-#> 
-#> Use '$model_0' to see model details.
-#> 
-#> ---------------------------------------------------------------------- 
-#> Model for exposed:
-#> ---------------------------------------------------------------------- 
-#> N = 4045 | Number of events = 265 
-#> 
-#> Use '$model_1' to see model details.
-#> 
-#> ======================================================================
-
-# Plot cumulative incidence and effect measures over time 
+# Plot cumulative incidence and effect estimates
 plot(fit) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
+------------------------------------------------------------------------
+
 ## Issues
 
 If you encounter any bugs or have any specific feature requests, please
 [file an issue](https://github.com/ewu16/nomatch/issues).
+
+------------------------------------------------------------------------
 
 ## Citation
 
@@ -175,10 +127,9 @@ following:
 
      @Manual{,
        title = {nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies
-                 Without Matching},
+                 Without Using Matching},
        author = {Emily Wu},
-       year = {2025},
-       note = {R package version 0.0.0.9000, 
+       year = {2026},
        https://github.com/ewu16/nomatch},
        url = {https://ewu16.github.io/nomatch/},
      }

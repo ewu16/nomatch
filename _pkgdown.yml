@@ -3,20 +3,17 @@ template:
   bootstrap: 5 # visual framework of pkgdown website
 reference:
 - title: Main functions
-  desc: Primary user-facing functions
+  desc: Primary user-facing functions for proposed method 
   contents:
   - nomatch
   - add_simultaneous_ci
   - plot.nomatchfit
-
-- title: Proposed method estimation
-  desc: Core estimation functions for the G-computation approach
+  
+- title: Supplementary functions for nomatch
+  desc: Secondary functions for proposed method 
   contents:
-  - fit_model_0
   - get_observed_weights
-  - compute_psi_dx_t0
-  - marginalize_psi_dx_t0
-  - compute_psi_bar_times
+  - summarize_nomatch_population
 
 - title: Matching-based estimation
   desc: Functions for matching cohort design and estimation
@@ -31,7 +28,6 @@ reference:
   - print.nomatchfit
   - summary.nomatchfit
   - estimates_to_df
-  - compare_ve_fits
 
 - title: Data
   contents:

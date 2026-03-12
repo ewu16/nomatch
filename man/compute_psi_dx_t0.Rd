@@ -11,8 +11,7 @@ compute_psi_dx_t0(fit_0, fit_1, exposure_time, t0, tau, newdata)
 
 \item{fit_1}{A fitted model returned from \code{\link[=fit_model_1]{fit_model_1()}}}
 
-\item{exposure_time}{Name of the time-to-exposure variable  in \code{newdata}.
-Used to compute \eqn{\psi_0(t_0; d,x)} where \eqn{d + \tau} and \eqn{d + t_0} are needed.}
+\item{exposure_time}{Name of the time-to-exposure variable  in \code{newdata}.}
 
 \item{t0}{Time since exposure at which to evaluate cumulative incidence.}
 
@@ -44,3 +43,4 @@ where \eqn{d} represents exposure time, \eqn{x} represents covariates, and
 \seealso{
 \code{\link[=predict_from_model_0]{predict_from_model_0()}}, \code{\link[=predict_from_model_1]{predict_from_model_1()}}
 }
+\keyword{internal}
