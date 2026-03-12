@@ -1,6 +1,7 @@
-# Print method for effectiveness fits
+# Print method for `nomatchfit` objects
 
-Prints a concise summary of effectiveness estimates from a fitted model.
+Prints a concise summary of the effectiveness estimates from a fitted
+model.
 
 ## Usage
 
@@ -29,7 +30,7 @@ print(
 
 - effect:
 
-  The effect measure to output. Either `"risk_ratio"`(default),
+  The effect measure to print. Either `"risk_ratio"`(default),
   `"relative_risk_reduction"` or `"risk_difference"`.
 
 - ...:

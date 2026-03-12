@@ -1,8 +1,9 @@
 # Match exposed and unexposed individuals using rolling cohort design
 
-Creates 1:1 matched pairs of exposed ("cases") and unexposed("controls")
-individuals. Uses a rolling cohort design where controls must be
-unexposed and event-free at the time they are matched to a case.
+Creates 1:1 matched pairs of exposed ("cases") and unexposed
+("controls") individuals. Uses a rolling cohort design where individuals
+who become exposed are matched with an eligible control, defined as
+individuals who are unexposed and at-risk at the time of matching.
 
 ## Usage
 
@@ -25,8 +26,8 @@ match_rolling_cohort(
 
   A data frame with one row per individual containing the columns named
   in `outcome_time`, `exposure`, `exposure_time`, `matching_vars` and
-  `id_name`. Missing values for all columns except `exposure_time` are
-  not allowed.
+  `id_name`. Missing values in any column except `exposure_time` are not
+  allowed.
 
 - outcome_time:
 
@@ -44,8 +45,8 @@ match_rolling_cohort(
 - exposure_time:
 
   Name of the time to exposure, measured on the same time scale as that
-  used for `outcome_time`. Must be a non-missing numeric value exposed
-  individuals and must be set to `NA` for unexposed individuals.
+  used for `outcome_time`. Must be a non-missing numeric value for
+  exposed individuals and must be set to `NA` for unexposed individuals.
 
 - matching_vars:
 
@@ -57,11 +58,16 @@ match_rolling_cohort(
 
 - replace:
 
-  Logical. Allow controls to be reused? Default: `FALSE`
+  Logical. Allow controls to be reused? Default: `FALSE`. If `TRUE`,
+  allows controls to be matched with exposed individuals at different
+  timepoints, but not to multiple exposed individuals within the same
+  timepoint.
 
 - seed:
 
-  Integer for reproducibility. Default: `NULL`
+  Integer seed for reproducible matching results. Can be useful because
+  when there are multiple eligible controls to be matched, controls are
+  randomly chosen. Default: `NULL`
 
 ## Value
 
@@ -75,9 +81,12 @@ A list containing the following:
 
   - `match_type`: "case" or "control"
 
-  - `match_<exposure>`: Treatment at matching
+  - `match_<exposure>`: Exposure at time of matching
 
   - `match_id`: Pair identifier
+
+  Data provides the matched pairs and matching information, but no other
+  changes are made to the original data associated with each individual.
 
 - n_unmatched_cases:
 
@@ -85,15 +94,16 @@ A list containing the following:
 
 - discarded:
 
-  Logical vector indicating excluded individuals
+  Logical vector indicating which rows in the original data are excluded
+  from the matched dataset
 
 ## Details
 
 For each exposure time, newly exposed individuals are matched to
 eligible controls using exact covariate matching. Controls are eligible
-if unexposed and event-free at that time. Exposed individuals may appear
-in the final matched dataset twice, as a control (when they are not yet
-exposed) and as a case.
+if they are unexposed and event-free at the time of matching. Exposed
+individuals may appear in the final matched dataset twice, as a control
+(when they are not yet exposed) and as a case.
 
 ## Examples
 

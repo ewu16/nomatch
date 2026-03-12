@@ -1,21 +1,13 @@
-# Internal function to compute cumulative incidence and effect measures
+# Internal function to compute cumulative incidence and effectiveness measures
 
 This is an internal function that performs the actual estimation of
 cumulative incidences and derived effect measures using the
 G-computation style approach. It is called by
 [`nomatch()`](https://ewu16.github.io/nomatch/reference/nomatch.md) and
 [`one_boot_nomatch()`](https://ewu16.github.io/nomatch/reference/one_boot_nomatch.md).
-Users should typically call these functions rather than calling this
-function directly. For historical reasons, this function handles more
-complex inputs than exposed in the
+Users should typically call
 [`nomatch()`](https://ewu16.github.io/nomatch/reference/nomatch.md)
-interface. In particular, it includes an options to
-
-- set censor time in hazard model for the exposed
-
-- weight by the weights from a matched dataset and
-
-- provide hazard model formulas or prefit objects
+rather than calling this function directly.
 
 ## Usage
 
@@ -44,8 +36,8 @@ get_one_nomatch(
 
   A data frame with one row per individual containing the columns named
   in `outcome_time`, `outcome_status`, `exposure`, `exposure_time`, and
-  `covariates`. Missing values for all columns except `exposure_time`
-  are not allowed.
+  `covariates`. Missing values in any of these columns except
+  `exposure_time` are not allowed.
 
 - outcome_time:
 
@@ -68,8 +60,8 @@ get_one_nomatch(
 - exposure_time:
 
   Name of the time to exposure, measured on the same time scale as that
-  used for `outcome_time`. Must be a non-missing numeric value exposed
-  individuals and must be set to `NA` for unexposed individuals.
+  used for `outcome_time`. Must be a non-missing numeric value for
+  exposed individuals and must be set to `NA` for unexposed individuals.
 
 - covariates:
 
@@ -88,7 +80,17 @@ get_one_nomatch(
   correspond to clinically meaningful follow-up durations, such as 30,
   60, or 90 days after exposure. A fine grid of timepoints (e.g.,
   `timepoints = (immune_lag + 1):100`) can be provided if cumulative
-  incidence curves over time are desired.
+  incidence curves over time are desired. By default, the sequence from
+  `immune_lag + 1` to the maximum event time in the exposed group, by
+  units of 1, is used.
+
+- formula_0:
+
+  One-sided (right-hand-side) formula for model 0.
+
+- formula_1:
+
+  One-sided (right-hand-side) formula for model 1.
 
 - censor_time:
 
@@ -116,12 +118,6 @@ get_one_nomatch(
 
   - `"custom"`: use user-specified weights provided via `custom_weights`
     argument;
-
-- return_matching:
-
-  Logical; return matched datasets? Default is TRUE if
-  `weights_source = "matched"`. When `weights_source != "matched"`, this
-  is automatically set to `FALSE`.
 
 ## Value
 

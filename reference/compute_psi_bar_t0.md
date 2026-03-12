@@ -1,6 +1,12 @@
-# Compute overall cumulative incidences at a single timepoint
+# Compute overall cumulative incidences at a single timepoint. Internally calls [`compute_psi_dx_t0()`](https://ewu16.github.io/nomatch/reference/compute_psi_dx_t0.md) to predict time and covariate-specific cumulative incidences and [marginalize_psi_dx_t0](https://ewu16.github.io/nomatch/reference/marginalize_psi_dx_t0.md) to marginalize these cumulative incidences over the selected weight functions for time and covariates.
 
-Compute overall cumulative incidences at a single timepoint
+Compute overall cumulative incidences at a single timepoint. Internally
+calls
+[`compute_psi_dx_t0()`](https://ewu16.github.io/nomatch/reference/compute_psi_dx_t0.md)
+to predict time and covariate-specific cumulative incidences and
+[marginalize_psi_dx_t0](https://ewu16.github.io/nomatch/reference/marginalize_psi_dx_t0.md)
+to marginalize these cumulative incidences over the selected weight
+functions for time and covariates.
 
 ## Usage
 
@@ -22,8 +28,7 @@ compute_psi_bar_t0(fit_0, fit_1, exposure_time, t0, tau, newdata, gp_list)
 
 - exposure_time:
 
-  Name of the time-to-exposure variable in `newdata`. Used to compute
-  \\\psi_0(t_0; d,x)\\ where \\d + \tau\\ and \\d + t_0\\ are needed.
+  Name of the time-to-exposure variable in `newdata`.
 
 - t0:
 
@@ -54,7 +59,7 @@ compute_psi_bar_t0(fit_0, fit_1, exposure_time, t0, tau, newdata, gp_list)
     - all variables in `covariates`
 
   - **p_weights** Data frame of covariate probabilities \\p(x)\\. Must
-    include:\\
+    include:
 
     - `group_id`: covariate group identifier
 

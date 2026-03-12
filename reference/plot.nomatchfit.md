@@ -33,10 +33,9 @@ plot(
 - ci_type:
 
   Character string specifying the type of confidence interval band to
-  plot. By default, `"wald"` if available, otherwise set to
-  `"percentile"` or `none`. One of `"wald", "percentile", "simul"`, or
-  `"none"`. Must choose a `ci_type` whose lower and upper bounds are
-  already computed in `estimates` component of `x`.
+  plot, one of `"wald", "percentile", "simul"`, or `"none"`. Must choose
+  a `ci_type` whose lower and upper bounds are already computed in
+  `estimates` component of `x`. Uses `"wald"` by default if available.
 
 - color:
 
@@ -53,8 +52,8 @@ and the chosen effect measure)
 
 ## Details
 
-For cumulative incidence panels, y-axis limits are shared across methods
-to facilitate comparison. The VE panel uses free y-axis scaling.
+The two cumulative incidence panels share y-axis limits. The effect
+measure panel has its own independent y-axis scaling.
 
 ## Examples
 
@@ -68,11 +67,10 @@ fit <- nomatch(
  covariates = c("x1", "x2"),
  timepoints = seq(30, 180, by = 30),
  immune_lag = 14,
- boot_reps = 5,
- n_cores = 2
+ boot_reps = 5
 )
 #> Bootstrapping 5 samples...
-#> Time difference of 1.3429 secs
+#> Bootstrap completed in 1.64 secs
 plot(fit)
 
 ```

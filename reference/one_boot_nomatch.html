@@ -64,7 +64,7 @@ a bootstrap replicate.</p>
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>A data frame with one row per individual containing the columns
 named in <code>outcome_time</code>, <code>outcome_status</code>, <code>exposure</code>, <code>exposure_time</code>, and
-<code>covariates</code>. Missing values for all columns except <code>exposure_time</code> are not allowed.</p></dd>
+<code>covariates</code>. Missing values in any of these columns except <code>exposure_time</code> are not allowed.</p></dd>
 
 
 <dt id="arg-outcome-time">outcome_time<a class="anchor" aria-label="anchor" href="#arg-outcome-time"></a></dt>
@@ -86,7 +86,7 @@ follow-up).</p></dd>
 
 <dt id="arg-exposure-time">exposure_time<a class="anchor" aria-label="anchor" href="#arg-exposure-time"></a></dt>
 <dd><p>Name of the time to exposure, measured on the same time scale
-as that used for <code>outcome_time</code>. Must be a non-missing numeric value exposed individuals
+as that used for <code>outcome_time</code>. Must be a non-missing numeric value for exposed individuals
 and must be set to <code>NA</code> for unexposed individuals.</p></dd>
 
 
@@ -104,7 +104,16 @@ as that used for <code>outcome_time</code> and <code>exposure_time</code> (e.g. 
 than <code> immune_lag</code> and and should correspond to clinically meaningful follow-up
 durations, such as 30, 60, or 90 days after exposure. A fine grid of
 timepoints (e.g., <code>timepoints = (immune_lag + 1):100</code>) can be provided if cumulative
-incidence curves over time are desired.</p></dd>
+incidence curves over time are desired. By default, the sequence from <code>immune_lag + 1</code> to
+the maximum event time in the exposed group, by units of 1, is used.</p></dd>
+
+
+<dt id="arg-formula-">formula_0<a class="anchor" aria-label="anchor" href="#arg-formula-"></a></dt>
+<dd><p>One-sided (right-hand-side) formula for model 0.</p></dd>
+
+
+<dt id="arg-formula-">formula_1<a class="anchor" aria-label="anchor" href="#arg-formula-"></a></dt>
+<dd><p>One-sided (right-hand-side) formula for model 1.</p></dd>
 
 </dl></div>
     <div class="section level2">

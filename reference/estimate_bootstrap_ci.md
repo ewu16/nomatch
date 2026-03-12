@@ -14,7 +14,7 @@ estimate_bootstrap_ci(
   pt_est = NULL,
   alpha = 0.05,
   keep_boot_samples = TRUE,
-  n_cores = 1
+  seed = NULL
 )
 ```
 
@@ -31,8 +31,8 @@ estimate_bootstrap_ci(
 
 - ci_type:
 
-  Method for constructing bootstrap confidence intervals. One of
-  `"wald"`, `"percentile"`, or `"both"`.
+  Method for constructing pointwise bootstrap confidence intervals. One
+  of `"wald"`, `"percentile"`, or `"both"`.
 
   - `"wald"` (default): Computes Wald-style intervals using bootstrap
     standard errors. See **Confidence intervals** section for details.
@@ -46,7 +46,8 @@ estimate_bootstrap_ci(
   Number of bootstrap replicates for confidence intervals. Recommended
   to use at least 1000 for publication-quality results. Use smaller
   values (e.g., 10-100) for initial exploration. Default: `0` (no
-  bootstrapping).
+  bootstrapping). Bootstrap procedure can be parallelizaed- see
+  **Parallelization** section for details.
 
 - pt_est:
 
@@ -67,12 +68,9 @@ estimate_bootstrap_ci(
   [`add_simultaneous_ci()`](https://ewu16.github.io/nomatch/reference/add_simultaneous_ci.md)
   to obtain simultaneous confidence intervals.
 
-- n_cores:
+- seed:
 
-  Integer; parallel cores for bootstrapping passed to
-  [`parallel::mclapply`](https://rdrr.io/r/parallel/mclapply.html) as
-  `mc.cores`. On Unix-like OS only; not available on Windows. Default:
-  `1`.
+  Integer seed for reproducible bootstrap results. Default: `NULL`.
 
 ## Value
 

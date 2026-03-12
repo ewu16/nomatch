@@ -26,8 +26,8 @@ one_boot_nomatch(
 
   A data frame with one row per individual containing the columns named
   in `outcome_time`, `outcome_status`, `exposure`, `exposure_time`, and
-  `covariates`. Missing values for all columns except `exposure_time`
-  are not allowed.
+  `covariates`. Missing values in any of these columns except
+  `exposure_time` are not allowed.
 
 - outcome_time:
 
@@ -50,8 +50,8 @@ one_boot_nomatch(
 - exposure_time:
 
   Name of the time to exposure, measured on the same time scale as that
-  used for `outcome_time`. Must be a non-missing numeric value exposed
-  individuals and must be set to `NA` for unexposed individuals.
+  used for `outcome_time`. Must be a non-missing numeric value for
+  exposed individuals and must be set to `NA` for unexposed individuals.
 
 - covariates:
 
@@ -70,7 +70,17 @@ one_boot_nomatch(
   correspond to clinically meaningful follow-up durations, such as 30,
   60, or 90 days after exposure. A fine grid of timepoints (e.g.,
   `timepoints = (immune_lag + 1):100`) can be provided if cumulative
-  incidence curves over time are desired.
+  incidence curves over time are desired. By default, the sequence from
+  `immune_lag + 1` to the maximum event time in the exposed group, by
+  units of 1, is used.
+
+- formula_0:
+
+  One-sided (right-hand-side) formula for model 0.
+
+- formula_1:
+
+  One-sided (right-hand-side) formula for model 1.
 
 ## Value
 

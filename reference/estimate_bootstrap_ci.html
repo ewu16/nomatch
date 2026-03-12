@@ -50,7 +50,7 @@ confidence intervals.</p>
 <span>  pt_est <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  keep_boot_samples <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_cores <span class="op">=</span> <span class="fl">1</span></span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -68,7 +68,7 @@ returns the bootstrap estimates</p></dd>
 
 
 <dt id="arg-ci-type">ci_type<a class="anchor" aria-label="anchor" href="#arg-ci-type"></a></dt>
-<dd><p>Method for constructing bootstrap confidence intervals. One of
+<dd><p>Method for constructing pointwise bootstrap confidence intervals. One of
 <code>"wald"</code>, <code>"percentile"</code>, or <code>"both"</code>.</p><ul><li><p><code>"wald"</code> (default): Computes Wald-style intervals using bootstrap standard errors.
 See <strong>Confidence intervals</strong> section for details.</p></li>
 <li><p><code>"percentile"</code>: Computes percentile bootstrap intervals.</p></li>
@@ -80,7 +80,7 @@ See <strong>Confidence intervals</strong> section for details.</p></li>
 <dd><p>Number of bootstrap replicates for confidence intervals.
 Recommended to use at least 1000 for publication-quality results. Use
 smaller values (e.g., 10-100) for initial exploration. Default: <code>0</code> (no
-bootstrapping).</p></dd>
+bootstrapping). Bootstrap procedure can be parallelizaed- see <strong>Parallelization</strong> section for details.</p></dd>
 
 
 <dt id="arg-pt-est">pt_est<a class="anchor" aria-label="anchor" href="#arg-pt-est"></a></dt>
@@ -101,10 +101,8 @@ when <code>ci_type = "percentile"</code>.</p></dd>
 to obtain simultaneous confidence intervals.</p></dd>
 
 
-<dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
-<dd><p>Integer; parallel cores for bootstrapping passed to
-<code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">parallel::mclapply</a></code> as <code>mc.cores</code>. On Unix-like OS only; not available on
-Windows. Default: <code>1</code>.</p></dd>
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>Integer seed for reproducible bootstrap results. Default: <code>NULL</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

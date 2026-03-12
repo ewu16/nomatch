@@ -1,18 +1,19 @@
 # Estimate observed distributions of exposure times and covariates
 
 Computes two empirical probability distributions which are used to
-marginalize time- and covariate- specific cumulative incidences:
+marginalize exposure time- and covariate- specific cumulative
+incidences:
 
-- \\g(d \mid x)\\: the distribution of exposure times within each
-  covariate subgroup of exposed individuals who remain at risk
-  `immune_lag` days after exposure.
+- \\g(d\|x)\\: the distribution of exposure times within each covariate
+  subgroup of exposed individuals who remain at risk `immune_lag` days
+  after exposure.
 
 - \\p(x)\\: the distribution of covariates among exposed individuals who
   remain at risk `immune_lag` days after exposure.
 
 Called internally by
 [`nomatch()`](https://ewu16.github.io/nomatch/reference/nomatch.md).
-Provides an example of the structure for user-specified
+Provides an example of the required structure for user-specified
 `custom_weights`.
 
 ## Usage
@@ -34,8 +35,8 @@ get_observed_weights(
 
   A data frame with one row per individual containing the columns named
   in `outcome_time`, `outcome_status`, `exposure`, `exposure_time`, and
-  `covariates`. Missing values for all columns except `exposure_time`
-  are not allowed.
+  `covariates`. Missing values in any of these columns except
+  `exposure_time` are not allowed.
 
 - outcome_time:
 
@@ -53,8 +54,8 @@ get_observed_weights(
 - exposure_time:
 
   Name of the time to exposure, measured on the same time scale as that
-  used for `outcome_time`. Must be a non-missing numeric value exposed
-  individuals and must be set to `NA` for unexposed individuals.
+  used for `outcome_time`. Must be a non-missing numeric value for
+  exposed individuals and must be set to `NA` for unexposed individuals.
 
 - covariates:
 
@@ -74,20 +75,20 @@ get_observed_weights(
   and should reflect the biological understanding of when
   vaccine-induced immunity develops (usually 1-2 weeks). For non-vaccine
   exposures, ` immune_lag` can be set to 0 (no delay period for
-  evaluating risk).
+  evaluating risk). Default: 0,
 
 ## Value
 
 A list with two data frames:
 
-- `g_weights`: covariate-conditional exposure time probabilities (\\g(d
-  \mid x)\\)
+- `g_weights`: covariate-conditional exposure time probabilities
+  (\\g(d\|x)\\)
 
 - `p_weights`: covariate probabilities (\\p(x)\\)
 
   Each data frame includes all variables in `covariates`, and a `prob`
   column with empirical probabilities. `g_weights` additionally includes
-  a `<exposure_time>` column for exposure times.
+  an `<exposure_time>` column for exposure times.
 
 ## Examples
 

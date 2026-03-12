@@ -2,15 +2,16 @@
 
 `nomatch()` estimates marginal cumulative incidences under exposure and
 no exposure using a G-computation approach. The method fits two
-conditional hazard models- one for each exposure type- and uses these
-models to predict time- and covariate-specific cumulative incidences.
-These cumulative incidences are then marginalized to compute overall
-(marginal) cumulative incidences. By default, the cumulative incidences
-are marginalized over the observed distribution of exposure times and
-covariates among the exposed. The resulting cumulative incidences can be
-summarized as risk ratios (RR = 1 - risk_exposed/risk_unexposed),
-relative risk reduction (1 - RR), or risk differences (RD =
-risk_exposed - risk_unexposed).
+conditional hazard models- one for the exposed group and one for the
+unexposed group- and uses these models to predict time- and
+covariate-specific cumulative incidences. These time- and
+covariate-specific cumulative incidences are then marginalized to
+compute overall (marginal) cumulative incidences. By default, the
+cumulative incidences are marginalized over the observed distribution of
+exposure times and covariates among the exposed. The resulting
+cumulative incidences can be summarized as risk ratios (RR = 1 -
+risk_exposed/risk_unexposed), relative risk reduction (1 - RR), or risk
+differences (RD = risk_exposed - risk_unexposed).
 
 ## Usage
 
@@ -22,8 +23,8 @@ nomatch(
   exposure,
   exposure_time,
   covariates,
-  immune_lag,
-  timepoints,
+  immune_lag = 0,
+  timepoints = NULL,
   weights_source = c("observed", "custom"),
   custom_weights = NULL,
   ci_type = c("wald", "percentile", "both"),
@@ -31,7 +32,7 @@ nomatch(
   alpha = 0.05,
   keep_models = TRUE,
   keep_boot_samples = TRUE,
-  n_cores = 1,
+  seed = NULL,
   formula_unexposed = NULL,
   formula_exposed = NULL
 )
@@ -43,8 +44,8 @@ nomatch(
 
   A data frame with one row per individual containing the columns named
   in `outcome_time`, `outcome_status`, `exposure`, `exposure_time`, and
-  `covariates`. Missing values for all columns except `exposure_time`
-  are not allowed.
+  `covariates`. Missing values in any of these columns except
+  `exposure_time` are not allowed.
 
 - outcome_time:
 
@@ -67,8 +68,8 @@ nomatch(
 - exposure_time:
 
   Name of the time to exposure, measured on the same time scale as that
-  used for `outcome_time`. Must be a non-missing numeric value exposed
-  individuals and must be set to `NA` for unexposed individuals.
+  used for `outcome_time`. Must be a non-missing numeric value for
+  exposed individuals and must be set to `NA` for unexposed individuals.
 
 - covariates:
 
@@ -88,7 +89,7 @@ nomatch(
   and should reflect the biological understanding of when
   vaccine-induced immunity develops (usually 1-2 weeks). For non-vaccine
   exposures, ` immune_lag` can be set to 0 (no delay period for
-  evaluating risk).
+  evaluating risk). Default: 0,
 
 - timepoints:
 
@@ -100,47 +101,52 @@ nomatch(
   correspond to clinically meaningful follow-up durations, such as 30,
   60, or 90 days after exposure. A fine grid of timepoints (e.g.,
   `timepoints = (immune_lag + 1):100`) can be provided if cumulative
-  incidence curves over time are desired.
+  incidence curves over time are desired. By default, the sequence from
+  `immune_lag + 1` to the maximum event time in the exposed group, by
+  units of 1, is used.
 
 - weights_source:
 
-  Character string specifying the type of marginalizing weights to use.
-  Either:
+  Character string specifying the type of marginalizing weights to use
+  for marginalization. Either:
 
   - `"observed"` (default): use the empirical distribution of exposure
     times and covariates among the exposed as the marginalizing weights.
-    This provides close alignment with the weights implicitly used in
-    matching.
+    If `immune_lag > 0`, this is the distribution of exposure times and
+    covariates among the exposed who remain at-risk `immune_lag` days
+    after exposure. These weights provide close alignment with the
+    weights implicitly used in matching.
 
   - `"custom"`: use the user-specified weights provided in the
-    `custom_weights` argument.
+    `custom_weights` argument. See **Marginalizing weights** section for
+    more details.
 
 - custom_weights:
 
-  a `list(g_weights, p_weights)` providing weights for marginalizing the
-  time- and covariate-specific cumulative incidences. Must have the
-  following format:
+  a named `list(g_weights, p_weights)` providing weights for
+  marginalizing the time- and covariate-specific cumulative incidences.
+  Must have the following format:
 
-  - `g_weights`: data frame with columns
+  - `g_weights`: data frame with the following columns:
 
-    - all variables in `covariates`
+    - columns named after each variable in `covariates`
 
     - `exposure_time` (time of exposure),
 
     - `prob` (probability of exposure at the given time within the
       covariate-group; should sum to 1 within each covariate-group)
 
-  - `p_weights`: data frame with columns
+  - `p_weights`: data frame with the following columns:
 
-    - all variables in `covariates`
+    - columns named after each variable in `covariates`
 
     - `prob` (probability of covariate-group; should sum to 1 over all
       covariate groups.)
 
 - ci_type:
 
-  Method for constructing bootstrap confidence intervals. One of
-  `"wald"`, `"percentile"`, or `"both"`.
+  Method for constructing pointwise bootstrap confidence intervals. One
+  of `"wald"`, `"percentile"`, or `"both"`.
 
   - `"wald"` (default): Computes Wald-style intervals using bootstrap
     standard errors. See **Confidence intervals** section for details.
@@ -154,7 +160,8 @@ nomatch(
   Number of bootstrap replicates for confidence intervals. Recommended
   to use at least 1000 for publication-quality results. Use smaller
   values (e.g., 10-100) for initial exploration. Default: `0` (no
-  bootstrapping).
+  bootstrapping). Bootstrap procedure can be parallelizaed- see
+  **Parallelization** section for details.
 
 - alpha:
 
@@ -173,27 +180,31 @@ nomatch(
   [`add_simultaneous_ci()`](https://ewu16.github.io/nomatch/reference/add_simultaneous_ci.md)
   to obtain simultaneous confidence intervals.
 
-- n_cores:
+- seed:
 
-  Integer; parallel cores for bootstrapping passed to
-  [`parallel::mclapply`](https://rdrr.io/r/parallel/mclapply.html) as
-  `mc.cores`. On Unix-like OS only; not available on Windows. Default:
-  `1`.
+  Integer seed for reproducible bootstrap results. Default: `NULL`.
 
-- formula_unexposed:
+- formula_unexposed, formula_exposed:
 
-  A character specification of the right-hand side of the formula to use
-  for fitting the hazard model for the unexposed. The set of variables
-  in the formula must be identical to the set of variables in
-  `covariates`.
+  Optional specification of the right-hand side of the formula to use
+  for fitting the hazard model for the unexposed and exposed groups,
+  respectively. Each accepts one of the following:
 
-- formula_exposed:
+  - a one-sided formula object (e.g. `~ x1 + x2`)
 
-  A character specification of the right-hand side of the formula to use
-  for fitting the hazard model for the exposed. The set of variables in
-  the formula must contain the variables in `covariates` and
-  `exposure_time`. It is recommended that `exposure_time` be modeled
-  flexibly (e.g. using splines).
+  - a string representation of a formula (e.g. `"x1 + x2"` or
+    `"~ x1 + x2"`), or a character vector of term names (e.g.
+    `c("x1", "x2")`).
+
+  The set of variables included in these formulas must be included in
+  `covariates`. In `formula_exposed`, it is strongly recommended to
+  model `exposure_time` flexibly (e.g. with a spline).
+
+  By default, `formula_unexposed` is a main-effects formula using all
+  `covariates` and `formula_exposed` is a main-effects formula using all
+  `covariates` and a natural cubic spline of `exposure_time` (4 df).
+
+  See **Modeling** section for details.
 
 ## Value
 
@@ -202,7 +213,7 @@ An object of class `nomatchfit` containing:
 - estimates:
 
   Named list of matrices containing the cumulative incidence and effect
-  estimates.
+  estimates:
 
   `cuminc_0`
 
@@ -220,30 +231,30 @@ An object of class `nomatchfit` containing:
 
   :   `cuminc_1/cuminc_0`
 
-  `vaccine_effectivess`
+  `relative_risk_reduction`
 
   :   `1 - risk_ratio`
 
-  Each matrix has one row per value in `timepoints` and columns
-  including the point estimate (`estimate`) and, when requested,
-  confidence limits of the form (`{wald/percentile}_lower`,
-  `{wald/percentile}_upper`).
+  Each matrix has one row per value in `timepoints` and columns for the
+  point estimate (`estimate`) and confidence limits
+  (`{wald/percentile}_lower`, `{wald/percentile}_upper`), when
+  applicable.
+
+- model_0:
+
+  (If `keep_models = TRUE`) Fitted hazard model for the unexposed group.
+  See **Modeling** section for details.
+
+- model_1:
+
+  (If `keep_models = TRUE`) Fitted hazard model for the exposed group.
+  See **Modeling** section for details.
 
 - weights:
 
   List with dataframes `g_weights`, `p_weights` specifying the
   marginalizing weights used for averaging over exposure times and
   covariates.
-
-- model_0:
-
-  Fitted hazard model for the unexposed group. See **Modeling** section
-  for details.
-
-- model_1:
-
-  Fitted hazard model for the exposed group. See **Modeling** section
-  for details.
 
 - n_success_boot:
 
@@ -252,9 +263,13 @@ An object of class `nomatchfit` containing:
 
 - boot_samples:
 
-  (If `keep_boot_samples = TRUE`) Named list of bootstrap draws (stored
-  as matrices) for each term. Rows index bootstrap replicates and
-  columns index `timepoints`.
+  (If `keep_boot_samples = TRUE`) Named list containing the `original`
+  bootstrap estimates and, if Wald confidence intervals are used, the
+  `transformed` bootstrap draws, which are the same bootstrap estimates
+  on the scales used for inference. Both `original` and `transformed`
+  are named lists containing the bootstrap estimates for each term. The
+  bootstrap estimates for each term are stored as matrices, with rows
+  indexing bootstrap replicates and columns indexing `timepoints`.
 
 The `nomatchfit` object has methods for
 [`print()`](https://rdrr.io/r/base/print.html),
@@ -269,38 +284,56 @@ to add simultaneous confidence intervals.
 exposure-specific cumulative incidences. For the unexposed model, the
 outcome is modeled on the original time scale and includes all
 individuals, with exposed individuals censored at their time of
-exposure. For the exposed model, the outcome is modeled in terms of time
-since exposure among individuals who were exposed and who remained at
-risk `tau` days after exposure. Both models adjust for the specified
-covariates to help control for confounding. The second model also
-flexibly adjusts for exposure time (by default, as a natural cubic
-spline with 4 degrees of freedom) to capture time-varying background
-risk. Predicted risks from both models are then marginalized over the
-specified exposure-time and covariate distributions to obtain
-G-computation style cumulative incidence estimates.
+exposure. For the exposed model, the outcome is modeled on the time
+scale of time since exposure and includes individuals who were exposed
+and who remained at risk `immune_lag` days after exposure. By default,
+both models adjust for the specified covariates as linear, main-effect
+terms to help control for confounding. The second model also flexibly
+adjusts for exposure time (by default, as a natural cubic spline with 4
+degrees of freedom) to capture time-varying background risk. Custom
+formulas specifiying the right hand side of the formulas to be used in
+these models can be provided through the optional arguments
+`formula_unexposed` and `formula_exposed`. Predicted risks from both
+models are then marginalized over the specified exposure-time and
+covariate weights to obtain G-computation style cumulative incidence
+estimates.
 
 **Marginalizing weights.** When `weights_source = "observed"`, the
 marginalizing weights are the empirical distributions of exposure times
-and covariates among the exposed who remain at-risk `tau` days after
-exposure. These weights are returned in the `nomatchfit` object under
-`weights`. They can also be obtained prior to the call to `nomatch()` by
-calling
+and covariates among the exposed who remain at-risk `immune_lag` days
+after exposure. These weights are returned in the `nomatchfit` object
+under `weights`. They can also be obtained prior to the call to
+`nomatch()` by calling
 [`get_observed_weights()`](https://ewu16.github.io/nomatch/reference/get_observed_weights.md).
 
-**Confidence intervals.** Wald CIs are constructed on transformed
-scales: \\\text{logit}\\ for cumulative incidence; \\\log{RR}\\ for risk
-ratios/relative risk reduction, using bootstrap SEs. These are then
-back-transformed to the original scale. No transformation is used for
-risk differences.
+**Confidence intervals.** Wald and percentile confidence intervals are
+constructed for cumulative incidence and effectiveness parameters at
+each timepoint. The Wald pointwise confidence intervals are constructed
+on transformed scales: \\\text{logit}\\ for cumulative incidence;
+\\\log{RR}\\ for risk ratios, and \\\log{1 - RR}\\ for relative risk
+reduction, using bootstrap standard errors. These confidence intervals
+are then back-transformed to the original scale. Identity transformation
+is used for risk differences. To obtain simultaneous confidence
+intervals, use
+[`add_simultaneous_ci()`](https://ewu16.github.io/nomatch/reference/add_simultaneous_ci.md)
+after saving the original fit.
 
-**Parallelization.** Bootstraps can be parallelized on Unix via
-[`parallel::mclapply()`](https://rdrr.io/r/parallel/mclapply.html) by
-providing `n_cores` argument.
+**Parallelization.** Bootstraps can be parallelized using the `future`
+framework. Set a parallel plan before calling `nomatch()`: e.g.
+
+    future::plan(future::multisession, workers = 4)
+    fit <- nomatch(..., boot_reps = 1000, seed = 42)
+    future::plan(future::sequential)  # reset when done
+
+If no plan is set, bootstraps run sequentially. `multisession` works on
+all operating systems and is recommended for most users. See the [future
+package documentation](https://future.futureverse.org) for additional
+plans and details on setup.
 
 ## Examples
 
 ``` r
-# Fit effectiveness model using simulated data
+# Fit nomatch using simulated data
 
 fit <- nomatch(
   data = simdata,
@@ -309,59 +342,44 @@ fit <- nomatch(
   exposure = "V",
   exposure_time = "D_obs",
   covariates = c("x1", "x2"),
-  timepoints = seq(30, 180, by = 30),
+  timepoints = seq(30, 90, by = 30),
   immune_lag = 14,
   boot_reps = 5,
-  n_cores = 1
+  seed = 123
 )
 #> Bootstrapping 5 samples...
-#> Time difference of 1.800435 secs
+#> Bootstrap completed in 1.09 secs
 
 # View basic results
 fit$estimates
 #> $cuminc_0
-#>       estimate wald_lower wald_upper    wald_se wald_pval wald_n
-#> 30  0.01163891 0.01007963 0.01343613 0.07419198        NA      5
-#> 60  0.03790915 0.03331788 0.04310488 0.06829663        NA      5
-#> 90  0.05857293 0.05262835 0.06514281 0.05781346        NA      5
-#> 120 0.06691947 0.06032600 0.07417670 0.05651542        NA      5
-#> 150 0.07548793 0.06861566 0.08298717 0.05247947        NA      5
-#> 180 0.09576440 0.08852914 0.10352382 0.04414821        NA      5
+#>      estimate  wald_lower wald_upper    wald_se wald_pval wald_n
+#> 30 0.01163891 0.009815874 0.01379582 0.08785672        NA      5
+#> 60 0.03790915 0.032558421 0.04409914 0.08046197        NA      5
+#> 90 0.05857293 0.052444528 0.06536807 0.05969768        NA      5
 #> 
 #> $cuminc_1
-#>        estimate wald_lower wald_upper    wald_se wald_pval wald_n
-#> 30  0.006219935 0.00490254 0.00788853 0.12210980        NA      5
-#> 60  0.022925618 0.02174377 0.02417012 0.02762124        NA      5
-#> 90  0.035346676 0.03197190 0.03906329 0.05298012        NA      5
-#> 120 0.044244807 0.04130257 0.04738628 0.03667769        NA      5
-#> 150 0.055146409 0.04937548 0.06154816 0.05950454        NA      5
-#> 180 0.079293545 0.07547382 0.08328917 0.02730204        NA      5
+#>       estimate  wald_lower wald_upper    wald_se wald_pval wald_n
+#> 30 0.006211499 0.003822016 0.01007975 0.24899735        NA      5
+#> 60 0.022820770 0.019600908 0.02655524 0.07927943        NA      5
+#> 90 0.035207076 0.028754881 0.04304289 0.10668815        NA      5
 #> 
 #> $risk_difference
-#>         estimate   wald_lower   wald_upper     wald_se    wald_pval wald_n
-#> 30  -0.005418978 -0.007191528 -0.003646428 0.000904379 2.073618e-09      5
-#> 60  -0.014983530 -0.019314424 -0.010652635 0.002209681 1.194644e-11      5
-#> 90  -0.023226258 -0.031540712 -0.014911803 0.004242146 4.372170e-08      5
-#> 120 -0.022674663 -0.030836500 -0.014512826 0.004164279 5.179400e-08      5
-#> 150 -0.020341520 -0.029851959 -0.010831081 0.004852354 2.763923e-05      5
-#> 180 -0.016470857 -0.025719682 -0.007222032 0.004718875 4.822615e-04      5
+#>        estimate   wald_lower   wald_upper     wald_se    wald_pval wald_n
+#> 30 -0.005427414 -0.009417768 -0.001437060 0.002035933 7.680255e-03      5
+#> 60 -0.015088377 -0.022777832 -0.007398923 0.003923263 1.201233e-04      5
+#> 90 -0.023365858 -0.031704713 -0.015027002 0.004254596 3.976111e-08      5
 #> 
 #> $risk_ratio
-#>      estimate wald_lower wald_upper    wald_se    wald_pval wald_n
-#> 30  0.5344086  0.4211850  0.6780692 0.12147601 1.267008e-04      5
-#> 60  0.6047516  0.5378709  0.6799484 0.05979658 3.846257e-11      5
-#> 90  0.6034643  0.5060940  0.7195683 0.08977948 1.001848e-05      5
-#> 120 0.6611649  0.5753649  0.7597597 0.07091909 1.772505e-06      5
-#> 150 0.7305328  0.6292230  0.8481543 0.07616898 4.035446e-04      5
-#> 180 0.8280065  0.7474679  0.9172230 0.05220997 9.867902e-04      5
+#>     estimate wald_lower wald_upper   wald_se    wald_pval wald_n
+#> 30 0.5336838  0.2976856  0.9567758 0.2978451 0.1174344614      5
+#> 60 0.6019858  0.4669828  0.7760178 0.1295644 0.0021267162      5
+#> 90 0.6010810  0.4851894  0.7446542 0.1092828 0.0002618968      5
 #> 
 #> $relative_risk_reduction
-#>      estimate wald_lower wald_upper    wald_se    wald_pval wald_n
-#> 30  0.4655914  0.3219308  0.5788150 0.12147601 1.267008e-04      5
-#> 60  0.3952484  0.3200516  0.4621291 0.05979658 3.846257e-11      5
-#> 90  0.3965357  0.2804317  0.4939060 0.08977948 1.001848e-05      5
-#> 120 0.3388351  0.2402403  0.4246351 0.07091909 1.772505e-06      5
-#> 150 0.2694672  0.1518457  0.3707770 0.07616898 4.035446e-04      5
-#> 180 0.1719935  0.0827770  0.2525321 0.05220997 9.867902e-04      5
+#>     estimate wald_lower wald_upper   wald_se    wald_pval wald_n
+#> 30 0.4663162 0.04322417  0.7023144 0.2978451 0.1174344614      5
+#> 60 0.3980142 0.22398220  0.5330172 0.1295644 0.0021267162      5
+#> 90 0.3989190 0.25534575  0.5148106 0.1092828 0.0002618968      5
 #> 
 ```

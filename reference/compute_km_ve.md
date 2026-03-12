@@ -1,6 +1,6 @@
-# Get the marginal cumulative incidence in the treated and untreated groups based on Kaplan Meier estimation.
+# Get the marginal cumulative incidence in the exposed and unexposed groups based on Kaplan Meier estimation.
 
-Get the marginal cumulative incidence in the treated and untreated
+Get the marginal cumulative incidence in the exposed and unexposed
 groups based on Kaplan Meier estimation.
 
 ## Usage
@@ -20,13 +20,12 @@ compute_km_ve(
 
 - adata:
 
-  A data frame that represents the analysis data set of a clinical
-  trial.
+  A data frame that represents the analysis data set
 
 - adata_outcome_name:
 
   Character string specifying the time to event variable in `adata`. The
-  time should be the time to event from vaccination/matched index date
+  time should be the time to event from exposure or matching
 
 - adata_event_name:
 
@@ -46,12 +45,14 @@ compute_km_ve(
   correspond to clinically meaningful follow-up durations, such as 30,
   60, or 90 days after exposure. A fine grid of timepoints (e.g.,
   `timepoints = (immune_lag + 1):100`) can be provided if cumulative
-  incidence curves over time are desired.
+  incidence curves over time are desired. By default, the sequence from
+  `immune_lag + 1` to the maximum event time in the exposed group, by
+  units of 1, is used.
 
 - keep_models:
 
-  Logical; return the two fitted hazard models used to compute
-  cumulative incidences? Default: `TRUE`.
+  Logical; return the fitted Kaplan Meier object used to compute
+  cumulative incidences? Default: `TRUE`
 
 ## Value
 
@@ -60,9 +61,9 @@ A list containing the following:
 - estimates:
 
   A matrix of estimates. The columns of the matrix are the cumulative
-  incidence/VE terms and the rows are the requested time points for
-  evaluation.
+  incidence/effectiveness terms and the rows are the requested
+  timepoints for evaluation.
 
 - models:
 
-  If `keep_models = TRUE`, the models used to compute risk and VE
+  If `keep_models = TRUE`, the fitted Kaplan Meier object

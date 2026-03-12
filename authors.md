@@ -10,14 +10,14 @@
 Source:
 [`DESCRIPTION`](https://github.com/ewu16/nomatch/blob/main/DESCRIPTION)
 
-Wu E (2025). *nomatch: Estimate Effectiveness of Interventions in Target
-Trial Emulation Observational Studies Without Matching*. R package
+Wu E (2026). *nomatch: Estimate Effectiveness of Interventions in Target
+Trial Emulation Observational Studies Without Using Matching*. R package
 version 0.0.0.9000, <https://ewu16.github.io/nomatch/>.
 
     @Manual{,
-      title = {nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies Without Matching},
+      title = {nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies Without Using Matching},
       author = {Emily Wu},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.0.0.9000},
       url = {https://ewu16.github.io/nomatch/},
     }

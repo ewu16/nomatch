@@ -7,8 +7,6 @@
 <url><loc>https://ewu16.github.io/nomatch/authors.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/index.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/add_simultaneous_ci.html</loc></url>
-<url><loc>https://ewu16.github.io/nomatch/reference/clean_matched_data.html</loc></url>
-<url><loc>https://ewu16.github.io/nomatch/reference/compare_ve_fits.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/compute_km_ve.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/compute_psi_bar_t0.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/compute_psi_bar_times.html</loc></url>
@@ -25,6 +23,7 @@
 <url><loc>https://ewu16.github.io/nomatch/reference/get_one_nomatch.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/get_z_star.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/index.html</loc></url>
+<url><loc>https://ewu16.github.io/nomatch/reference/make_matched_adata.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/marginalize_psi_dx_t0.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/match_rolling_cohort.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/matching.html</loc></url>
@@ -33,9 +32,11 @@
 <url><loc>https://ewu16.github.io/nomatch/reference/one_boot_matching.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/one_boot_nomatch.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/plot.nomatchfit.html</loc></url>
+<url><loc>https://ewu16.github.io/nomatch/reference/plot_effect_panel.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/predict_from_model_0.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/print.nomatchfit.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/simdata.html</loc></url>
+<url><loc>https://ewu16.github.io/nomatch/reference/summarize_nomatch_population.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/summary.nomatchfit.html</loc></url>
 </urlset>
 

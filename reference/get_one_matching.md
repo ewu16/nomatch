@@ -1,8 +1,8 @@
-# Compute VE point estimate in matched data set
+# Internal function to compute cumulative incidence and effectiveness measures for a matched dataset
 
 First, creates the analysis matched data set based on `matched_data`.
-Then computes Kaplan Meier estimates of cumulative incidence on the
-analysis data set.
+Then computes Kaplan Meier estimates of cumulative incidence in the
+matched analysis data set.
 
 ## Usage
 
@@ -48,8 +48,8 @@ get_one_matching(
 - exposure_time:
 
   Name of the time to exposure, measured on the same time scale as that
-  used for `outcome_time`. Must be a non-missing numeric value exposed
-  individuals and must be set to `NA` for unexposed individuals.
+  used for `outcome_time`. Must be a non-missing numeric value for
+  exposed individuals and must be set to `NA` for unexposed individuals.
 
 - timepoints:
 
@@ -61,14 +61,22 @@ get_one_matching(
   correspond to clinically meaningful follow-up durations, such as 30,
   60, or 90 days after exposure. A fine grid of timepoints (e.g.,
   `timepoints = (immune_lag + 1):100`) can be provided if cumulative
-  incidence curves over time are desired.
+  incidence curves over time are desired. By default, the sequence from
+  `immune_lag + 1` to the maximum event time in the exposed group, by
+  units of 1, is used.
 
 - keep_models:
 
-  Logical; return the two fitted hazard models used to compute
-  cumulative incidences? Default: `TRUE`.
+  Logical; return the fitted Kaplan Meier object used to compute
+  cumulative incidences? Default: `TRUE`
+
+- keep_adata:
+
+  Logical; return the matched analysis dataset? Default: TRUE
 
 ## Value
 
 The object returned by
 [`compute_km_ve()`](https://ewu16.github.io/nomatch/reference/compute_km_ve.md)
+with the matched analysis dataset, `matched_adata`, attached, if
+requested.

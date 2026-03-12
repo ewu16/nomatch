@@ -34,7 +34,7 @@
     <div class="section level2">
       <h2 id="main-functions">Main functions<a class="anchor" aria-label="anchor" href="#main-functions"></a></h2>
 
-      <div class="section-desc"><p>Primary user-facing functions</p></div>
+      <div class="section-desc"><p>Primary user-facing functions for proposed method</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -53,7 +53,7 @@
           <code><a href="add_simultaneous_ci.html">add_simultaneous_ci()</a></code>
 
         </dt>
-        <dd>Add simultaneous confidence intervals to effectiveness fit</dd>
+        <dd>Add simultaneous confidence intervals to <code>nomatchfit</code> object</dd>
 
         <dt>
 
@@ -62,9 +62,9 @@
         </dt>
         <dd>Plot method for nomatchfit objects</dd>
       </dl></div><div class="section level2">
-      <h2 id="proposed-method-estimation">Proposed method estimation<a class="anchor" aria-label="anchor" href="#proposed-method-estimation"></a></h2>
+      <h2 id="supplementary-functions-for-nomatch">Supplementary functions for nomatch<a class="anchor" aria-label="anchor" href="#supplementary-functions-for-nomatch"></a></h2>
 
-      <div class="section-desc"><p>Core estimation functions for the G-computation approach</p></div>
+      <div class="section-desc"><p>Secondary functions for proposed method</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -73,13 +73,6 @@
 
       <dl><dt>
 
-          <code><a href="fit_model_0.html">fit_model_0()</a></code> <code><a href="fit_model_0.html">fit_model_1()</a></code>
-
-        </dt>
-        <dd>Fit survival models to estimate exposure-specific hazards for G-computation approach</dd>
-
-        <dt>
-
           <code><a href="get_observed_weights.html">get_observed_weights()</a></code>
 
         </dt>
@@ -87,24 +80,10 @@
 
         <dt>
 
-          <code><a href="compute_psi_dx_t0.html">compute_psi_dx_t0()</a></code>
+          <code><a href="summarize_nomatch_population.html">summarize_nomatch_population()</a></code>
 
         </dt>
-        <dd>Compute time- and covariate- specific cumulative incidences</dd>
-
-        <dt>
-
-          <code><a href="marginalize_psi_dx_t0.html">marginalize_psi_dx_t0()</a></code>
-
-        </dt>
-        <dd>Marginalize conditional cumulative incidences</dd>
-
-        <dt>
-
-          <code><a href="compute_psi_bar_times.html">compute_psi_bar_times()</a></code>
-
-        </dt>
-        <dd>Compute overall cumulative incidences at multiple timepoints</dd>
+        <dd>Estimate covariate means for population represented in <code><a href="../reference/nomatch.html">nomatch()</a></code> estimand</dd>
       </dl></div><div class="section level2">
       <h2 id="matching-based-estimation">Matching-based estimation<a class="anchor" aria-label="anchor" href="#matching-based-estimation"></a></h2>
 
@@ -143,14 +122,14 @@
           <code><a href="print.nomatchfit.html">print(<i>&lt;nomatchfit&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print method for effectiveness fits</dd>
+        <dd>Print method for <code>nomatchfit</code> objects</dd>
 
         <dt>
 
           <code><a href="summary.nomatchfit.html">summary(<i>&lt;nomatchfit&gt;</i>)</a></code>
 
         </dt>
-        <dd>Summary method for effectiveness fits</dd>
+        <dd>Summary method for <code>nomatchfit</code> objects</dd>
 
         <dt>
 
@@ -158,13 +137,6 @@
 
         </dt>
         <dd>Convert estimates from a fitted object into a tidy data frame</dd>
-
-        <dt>
-
-          <code><a href="compare_ve_fits.html">compare_ve_fits()</a></code>
-
-        </dt>
-        <dd>Compare two effectiveness fit objects</dd>
       </dl></div><div class="section level2">
       <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a></h2>
 

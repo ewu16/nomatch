@@ -1,6 +1,6 @@
-# Compute one bootstrap replicate of matching-based VE point estimate
+# Compute one bootstrap replicate of matching analysis method
 
-Compute one bootstrap replicate of matching-based VE point estimate
+Compute one bootstrap replicate of matching analysis method
 
 ## Usage
 
@@ -50,8 +50,8 @@ one_boot_matching(
 - exposure_time:
 
   Name of the time to exposure, measured on the same time scale as that
-  used for `outcome_time`. Must be a non-missing numeric value exposed
-  individuals and must be set to `NA` for unexposed individuals.
+  used for `outcome_time`. Must be a non-missing numeric value for
+  exposed individuals and must be set to `NA` for unexposed individuals.
 
 - timepoints:
 
@@ -63,10 +63,12 @@ one_boot_matching(
   correspond to clinically meaningful follow-up durations, such as 30,
   60, or 90 days after exposure. A fine grid of timepoints (e.g.,
   `timepoints = (immune_lag + 1):100`) can be provided if cumulative
-  incidence curves over time are desired.
+  incidence curves over time are desired. By default, the sequence from
+  `immune_lag + 1` to the maximum event time in the exposed group, by
+  units of 1, is used.
 
 ## Value
 
-A matrix of bootstrapped estimates where the the columns of the matrix
-are the cumulative incidence/VE terms and the rows are the requested
-time points for evaluation.
+The `pt_estimates` component returned by
+[`get_one_matching()`](https://ewu16.github.io/nomatch/reference/get_one_matching.md),
+for a bootstrap sample.

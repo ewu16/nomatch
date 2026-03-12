@@ -1,7 +1,7 @@
 # Compute overall cumulative incidences at multiple timepoints
 
-Wrapper that computes cumulative incidences at multiple timepoints.
-Calls
+Wrapper that computes marginal cumulative incidences at multiple
+timepoints. Calls
 [`compute_psi_bar_t0()`](https://ewu16.github.io/nomatch/reference/compute_psi_bar_t0.md)
 internally for each timepoint. Models are fitted once before calling
 this function to allow efficient evaluation at multiple timepoints
@@ -35,8 +35,7 @@ compute_psi_bar_times(
 
 - exposure_time:
 
-  Name of the time-to-exposure variable in `newdata`. Used to compute
-  \\\psi_0(t_0; d,x)\\ where \\d + \tau\\ and \\d + t_0\\ are needed.
+  Name of the time-to-exposure variable in `newdata`.
 
 - timepoints:
 
@@ -48,7 +47,9 @@ compute_psi_bar_times(
   correspond to clinically meaningful follow-up durations, such as 30,
   60, or 90 days after exposure. A fine grid of timepoints (e.g.,
   `timepoints = (immune_lag + 1):100`) can be provided if cumulative
-  incidence curves over time are desired.
+  incidence curves over time are desired. By default, the sequence from
+  `immune_lag + 1` to the maximum event time in the exposed group, by
+  units of 1, is used.
 
 - tau:
 
@@ -75,7 +76,7 @@ compute_psi_bar_times(
     - all variables in `covariates`
 
   - **p_weights** Data frame of covariate probabilities \\p(x)\\. Must
-    include:\\
+    include:
 
     - `group_id`: covariate group identifier
 

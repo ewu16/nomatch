@@ -1,4 +1,4 @@
-# nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies Without Matching
+# nomatch: Estimate Effectiveness of Interventions in Target Trial Emulation Observational Studies Without Using Matching
 
 Implements estimators of marginal cumulative incidence for binary
 interventions using observational data.

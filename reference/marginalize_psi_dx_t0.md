@@ -1,6 +1,6 @@
-# Marginalize conditional cumulative incidences
+# Marginalize time- and covariate- specific cumulative incidences
 
-Averages day- and covariate-specific cumulative incidences from
+Averages time- and covariate-specific cumulative incidences from
 [`compute_psi_dx_t0()`](https://ewu16.github.io/nomatch/reference/compute_psi_dx_t0.md)
 to produce overall cumulative incidences under each exposure. By
 default, performs a simple average. If weights are provided for in
@@ -20,7 +20,7 @@ marginalize_psi_dx_t0(psi_dx, gp_list = NULL, show_intermediates = FALSE)
 
   - `<covariates>`: all covariate columns
 
-  - `<exposure_time>`: vaccination day column
+  - `<exposure_time>`: exposure time column
 
   - `psi_0_dx`: cumulative incidence under no vaccine,\\\psi_0(t_0; d,
     x)\\
@@ -46,7 +46,7 @@ marginalize_psi_dx_t0(psi_dx, gp_list = NULL, show_intermediates = FALSE)
     - all variables in `covariates`
 
   - **p_weights** Data frame of covariate probabilities \\p(x)\\. Must
-    include:\\
+    include:
 
     - `group_id`: covariate group identifier
 

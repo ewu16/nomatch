@@ -1,6 +1,8 @@
-# Summary method for effectiveness fits
+# Summary method for `nomatchfit` objects
 
-Summarizes how effectiveness estimates were obtained
+Summarizes how effectiveness estimates were obtained including analysis
+method, key parameters, and descriptives to aid in understanding the
+analysis.
 
 ## Usage
 

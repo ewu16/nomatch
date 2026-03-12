@@ -25,8 +25,7 @@ compute_psi_dx_t0(fit_0, fit_1, exposure_time, t0, tau, newdata)
 
 - exposure_time:
 
-  Name of the time-to-exposure variable in `newdata`. Used to compute
-  \\\psi_0(t_0; d,x)\\ where \\d + \tau\\ and \\d + t_0\\ are needed.
+  Name of the time-to-exposure variable in `newdata`.
 
 - t0:
 
