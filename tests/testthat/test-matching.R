@@ -83,6 +83,65 @@ test_that("matching() resolves timepoints = NULL without error", {
 })
 
 
+# Edge cases --------------------------------------------------------------
+test_that("individuals with exposure_time > outcome_time are treated as unexposed", {
+    # Setup: take the simulated data and corrupt ~50% of exposed individuals
+    # by shifting their exposure time to AFTER their event time
+    dat <- simdata
+    set.seed(123)
+    late_exposure <- rbinom(n = sum(dat$V == 1), size = 1, prob = 0.5)
+    dat$D_obs[dat$V == 1] <- ifelse(late_exposure,  
+                                    dat$D_obs[dat$V == 1] + dat$Y[dat$V == 1],  # push exposure past event
+                                    dat$D_obs[dat$V == 1])
+    
+    out <- match_rolling_cohort(dat, "Y", "V", "D_obs", c("x1", "x2"), "ID", seed = 123)
+    
+    
+    # Reclassifying individuals with exposure_time > outcome time as unexposed
+    # should produce identical results since only interested in exposures
+    # that happen prior to first event 
+    dat2 <- dat
+    dat2$V[dat$V == 1]    <- ifelse(late_exposure, 0, 1)          # recode as unexposed
+    dat2$D_obs[dat$V == 1] <- ifelse(late_exposure, NA, dat2$D_obs[dat$V == 1])  # clear their exposure time
+    out2 <- match_rolling_cohort(dat2, "Y", "V", "D_obs", c("x1", "x2"), "ID", seed = 123)
+    
+    vars <- c("ID", "Y", "event", "match_index_time", "match_type", "match_V", "match_id")
+    expect_equal(out[[1]][,vars],
+                 out2[[1]][, vars])
+    
+    
+    #Downstream matching analysis also handles individuals with exposure_time >
+    # outcome time as unexposed
+    fit <- matching(out[[1]], "Y", "event", "V", "D_obs",
+                    immune_lag = 14, timepoints = seq(30,90, by = 30), boot_reps = 0)
+    fit2 <- matching(out2[[1]], "Y", "event", "V", "D_obs",
+                     immune_lag = 14, timepoints = seq(30,90, by = 30), boot_reps = 0)
+    
+    fit$call <- fit2$call <- NULL
+    fit$matched_adata <- fit2$matched_adata <- NULL
+    expect_equal(fit, fit2)
+    
+})
+
+test_that("matching() works with timepoint = 0 but not timepoint < 0", {
+    expect_no_error(
+        suppressWarnings(
+        fit <- matching(matched_data, "Y", "event", "V", "D_obs",
+                 immune_lag = 14, timepoints = 0:20)
+        )
+    )
+    
+    df <- estimates_to_df(fit)
+    at_tau <- df[df$t0 <= 14 & df$term %in% c("cuminc_0", "cuminc_1"), ]
+    expect_true(all(at_tau$estimate == 0))
+    
+    expect_error(
+        fit <- matching(matched_data, "Y", "event", "V", "D_obs",
+                        immune_lag = 14, timepoints = -5:20)
+    )
+})
+
+
 
 # Failure modes -----------------------------------------------------------
 test_that("matching() fails gracefully when outcomes are missing", {
@@ -92,5 +151,17 @@ test_that("matching() fails gracefully when outcomes are missing", {
     expect_error(
         matching(matched_data, "Y", "event", "V", "D_obs", immune_lag = 14, timepoints = c(30,60)),
         "Missing values in `outcome_time`", ignore.case = TRUE
+    )
+})
+
+
+test_that("matching() warns when no events", {
+    dat <- matched_data 
+    dat$event <- 0
+    suppressWarnings(
+    expect_warning(
+        fit <- matching(dat, "Y", "event", "V", "D_obs", immune_lag = 14, timepoints = c(30,60)),
+        "No events", ignore.case = TRUE
+    )
     )
 })
