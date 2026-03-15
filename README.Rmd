@@ -17,6 +17,8 @@ library(tibble)
 
 # R/`nomatch`
 
+[![DOI](https://zenodo.org/badge/930366888.svg)](https://doi.org/10.5281/zenodo.19039291)
+
 > A matching alternative for more efficiently evaluating effectiveness of interventions using observational data
 
 ---
