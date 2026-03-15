@@ -146,11 +146,13 @@ test_that("resolve_hazard_formulas() accepts formulas", {
     covars <- c("x1", "x2")
     expo   <- "D_obs"
     
-    fm <- resolve_hazard_formulas(
-        formula_unexposed =  as.formula("~ x1 + I(x2^2)"),
-        formula_exposed   = as.formula(" ~ x1 + I(x2^2) + splines::ns(D_obs, df = 4)"),
-        covariates = covars,
-        exposure_time = expo
+    expect_no_error(
+        fm <- resolve_hazard_formulas(
+            formula_unexposed =  as.formula("~ x1 + I(x2^2)"),
+            formula_exposed   = as.formula(" ~ x1 + I(x2^2) + splines::ns(D_obs, df = 4)"),
+            covariates = covars,
+            exposure_time = expo
+        )
     )
 })
 

@@ -58,9 +58,11 @@ test_that("nomatch() gives different results with different seeds", {
 # Confidence intervals ----------------------------------------------------
 test_that("nomatch() adds CI columns when boot_reps > 0", {
     nomatch_with_ci <- function(ci_type){
+        suppressWarnings(
         nomatch(simdata, "Y", "event", "V", "D_obs", c("x1","x2"),
                 immune_lag = 14, timepoints = seq(30, 90, 30),
                 boot_reps = 5, ci_type = ci_type)
+        )
     }
     fit <- nomatch_with_ci("wald")
     expect_true(all(c("wald_lower", "wald_upper") %in% 
@@ -154,9 +156,12 @@ test_that("individuals with exposure_time > outcome_time are treated as unexpose
                                     dat$D_obs[dat$V == 1] + dat$Y[dat$V == 1],  # push exposure past event
                                     dat$D_obs[dat$V == 1])
     tau <- 14
+    suppressWarnings(
     fit <- nomatch(dat, "Y", "event", "V", "D_obs",
                    covariates = c("x1"), immune_lag = tau,
-                   timepoints = seq(30, 90, 30), boot_reps = 0)
+                   timepoints = seq(30, 90, 30), boot_reps = 0),
+    
+    )
     
     # Verify that model_1 and weights only include individuals 
     # who were exposed before their event 
