@@ -13,7 +13,6 @@
 <url><loc>https://ewu16.github.io/nomatch/reference/compute_psi_dx_t0.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/dot-term_transformations.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/dot-transformations.html</loc></url>
-<url><loc>https://ewu16.github.io/nomatch/reference/estimate_bootstrap_ci.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/estimates_to_df.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/fit_model_0.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/get_gp.html</loc></url>
@@ -35,6 +34,7 @@
 <url><loc>https://ewu16.github.io/nomatch/reference/plot_effect_panel.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/predict_from_model_0.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/print.nomatchfit.html</loc></url>
+<url><loc>https://ewu16.github.io/nomatch/reference/run_bootstrap_inference.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/simdata.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/summarize_nomatch_population.html</loc></url>
 <url><loc>https://ewu16.github.io/nomatch/reference/summary.nomatchfit.html</loc></url>

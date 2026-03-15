@@ -17,7 +17,7 @@ automatically returned with a nomatchfit object when boot_reps &amp;gt; 0."></he
 
     <a class="navbar-brand me-2" href="../index.html">nomatch</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,7 +114,7 @@ issued.</p>
 <span class="r-in"><span>  keep_boot_samples <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># must be set to TRUE (default)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Bootstrapping 100 samples...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Bootstrap completed in 31.72 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Bootstrap completed in 32.65 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Add simultaneous CIs</span></span></span>
 <span class="r-in"><span><span class="va">fit_simul</span> <span class="op">&lt;-</span> <span class="fu">add_simultaneous_ci</span><span class="op">(</span><span class="va">fit</span>, seed <span class="op">=</span> <span class="fl">123</span><span class="op">)</span></span></span>
@@ -131,12 +131,12 @@ issued.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Result:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        30    0.534              0.346              0.826     3.62e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        60    0.605              0.490              0.746     2.28e-04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3        90    0.603              0.511              0.712     2.70e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       120    0.661              0.561              0.779     4.97e-05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       150    0.731              0.629              0.849     4.45e-04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       180    0.828              0.715              0.959     2.18e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        30    0.534              0.346              0.826     4.81e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        60    0.605              0.490              0.746     2.74e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        90    0.603              0.511              0.712     2.28e-09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       120    0.661              0.561              0.779     7.28e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       150    0.731              0.629              0.849     4.28e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       180    0.828              0.715              0.959     1.18e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   95% Simul CI: Lower 95% Simul CI: Upper</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1               0.308               0.928</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2               0.463               0.789</span>

@@ -80,7 +80,7 @@ fit <- nomatch(
   keep_boot_samples = TRUE # must be set to TRUE (default)
 )
 #> Bootstrapping 100 samples...
-#> Bootstrap completed in 31.72 secs
+#> Bootstrap completed in 32.65 secs
 
 # Add simultaneous CIs
 fit_simul <- add_simultaneous_ci(fit, seed = 123)
@@ -97,12 +97,12 @@ fit_simul
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value
-#> 1        30    0.534              0.346              0.826     3.62e-02
-#> 2        60    0.605              0.490              0.746     2.28e-04
-#> 3        90    0.603              0.511              0.712     2.70e-06
-#> 4       120    0.661              0.561              0.779     4.97e-05
-#> 5       150    0.731              0.629              0.849     4.45e-04
-#> 6       180    0.828              0.715              0.959     2.18e-02
+#> 1        30    0.534              0.346              0.826     4.81e-03
+#> 2        60    0.605              0.490              0.746     2.74e-06
+#> 3        90    0.603              0.511              0.712     2.28e-09
+#> 4       120    0.661              0.561              0.779     7.28e-07
+#> 5       150    0.731              0.629              0.849     4.28e-05
+#> 6       180    0.828              0.715              0.959     1.18e-02
 #>   95% Simul CI: Lower 95% Simul CI: Upper
 #> 1               0.308               0.928
 #> 2               0.463               0.789

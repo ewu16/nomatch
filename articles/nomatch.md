@@ -108,7 +108,23 @@ incidences. The main types of arguments are:
   replicates are used to construct confidence intervals and p-values. We
   use a small number here for speed, but `boot_reps = 1000` is
   recommended for publication-quality results. By default, Wald-type
-  bootstrap confidence intervals are returned.
+  bootstrap confidence intervals are returned. Bootstraps can be
+  parallelized using the [`future`](https://future.futureverse.org)
+  framework. Simply set a parallel plan before calling nomatch(): e.g.
+
+``` r
+# Set parallel plan before calling nomatch(): 
+# - multisession is recommended as it runs multiple parallel processes 
+#   in the background  and is supported by all operating systems
+future::plan(future::multisession, workers = 4)
+# Run nomatch() 
+fit <- nomatch(..., boot_reps = 1000, seed = 123)
+# Reset when done 
+future::plan(future::sequential)  
+```
+
+Since we have specified a small number of bootstraps, we will run the
+code without setting up a parallel backend.
 
 ``` r
 
@@ -123,7 +139,7 @@ fit <- nomatch(data = simdata,
                timepoints = seq(30, 180, by = 30),
                boot_reps = 10)
 #> Bootstrapping 10 samples...
-#> Bootstrap completed in 3.57 secs
+#> Bootstrap completed in 3.71 secs
 ```
 
 The cumulative incidence estimates (`cuminc_0` for unexposed and
@@ -133,11 +149,11 @@ within the `$estimates` component of the fitted object.
 ``` r
 str(fit$estimates, give.attr = FALSE)
 #> List of 5
-#>  $ cuminc_0               : num [1:6, 1:6] 0.0116 0.0379 0.0586 0.0669 0.0755 ...
-#>  $ cuminc_1               : num [1:6, 1:6] 0.00622 0.02293 0.03535 0.04424 0.05515 ...
-#>  $ risk_difference        : num [1:6, 1:6] -0.00542 -0.01498 -0.02323 -0.02267 -0.02034 ...
-#>  $ risk_ratio             : num [1:6, 1:6] 0.534 0.605 0.603 0.661 0.731 ...
-#>  $ relative_risk_reduction: num [1:6, 1:6] 0.466 0.395 0.397 0.339 0.269 ...
+#>  $ cuminc_0               : num [1:6, 1:5] 0.0116 0.0379 0.0586 0.0669 0.0755 ...
+#>  $ cuminc_1               : num [1:6, 1:5] 0.00622 0.02293 0.03535 0.04424 0.05515 ...
+#>  $ risk_difference        : num [1:6, 1:5] -0.00542 -0.01498 -0.02323 -0.02267 -0.02034 ...
+#>  $ risk_ratio             : num [1:6, 1:5] 0.534 0.605 0.603 0.661 0.731 ...
+#>  $ relative_risk_reduction: num [1:6, 1:5] 0.466 0.395 0.397 0.339 0.269 ...
 ```
 
 We can thus preview the relative risk reduction estimates (i.e. vaccine
@@ -145,13 +161,13 @@ effectiveness) using
 
 ``` r
 head(fit$estimates$relative_risk_reduction) 
-#>      estimate wald_lower wald_upper    wald_se    wald_pval wald_n
-#> 30  0.4655914 0.06415232  0.6948301 0.28586855 1.033785e-01     10
-#> 60  0.3952484 0.28840317  0.4860510 0.08300851 1.921209e-06     10
-#> 90  0.3965357 0.31989227  0.4645419 0.06100331 8.019607e-11     10
-#> 120 0.3388351 0.28382017  0.3896239 0.04078033 0.000000e+00     10
-#> 150 0.2694672 0.16974131  0.3572146 0.06528853 3.670030e-05     10
-#> 180 0.1719935 0.03465023  0.2897966 0.07830221 2.805369e-02     10
+#>      estimate wald_lower wald_upper    wald_pval wald_n
+#> 30  0.4655914 0.06415232  0.6948301 2.838690e-02     10
+#> 60  0.3952484 0.28840317  0.4860510 1.370845e-09     10
+#> 90  0.3965357 0.31989227  0.4645419 2.220446e-16     10
+#> 120 0.3388351 0.28382017  0.3896239 0.000000e+00     10
+#> 150 0.2694672 0.16974131  0.3572146 1.515877e-06     10
+#> 180 0.1719935 0.03465023  0.2897966 1.593802e-02     10
 ```
 
 If all confounders are adjusted for, the resulting cumulative
@@ -242,7 +258,7 @@ because we evaluated the estimates at only six timepoints.
 plot(fit, effect = "relative_risk_reduction")
 ```
 
-![](nomatch_files/figure-html/unnamed-chunk-7-1.png)
+![](nomatch_files/figure-html/unnamed-chunk-8-1.png)
 
 #### Plotting simultaneous confidence intervals
 
@@ -275,12 +291,12 @@ fit_with_simul
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value
-#> 1        30    0.534              0.305              0.936     1.03e-01
-#> 2        60    0.605              0.514              0.712     1.92e-06
-#> 3        90    0.603              0.535              0.680     8.02e-11
+#> 1        30    0.534              0.305              0.936     2.84e-02
+#> 2        60    0.605              0.514              0.712     1.37e-09
+#> 3        90    0.603              0.535              0.680     2.22e-16
 #> 4       120    0.661              0.610              0.716     0.00e+00
-#> 5       150    0.731              0.643              0.830     3.67e-05
-#> 6       180    0.828              0.710              0.965     2.81e-02
+#> 5       150    0.731              0.643              0.830     1.52e-06
+#> 6       180    0.828              0.710              0.965     1.59e-02
 #>   95% Simul CI: Lower 95% Simul CI: Upper
 #> 1               0.261               1.093
 #> 2               0.491               0.744
@@ -304,7 +320,7 @@ intervals; otherwise, the call will return an error.
 plot(fit_with_simul , effect = "relative_risk_reduction", ci_type = "simul") 
 ```
 
-![](nomatch_files/figure-html/unnamed-chunk-10-1.png)
+![](nomatch_files/figure-html/unnamed-chunk-11-1.png)
 
 The simultaneous confidence intervals indicate that 95% of such bands,
 constructed across repeated samples, would contain the entire true
@@ -321,15 +337,15 @@ a long dataset suitable for plotting.
 plot_data <- estimates_to_df(fit)
 
 head(as_tibble(plot_data))
-#> # A tibble: 6 × 8
-#>      t0 term             estimate wald_lower wald_upper wald_se wald_pval wald_n
-#>   <dbl> <chr>               <dbl>      <dbl>      <dbl>   <dbl>     <dbl>  <dbl>
-#> 1    30 cuminc_0          0.0116     0.0109     0.0125  0.0359   NA           10
-#> 2    30 cuminc_1          0.00622    0.00369    0.0105  0.268    NA           10
-#> 3    30 risk_difference  -0.00542   -0.00904   -0.00180 0.00185   0.00336     10
-#> 4    30 risk_ratio        0.534      0.305      0.936   0.286     0.103       10
-#> 5    30 relative_risk_r…  0.466      0.0642     0.695   0.286     0.103       10
-#> 6    60 cuminc_0          0.0379     0.0357     0.0402  0.0315   NA           10
+#> # A tibble: 6 × 7
+#>      t0 term                    estimate wald_lower wald_upper wald_pval wald_n
+#>   <dbl> <chr>                      <dbl>      <dbl>      <dbl>     <dbl>  <dbl>
+#> 1    30 cuminc_0                 0.0116     0.0109     0.0125   NA           10
+#> 2    30 cuminc_1                 0.00622    0.00369    0.0105   NA           10
+#> 3    30 risk_difference         -0.00542   -0.00904   -0.00180   0.00336     10
+#> 4    30 risk_ratio               0.534      0.305      0.936     0.0284      10
+#> 5    30 relative_risk_reduction  0.466      0.0642     0.695     0.0284      10
+#> 6    60 cuminc_0                 0.0379     0.0357     0.0402   NA           10
 ```
 
 For example, we can create a plot that overlays the cumulative incidence
@@ -351,7 +367,7 @@ plot_data |>
        fill = "Exposure Group")
 ```
 
-![](nomatch_files/figure-html/unnamed-chunk-12-1.png)
+![](nomatch_files/figure-html/unnamed-chunk-13-1.png)
 
 ### Comparison with matching
 
@@ -391,7 +407,7 @@ fit_matching <-matching(matched_data = matched_data,
                         timepoints = seq(30, 180, by = 30),
                         boot_reps = 10) 
 #> Bootstrapping 10 samples...
-#> Bootstrap completed in 1.47 secs
+#> Bootstrap completed in 1.43 secs
 
 fit_matching
 #> 
@@ -403,12 +419,12 @@ fit_matching
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value
-#> 1        30    0.497              0.316              0.783     0.029890
-#> 2        60    0.517              0.397              0.672     0.000319
-#> 3        90    0.611              0.488              0.766     0.000709
-#> 4       120    0.671              0.561              0.804     0.000361
-#> 5       150    0.710              0.606              0.832     0.000344
-#> 6       180    0.775              0.622              0.966     0.045460
+#> 1        30    0.497              0.316              0.783     2.55e-03
+#> 2        60    0.517              0.397              0.672     8.81e-07
+#> 3        90    0.611              0.488              0.766     1.81e-05
+#> 4       120    0.671              0.561              0.804     1.53e-05
+#> 5       150    0.710              0.606              0.832     2.36e-05
+#> 6       180    0.775              0.622              0.966     2.35e-02
 #> 
 #> Use summary() for more details
 #> Use plot() to visualize results
@@ -448,7 +464,7 @@ comparison |>
        fill = "Method")
 ```
 
-![](nomatch_files/figure-html/unnamed-chunk-13-1.png)
+![](nomatch_files/figure-html/unnamed-chunk-14-1.png)
 
 ## Session Information
 
@@ -473,8 +489,8 @@ comparison |>
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #> [1] purrr_1.2.1        future_1.69.0      nomatch_0.0.0.9000 dplyr_1.2.0       
-    #> [5] ggplot2_4.0.2      tibble_3.3.1      
+    #> [1] purrr_1.2.1   future_1.70.0 nomatch_0.1.0 dplyr_1.2.0   ggplot2_4.0.2
+    #> [6] tibble_3.3.1 
     #> 
     #> loaded via a namespace (and not attached):
     #>  [1] utf8_1.2.6         sass_0.4.10        generics_0.1.4     lattice_0.22-9    
@@ -484,7 +500,7 @@ comparison |>
     #> [17] textshaping_1.0.5  jquerylib_0.1.4    cli_3.6.5          rlang_1.1.7       
     #> [21] parallelly_1.46.1  splines_4.5.3      withr_3.0.2        cachem_1.1.0      
     #> [25] yaml_2.3.12        ggh4x_0.3.1        tools_4.5.3        parallel_4.5.3    
-    #> [29] globals_0.19.0     vctrs_0.7.1        R6_2.6.1           lifecycle_1.0.5   
+    #> [29] globals_0.19.1     vctrs_0.7.1        R6_2.6.1           lifecycle_1.0.5   
     #> [33] fs_1.6.7           MASS_7.3-65        ragg_1.5.1         furrr_0.3.1       
     #> [37] pkgconfig_2.0.3    desc_1.4.3         pkgdown_2.2.0      pillar_1.11.1     
     #> [41] bslib_0.10.0       gtable_0.3.6       glue_1.8.0         systemfonts_1.3.2 

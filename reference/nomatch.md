@@ -309,12 +309,14 @@ under `weights`. They can also be obtained prior to the call to
 **Confidence intervals.** Wald and percentile confidence intervals are
 constructed for cumulative incidence and effectiveness parameters at
 each timepoint. The Wald pointwise confidence intervals are constructed
-on transformed scales: \\\text{logit}\\ for cumulative incidence;
-\\\log{RR}\\ for risk ratios, and \\\log{1 - RR}\\ for relative risk
-reduction, using bootstrap standard errors. These confidence intervals
-are then back-transformed to the original scale. Identity transformation
-is used for risk differences. To obtain simultaneous confidence
-intervals, use
+on transformed scales: \\\text{logit}\\ for cumulative incidence,
+identity transformation for risk differences, \\\log{RR}\\ for risk
+ratios, and \\\log{1 - RR}\\ for relative risk reduction using bootstrap
+standard errors of the transformed estimates. These confidence intervals
+are then back-transformed to the original scale. Wald p-values test the
+null of no effect (RD = 0, RR = 1, 1-RR = 0) on the same transformed
+scales used to construct the Wald confidence intervals. To obtain
+simultaneous confidence intervals, use
 [`add_simultaneous_ci()`](https://ewu16.github.io/nomatch/reference/add_simultaneous_ci.md)
 after saving the original fit.
 
@@ -348,38 +350,38 @@ fit <- nomatch(
   seed = 123
 )
 #> Bootstrapping 5 samples...
-#> Bootstrap completed in 1.09 secs
+#> Bootstrap completed in 1.06 secs
 
 # View basic results
 fit$estimates
 #> $cuminc_0
-#>      estimate  wald_lower wald_upper    wald_se wald_pval wald_n
-#> 30 0.01163891 0.009815874 0.01379582 0.08785672        NA      5
-#> 60 0.03790915 0.032558421 0.04409914 0.08046197        NA      5
-#> 90 0.05857293 0.052444528 0.06536807 0.05969768        NA      5
+#>      estimate  wald_lower wald_upper wald_pval wald_n
+#> 30 0.01163891 0.009815874 0.01379582        NA      5
+#> 60 0.03790915 0.032558421 0.04409914        NA      5
+#> 90 0.05857293 0.052444528 0.06536807        NA      5
 #> 
 #> $cuminc_1
-#>       estimate  wald_lower wald_upper    wald_se wald_pval wald_n
-#> 30 0.006211499 0.003822016 0.01007975 0.24899735        NA      5
-#> 60 0.022820770 0.019600908 0.02655524 0.07927943        NA      5
-#> 90 0.035207076 0.028754881 0.04304289 0.10668815        NA      5
+#>       estimate  wald_lower wald_upper wald_pval wald_n
+#> 30 0.006211499 0.003822016 0.01007975        NA      5
+#> 60 0.022820770 0.019600908 0.02655524        NA      5
+#> 90 0.035207076 0.028754881 0.04304289        NA      5
 #> 
 #> $risk_difference
-#>        estimate   wald_lower   wald_upper     wald_se    wald_pval wald_n
-#> 30 -0.005427414 -0.009417768 -0.001437060 0.002035933 7.680255e-03      5
-#> 60 -0.015088377 -0.022777832 -0.007398923 0.003923263 1.201233e-04      5
-#> 90 -0.023365858 -0.031704713 -0.015027002 0.004254596 3.976111e-08      5
+#>        estimate   wald_lower   wald_upper    wald_pval wald_n
+#> 30 -0.005427414 -0.009417768 -0.001437060 7.680255e-03      5
+#> 60 -0.015088377 -0.022777832 -0.007398923 1.201233e-04      5
+#> 90 -0.023365858 -0.031704713 -0.015027002 3.976111e-08      5
 #> 
 #> $risk_ratio
-#>     estimate wald_lower wald_upper   wald_se    wald_pval wald_n
-#> 30 0.5336838  0.2976856  0.9567758 0.2978451 0.1174344614      5
-#> 60 0.6019858  0.4669828  0.7760178 0.1295644 0.0021267162      5
-#> 90 0.6010810  0.4851894  0.7446542 0.1092828 0.0002618968      5
+#>     estimate wald_lower wald_upper    wald_pval wald_n
+#> 30 0.5336838  0.2976856  0.9567758 3.500360e-02      5
+#> 60 0.6019858  0.4669828  0.7760178 8.960706e-05      5
+#> 90 0.6010810  0.4851894  0.7446542 3.194904e-06      5
 #> 
 #> $relative_risk_reduction
-#>     estimate wald_lower wald_upper   wald_se    wald_pval wald_n
-#> 30 0.4663162 0.04322417  0.7023144 0.2978451 0.1174344614      5
-#> 60 0.3980142 0.22398220  0.5330172 0.1295644 0.0021267162      5
-#> 90 0.3989190 0.25534575  0.5148106 0.1092828 0.0002618968      5
+#>     estimate wald_lower wald_upper    wald_pval wald_n
+#> 30 0.4663162 0.04322417  0.7023144 3.500360e-02      5
+#> 60 0.3980142 0.22398220  0.5330172 8.960706e-05      5
+#> 90 0.3989190 0.25534575  0.5148106 3.194904e-06      5
 #> 
 ```

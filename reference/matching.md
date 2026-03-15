@@ -254,7 +254,7 @@ fit_matching <- matching(
   seed = 123
 )
 #> Bootstrapping 5 samples...
-#> Bootstrap completed in 0.747 secs
+#> Bootstrap completed in 1.02 secs
 
 # View basic results
 fit_matching
@@ -268,9 +268,9 @@ fit_matching
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value
-#> 1        30    0.497              0.196              1.260     2.89e-01
-#> 2        60    0.517              0.443              0.604     1.10e-09
-#> 3        90    0.611              0.457              0.818     8.95e-03
+#> 1        30    0.497              0.196              1.260     0.140809
+#> 2        60    0.517              0.443              0.604     0.000000
+#> 3        90    0.611              0.457              0.818     0.000934
 #> 
 #> Use summary() for more details
 #> Use plot() to visualize results

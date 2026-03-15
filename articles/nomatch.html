@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">nomatch</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -176,9 +176,21 @@ vaccination.</li>
 construct confidence intervals and p-values. We use a small number here
 for speed, but <code>boot_reps = 1000</code> is recommended for
 publication-quality results. By default, Wald-type bootstrap confidence
-intervals are returned.</p></li>
+intervals are returned. Bootstraps can be parallelized using the <a href="https://future.futureverse.org" class="external-link"><code>future</code></a> framework.
+Simply set a parallel plan before calling nomatch(): e.g.</p></li>
 </ul>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Set parallel plan before calling nomatch(): </span></span>
+<span><span class="co"># - multisession is recommended as it runs multiple parallel processes </span></span>
+<span><span class="co">#   in the background  and is supported by all operating systems</span></span>
+<span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/multisession.html" class="external-link">multisession</a></span>, workers <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="co"># Run nomatch() </span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nomatch.html">nomatch</a></span><span class="op">(</span><span class="va">...</span>, boot_reps <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">123</span><span class="op">)</span></span>
+<span><span class="co"># Reset when done </span></span>
+<span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/sequential.html" class="external-link">sequential</a></span><span class="op">)</span>  </span></code></pre></div>
+<p>Since we have specified a small number of bootstraps, we will run the
+code without setting up a parallel backend.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Compute cumulative incidence </span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nomatch.html">nomatch</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">simdata</span>,</span>
@@ -191,30 +203,30 @@ intervals are returned.</p></li>
 <span>               timepoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>               boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Bootstrap completed in 3.57 secs</span></span></code></pre></div>
+<span><span class="co">#&gt; Bootstrap completed in 3.71 secs</span></span></code></pre></div>
 <p>The cumulative incidence estimates (<code>cuminc_0</code> for
 unexposed and <code>cuminc_1</code> for exposed) ) and other
 effectiveness measures are stored within the <code>$estimates</code>
 component of the fitted object.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">estimates</span>, give.attr <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 5</span></span>
-<span><span class="co">#&gt;  $ cuminc_0               : num [1:6, 1:6] 0.0116 0.0379 0.0586 0.0669 0.0755 ...</span></span>
-<span><span class="co">#&gt;  $ cuminc_1               : num [1:6, 1:6] 0.00622 0.02293 0.03535 0.04424 0.05515 ...</span></span>
-<span><span class="co">#&gt;  $ risk_difference        : num [1:6, 1:6] -0.00542 -0.01498 -0.02323 -0.02267 -0.02034 ...</span></span>
-<span><span class="co">#&gt;  $ risk_ratio             : num [1:6, 1:6] 0.534 0.605 0.603 0.661 0.731 ...</span></span>
-<span><span class="co">#&gt;  $ relative_risk_reduction: num [1:6, 1:6] 0.466 0.395 0.397 0.339 0.269 ...</span></span></code></pre></div>
+<span><span class="co">#&gt;  $ cuminc_0               : num [1:6, 1:5] 0.0116 0.0379 0.0586 0.0669 0.0755 ...</span></span>
+<span><span class="co">#&gt;  $ cuminc_1               : num [1:6, 1:5] 0.00622 0.02293 0.03535 0.04424 0.05515 ...</span></span>
+<span><span class="co">#&gt;  $ risk_difference        : num [1:6, 1:5] -0.00542 -0.01498 -0.02323 -0.02267 -0.02034 ...</span></span>
+<span><span class="co">#&gt;  $ risk_ratio             : num [1:6, 1:5] 0.534 0.605 0.603 0.661 0.731 ...</span></span>
+<span><span class="co">#&gt;  $ relative_risk_reduction: num [1:6, 1:5] 0.466 0.395 0.397 0.339 0.269 ...</span></span></code></pre></div>
 <p>We can thus preview the relative risk reduction estimates
 (i.e. vaccine effectiveness) using</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">estimates</span><span class="op">$</span><span class="va">relative_risk_reduction</span><span class="op">)</span> </span>
-<span><span class="co">#&gt;      estimate wald_lower wald_upper    wald_se    wald_pval wald_n</span></span>
-<span><span class="co">#&gt; 30  0.4655914 0.06415232  0.6948301 0.28586855 1.033785e-01     10</span></span>
-<span><span class="co">#&gt; 60  0.3952484 0.28840317  0.4860510 0.08300851 1.921209e-06     10</span></span>
-<span><span class="co">#&gt; 90  0.3965357 0.31989227  0.4645419 0.06100331 8.019607e-11     10</span></span>
-<span><span class="co">#&gt; 120 0.3388351 0.28382017  0.3896239 0.04078033 0.000000e+00     10</span></span>
-<span><span class="co">#&gt; 150 0.2694672 0.16974131  0.3572146 0.06528853 3.670030e-05     10</span></span>
-<span><span class="co">#&gt; 180 0.1719935 0.03465023  0.2897966 0.07830221 2.805369e-02     10</span></span></code></pre></div>
+<span><span class="co">#&gt;      estimate wald_lower wald_upper    wald_pval wald_n</span></span>
+<span><span class="co">#&gt; 30  0.4655914 0.06415232  0.6948301 2.838690e-02     10</span></span>
+<span><span class="co">#&gt; 60  0.3952484 0.28840317  0.4860510 1.370845e-09     10</span></span>
+<span><span class="co">#&gt; 90  0.3965357 0.31989227  0.4645419 2.220446e-16     10</span></span>
+<span><span class="co">#&gt; 120 0.3388351 0.28382017  0.3896239 0.000000e+00     10</span></span>
+<span><span class="co">#&gt; 150 0.2694672 0.16974131  0.3572146 1.515877e-06     10</span></span>
+<span><span class="co">#&gt; 180 0.1719935 0.03465023  0.2897966 1.593802e-02     10</span></span></code></pre></div>
 <p>If all confounders are adjusted for, the resulting cumulative
 incidence/effect estimates can be interpreted as the cumulative
 incidences or effect that would be observed in a clinical trial in which
@@ -243,7 +255,7 @@ predictions are marginalized over the distribution of exposure times and
 covariates in the exposed.</p>
 <p>A summary of the estimation approach and fitted models can be
 obtained by</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ====================================================================== </span></span>
@@ -293,9 +305,9 @@ using <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="extern
 desired, it is best to supply a dense grid of timepoints. Our example
 plot appears somewhat coarse because we evaluated the estimates at only
 six timepoints.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, effect <span class="op">=</span> <span class="st">"relative_risk_reduction"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="nomatch_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="nomatch_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576"></p>
 <div class="section level4">
 <h4 id="plotting-simultaneous-confidence-intervals">Plotting simultaneous confidence intervals<a class="anchor" aria-label="anchor" href="#plotting-simultaneous-confidence-intervals"></a>
 </h4>
@@ -307,12 +319,12 @@ used instead. These can be added using
 fit with simultaneous confidence intervals, provided bootstrap samples
 were retained (keep_boot_samples = TRUE, the default). The updated fit
 should be saved as a new object.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Compute simultaneous CI</span></span>
 <span><span class="va">fit_with_simul</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_simultaneous_ci.html">add_simultaneous_ci</a></span><span class="op">(</span><span class="va">fit</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span></code></pre></div>
 <p>The simultaneous confidence intervals are now stored in the fitted
 object.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_with_simul</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  Risk Ratio Estimates </span></span>
@@ -324,12 +336,12 @@ object.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Result:</span></span>
 <span><span class="co">#&gt;   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value</span></span>
-<span><span class="co">#&gt; 1        30    0.534              0.305              0.936     1.03e-01</span></span>
-<span><span class="co">#&gt; 2        60    0.605              0.514              0.712     1.92e-06</span></span>
-<span><span class="co">#&gt; 3        90    0.603              0.535              0.680     8.02e-11</span></span>
+<span><span class="co">#&gt; 1        30    0.534              0.305              0.936     2.84e-02</span></span>
+<span><span class="co">#&gt; 2        60    0.605              0.514              0.712     1.37e-09</span></span>
+<span><span class="co">#&gt; 3        90    0.603              0.535              0.680     2.22e-16</span></span>
 <span><span class="co">#&gt; 4       120    0.661              0.610              0.716     0.00e+00</span></span>
-<span><span class="co">#&gt; 5       150    0.731              0.643              0.830     3.67e-05</span></span>
-<span><span class="co">#&gt; 6       180    0.828              0.710              0.965     2.81e-02</span></span>
+<span><span class="co">#&gt; 5       150    0.731              0.643              0.830     1.52e-06</span></span>
+<span><span class="co">#&gt; 6       180    0.828              0.710              0.965     1.59e-02</span></span>
 <span><span class="co">#&gt;   95% Simul CI: Lower 95% Simul CI: Upper</span></span>
 <span><span class="co">#&gt; 1               0.261               1.093</span></span>
 <span><span class="co">#&gt; 2               0.491               0.744</span></span>
@@ -344,10 +356,10 @@ object.</p>
 with the argument <code>ci_type = "simul"</code>.<br>
 The fitted object must already contain the simultaneous confidence
 intervals; otherwise, the call will return an error.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Plot simultaneous confidence bands </span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_with_simul</span> , effect <span class="op">=</span> <span class="st">"relative_risk_reduction"</span>, ci_type <span class="op">=</span> <span class="st">"simul"</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="nomatch_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="nomatch_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="576"></p>
 <p>The simultaneous confidence intervals indicate that 95% of such
 bands, constructed across repeated samples, would contain the entire
 true curve.</p>
@@ -360,22 +372,22 @@ true curve.</p>
 <code><a href="../reference/estimates_to_df.html">estimates_to_df()</a></code> takes the estimates component of the
 fitted object and reformats it into a long dataset suitable for
 plotting.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimates_to_df.html">estimates_to_df</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">as_tibble</span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
-<span><span class="co">#&gt;      t0 term             estimate wald_lower wald_upper wald_se wald_pval wald_n</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    30 cuminc_0          0.011<span style="text-decoration: underline;">6</span>     0.010<span style="text-decoration: underline;">9</span>     0.012<span style="text-decoration: underline;">5</span>  0.035<span style="text-decoration: underline;">9</span>   <span style="color: #BB0000;">NA</span>           10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    30 cuminc_1          0.006<span style="text-decoration: underline;">22</span>    0.003<span style="text-decoration: underline;">69</span>    0.010<span style="text-decoration: underline;">5</span>  0.268    <span style="color: #BB0000;">NA</span>           10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    30 risk_difference  -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">42</span>   -<span style="color: #BB0000;">0.009</span><span style="color: #BB0000; text-decoration: underline;">04</span>   -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">80</span> 0.001<span style="text-decoration: underline;">85</span>   0.003<span style="text-decoration: underline;">36</span>     10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    30 risk_ratio        0.534      0.305      0.936   0.286     0.103       10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    30 relative_risk_r…  0.466      0.064<span style="text-decoration: underline;">2</span>     0.695   0.286     0.103       10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    60 cuminc_0          0.037<span style="text-decoration: underline;">9</span>     0.035<span style="text-decoration: underline;">7</span>     0.040<span style="text-decoration: underline;">2</span>  0.031<span style="text-decoration: underline;">5</span>   <span style="color: #BB0000;">NA</span>           10</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span></span>
+<span><span class="co">#&gt;      t0 term                    estimate wald_lower wald_upper wald_pval wald_n</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    30 cuminc_0                 0.011<span style="text-decoration: underline;">6</span>     0.010<span style="text-decoration: underline;">9</span>     0.012<span style="text-decoration: underline;">5</span>   <span style="color: #BB0000;">NA</span>           10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    30 cuminc_1                 0.006<span style="text-decoration: underline;">22</span>    0.003<span style="text-decoration: underline;">69</span>    0.010<span style="text-decoration: underline;">5</span>   <span style="color: #BB0000;">NA</span>           10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    30 risk_difference         -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">42</span>   -<span style="color: #BB0000;">0.009</span><span style="color: #BB0000; text-decoration: underline;">04</span>   -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">80</span>   0.003<span style="text-decoration: underline;">36</span>     10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    30 risk_ratio               0.534      0.305      0.936     0.028<span style="text-decoration: underline;">4</span>      10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    30 relative_risk_reduction  0.466      0.064<span style="text-decoration: underline;">2</span>     0.695     0.028<span style="text-decoration: underline;">4</span>      10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    60 cuminc_0                 0.037<span style="text-decoration: underline;">9</span>     0.035<span style="text-decoration: underline;">7</span>     0.040<span style="text-decoration: underline;">2</span>   <span style="color: #BB0000;">NA</span>           10</span></span></code></pre></div>
 <p>For example, we can create a plot that overlays the cumulative
 incidence estimates for the two exposure types as follows:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">term</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cuminc_0"</span>, <span class="st">"cuminc_1"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">t0</span>, y <span class="op">=</span> <span class="va">estimate</span>, color <span class="op">=</span> <span class="va">term</span>, fill <span class="op">=</span> <span class="va">term</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
@@ -389,7 +401,7 @@ incidence estimates for the two exposure types as follows:</p>
 <span>       title <span class="op">=</span> <span class="st">"Cumulative Incidence Curves"</span>, </span>
 <span>       color <span class="op">=</span> <span class="st">"Exposure Group"</span>,</span>
 <span>       fill <span class="op">=</span> <span class="st">"Exposure Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="nomatch_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="nomatch_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 <div class="section level3">
 <h3 id="comparison-with-matching">Comparison with matching<a class="anchor" aria-label="anchor" href="#comparison-with-matching"></a>
@@ -405,7 +417,7 @@ rolling-cohort matching analysis using 1:1 exact matching and
 Kaplan–Meier estimation to compute marginal cumulative incidences. These
 matching functions are intentionally limited in scope and may be slow on
 large datasets.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ------------------------------------------------------------------------------</span></span>
 <span><span class="co"># 3. Compare results with matching estimator</span></span>
 <span></span>
@@ -429,7 +441,7 @@ large datasets.</p>
 <span>                        timepoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>                        boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Bootstrap completed in 1.47 secs</span></span>
+<span><span class="co">#&gt; Bootstrap completed in 1.43 secs</span></span>
 <span></span>
 <span><span class="va">fit_matching</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -441,12 +453,12 @@ large datasets.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Result:</span></span>
 <span><span class="co">#&gt;   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value</span></span>
-<span><span class="co">#&gt; 1        30    0.497              0.316              0.783     0.029890</span></span>
-<span><span class="co">#&gt; 2        60    0.517              0.397              0.672     0.000319</span></span>
-<span><span class="co">#&gt; 3        90    0.611              0.488              0.766     0.000709</span></span>
-<span><span class="co">#&gt; 4       120    0.671              0.561              0.804     0.000361</span></span>
-<span><span class="co">#&gt; 5       150    0.710              0.606              0.832     0.000344</span></span>
-<span><span class="co">#&gt; 6       180    0.775              0.622              0.966     0.045460</span></span>
+<span><span class="co">#&gt; 1        30    0.497              0.316              0.783     2.55e-03</span></span>
+<span><span class="co">#&gt; 2        60    0.517              0.397              0.672     8.81e-07</span></span>
+<span><span class="co">#&gt; 3        90    0.611              0.488              0.766     1.81e-05</span></span>
+<span><span class="co">#&gt; 4       120    0.671              0.561              0.804     1.53e-05</span></span>
+<span><span class="co">#&gt; 5       150    0.710              0.606              0.832     2.36e-05</span></span>
+<span><span class="co">#&gt; 6       180    0.775              0.622              0.966     2.35e-02</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Use summary() for more details</span></span>
 <span><span class="co">#&gt; Use plot() to visualize results</span></span>
@@ -484,7 +496,7 @@ large datasets.</p>
 <span>       y <span class="op">=</span> <span class="st">"Estimate"</span>, </span>
 <span>       color <span class="op">=</span> <span class="st">"Method"</span>,</span>
 <span>       fill <span class="op">=</span> <span class="st">"Method"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="nomatch_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="nomatch_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 </div>
 <div class="section level2">
@@ -511,8 +523,8 @@ large datasets.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] purrr_1.2.1        future_1.69.0      nomatch_0.0.0.9000 dplyr_1.2.0       </span></span>
-<span><span class="co">#&gt; [5] ggplot2_4.0.2      tibble_3.3.1      </span></span>
+<span><span class="co">#&gt; [1] purrr_1.2.1   future_1.70.0 nomatch_0.1.0 dplyr_1.2.0   ggplot2_4.0.2</span></span>
+<span><span class="co">#&gt; [6] tibble_3.3.1 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] utf8_1.2.6         sass_0.4.10        generics_0.1.4     lattice_0.22-9    </span></span>
@@ -522,7 +534,7 @@ large datasets.</p>
 <span><span class="co">#&gt; [17] textshaping_1.0.5  jquerylib_0.1.4    cli_3.6.5          rlang_1.1.7       </span></span>
 <span><span class="co">#&gt; [21] parallelly_1.46.1  splines_4.5.3      withr_3.0.2        cachem_1.1.0      </span></span>
 <span><span class="co">#&gt; [25] yaml_2.3.12        ggh4x_0.3.1        tools_4.5.3        parallel_4.5.3    </span></span>
-<span><span class="co">#&gt; [29] globals_0.19.0     vctrs_0.7.1        R6_2.6.1           lifecycle_1.0.5   </span></span>
+<span><span class="co">#&gt; [29] globals_0.19.1     vctrs_0.7.1        R6_2.6.1           lifecycle_1.0.5   </span></span>
 <span><span class="co">#&gt; [33] fs_1.6.7           MASS_7.3-65        ragg_1.5.1         furrr_0.3.1       </span></span>
 <span><span class="co">#&gt; [37] pkgconfig_2.0.3    desc_1.4.3         pkgdown_2.2.0      pillar_1.11.1     </span></span>
 <span><span class="co">#&gt; [41] bslib_0.10.0       gtable_0.3.6       glue_1.8.0         systemfonts_1.3.2 </span></span>
