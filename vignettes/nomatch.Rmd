@@ -97,8 +97,20 @@ The main types of arguments are:
   - `timepoints` when to evaluate cumulative incidence. Here we compute cumulative incidence at 30, 60, 90, ..., 180 days after vaccination.
 
 - **Bootstrap argument** - `boot_reps`controls how many bootstrap replicates are used to construct confidence intervals and p-values. 
-We use a small number here for speed, but `boot_reps = 1000` is recommended for publication-quality results. By default, Wald-type bootstrap confidence intervals are returned.
+We use a small number here for speed, but `boot_reps = 1000` is recommended for publication-quality results. By default, Wald-type bootstrap confidence intervals are returned. Bootstraps can be parallelized using the [`future`](https://future.futureverse.org) framework. Simply set a parallel plan before calling nomatch(): e.g.
+```{r, eval = FALSE}
+# Set parallel plan before calling nomatch(): 
+# - multisession is recommended as it runs multiple parallel processes 
+#   in the background  and is supported by all operating systems
+future::plan(future::multisession, workers = 4)
+# Run nomatch() 
+fit <- nomatch(..., boot_reps = 1000, seed = 123)
+# Reset when done 
+future::plan(future::sequential)  
+```
 
+Since we have specified a small number of bootstraps, we will run the code
+without setting up a parallel backend. 
 
 ```{r}
 
@@ -112,8 +124,6 @@ fit <- nomatch(data = simdata,
                immune_lag = 14,
                timepoints = seq(30, 180, by = 30),
                boot_reps = 10)
-
-
 ```
 
 The cumulative incidence estimates (`cuminc_0` for unexposed and  `cuminc_1` for exposed) ) and other effectiveness measures
