@@ -70,7 +70,7 @@ fit <- nomatch(
  boot_reps = 5
 )
 #> Bootstrapping 5 samples...
-#> Bootstrap completed in 1.63 secs
+#> Bootstrap completed in 1.70 secs
 plot(fit)
 
 ```
