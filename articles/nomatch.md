@@ -139,7 +139,7 @@ fit <- nomatch(data = simdata,
                timepoints = seq(30, 180, by = 30),
                boot_reps = 10)
 #> Bootstrapping 10 samples...
-#> Bootstrap completed in 3.78 secs
+#> Bootstrap completed in 3.68 secs
 ```
 
 The cumulative incidence estimates (`cuminc_0` for unexposed and
@@ -407,7 +407,7 @@ fit_matching <-matching(matched_data = matched_data,
                         timepoints = seq(30, 180, by = 30),
                         boot_reps = 10) 
 #> Bootstrapping 10 samples...
-#> Bootstrap completed in 1.56 secs
+#> Bootstrap completed in 1.46 secs
 
 fit_matching
 #> 

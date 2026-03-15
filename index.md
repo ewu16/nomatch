@@ -1,5 +1,7 @@
 # R/`nomatch`
 
+[![DOI](https://zenodo.org/badge/930366888.svg)](https://doi.org/10.5281/zenodo.19039291)
+
 > A matching alternative for more efficiently evaluating effectiveness
 > of interventions using observational data
 
@@ -92,12 +94,12 @@ fit
 #> 
 #> Result:
 #>   Timepoint Estimate 95% Wald CI: Lower 95% Wald CI: Upper Wald p-value
-#> 1        30    0.534              0.392              0.729     3.30e-03
-#> 2        60    0.605              0.500              0.731     4.49e-05
-#> 3        90    0.603              0.496              0.735     7.66e-05
-#> 4       120    0.661              0.548              0.798     4.24e-04
-#> 5       150    0.731              0.617              0.865     1.77e-03
-#> 6       180    0.828              0.719              0.953     1.65e-02
+#> 1        30    0.534              0.310              0.921     0.024016
+#> 2        60    0.605              0.437              0.836     0.002347
+#> 3        90    0.603              0.463              0.787     0.000195
+#> 4       120    0.661              0.504              0.868     0.002896
+#> 5       150    0.731              0.575              0.928     0.010058
+#> 6       180    0.828              0.659              1.040     0.104331
 #> 
 #> Use summary() for more details
 #> Use plot() to visualize results

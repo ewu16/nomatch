@@ -350,7 +350,7 @@ fit <- nomatch(
   seed = 123
 )
 #> Bootstrapping 5 samples...
-#> Bootstrap completed in 1.09 secs
+#> Bootstrap completed in 1.05 secs
 
 # View basic results
 fit$estimates

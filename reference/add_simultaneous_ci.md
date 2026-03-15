@@ -80,7 +80,7 @@ fit <- nomatch(
   keep_boot_samples = TRUE # must be set to TRUE (default)
 )
 #> Bootstrapping 100 samples...
-#> Bootstrap completed in 33.24 secs
+#> Bootstrap completed in 32.12 secs
 
 # Add simultaneous CIs
 fit_simul <- add_simultaneous_ci(fit, seed = 123)

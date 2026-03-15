@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ewu16/nomatch/blob/v0.1.0/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ewu16/nomatch/blob/main/DESCRIPTION)
 
 Wu E (2026). *nomatch: Estimate Effectiveness of Interventions in Target
 Trial Emulation Observational Studies Without Using Matching*. R package

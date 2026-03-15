@@ -254,7 +254,7 @@ fit_matching <- matching(
   seed = 123
 )
 #> Bootstrapping 5 samples...
-#> Bootstrap completed in 1.02 secs
+#> Bootstrap completed in 0.686 secs
 
 # View basic results
 fit_matching
