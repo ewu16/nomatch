@@ -30,13 +30,12 @@
 #'
 #' @keywords internal
 #'
-estimate_bootstrap_ci <- function(one_boot_function,
+run_bootstrap_inference <- function(one_boot_function,
                                   one_boot_args,
                                   ci_type,
                                   boot_reps,
                                   pt_est = NULL,
                                   alpha = 0.05,
-                                  keep_boot_samples = TRUE,
                                   seed = NULL){
 
     if(boot_reps == 0){
@@ -124,17 +123,25 @@ estimate_bootstrap_ci <- function(one_boot_function,
 
     transform_list <- vector(mode = "list", length = length(boot_samples_clean))
     names(transform_list) <- names(boot_samples_clean)
-
+    wald <- ci_type %in% c("wald", "both")
+    effect_measures <- c("risk_difference", "risk_ratio", "relative_risk_reduction")
+    
     ci_estimates <- lapply(names(boot_samples_clean), \(term){
-        ci <- compute_boot_ci(x = pt_est[, term],
+        x <-  pt_est[, term]
+        ci <- compute_boot_ci(x = x,
                               boot_x = boot_samples_clean[[term]],
                               ci_type = ci_type,
                               alpha = alpha,
                               transform = .term_transformations[[term]])
 
         transform_list[[term]] <<- ci$transform$eta_boot
-
-        cbind(estimate = pt_est[, term], ci$ci)
+        result <- cbind(estimate = pt_est[, term], ci$ci)
+        
+        if(wald){
+            wald_pval <- if( term %in% effect_measures) compute_wald_pval(ci$ci) else NA
+            result <- cbind(result, wald_pval)
+        }
+        result
     })
     names(ci_estimates) <- names(boot_samples_clean)
 
@@ -149,7 +156,7 @@ estimate_bootstrap_ci <- function(one_boot_function,
                 n_success_boot = n_success_boot,
                 boot_errors = errors ,
                 boot_nas = nas,
-                boot_samples = if(keep_boot_samples) boot_sample_return else NULL
+                boot_samples = boot_sample_return
                 )
 
     return(out)

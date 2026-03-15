@@ -191,18 +191,20 @@ relative risk reduction (1 - RR), or risk differences (RD = risk_exposed - risk_
 }
 \details{
 \strong{Modeling.} Two Cox proportional hazards models are fit to estimate
-exposure-specific cumulative incidences. For the unexposed model, the outcome is modeled
-on the original time scale and includes all individuals, with exposed individuals
-censored at their time of exposure. For the exposed model, the outcome is modeled on the time scale
-of time since exposure and includes individuals who were
-exposed and who remained at risk \code{immune_lag} days after exposure. By default, both models adjust for
-the specified covariates as linear, main-effect terms to help control for confounding. The second model
-also flexibly adjusts for exposure time (by default, as a natural cubic spline with 4
-degrees of freedom) to capture time-varying background risk. Custom formulas specifiying the
-right hand side of the formulas to be used in these models can be provided through the optional arguments \code{formula_unexposed} and
-\code{formula_exposed}.
-Predicted risks from both models are then marginalized over the specified exposure-time and covariate weights to obtain G-computation style cumulative
-incidence estimates.
+exposure-specific cumulative incidences. For the unexposed model, the outcome
+is modeled on the original time scale and includes all individuals, with
+exposed individuals censored at their time of exposure. For the exposed model,
+the outcome is modeled on the time scale of time since exposure and includes
+individuals who were exposed and who remained at risk \code{immune_lag} days after
+exposure. By default, both models adjust for the specified covariates as
+linear, main-effect terms to help control for confounding. The second model
+also flexibly adjusts for exposure time (by default, as a natural cubic spline
+with 4 degrees of freedom) to capture time-varying background risk. Custom
+formulas specifiying the right hand side of the formulas to be used in these
+models can be provided through the optional arguments \code{formula_unexposed} and
+\code{formula_exposed}. Predicted risks from both models are then marginalized over
+the specified exposure-time and covariate weights to obtain G-computation
+style cumulative incidence estimates.
 
 \strong{Marginalizing weights.} When \code{weights_source = "observed"}, the marginalizing weights
 are the empirical distributions of exposure times and covariates among the
@@ -211,13 +213,16 @@ returned in the \code{nomatchfit} object under \code{weights}. They can also be 
 prior to the call to \code{nomatch()} by calling \code{get_observed_weights()}.
 
 \strong{Confidence intervals.} Wald and percentile confidence intervals are constructed
-for cumulative incidence and effectiveness parameters at each timepoint.
-The Wald pointwise confidence intervals are constructed on transformed scales:
-\eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios, and \eqn{\log{1 - RR}} for relative risk
-reduction, using bootstrap standard errors. These confidence intervals are
-then back-transformed to the original scale. Identity transformation is used for risk differences.
-To obtain simultaneous confidence intervals, use \code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}} after
-saving the original fit.
+for cumulative incidence and effectiveness parameters at each timepoint. The
+Wald pointwise confidence intervals are constructed on transformed scales:
+\eqn{\text{logit}} for cumulative incidence, identity transformation for risk
+differences, \eqn{\log{RR}} for risk ratios, and \eqn{\log{1 - RR}} for
+relative risk reduction using bootstrap standard errors of the transformed
+estimates. These confidence intervals are then back-transformed to the
+original scale. Wald p-values test the null of no effect (RD = 0, RR = 1, 1-RR
+= 0) on the same transformed scales used to construct the Wald confidence
+intervals. To obtain simultaneous confidence intervals, use
+\code{\link[=add_simultaneous_ci]{add_simultaneous_ci()}} after saving the original fit.
 
 \strong{Parallelization.} Bootstraps can be parallelized using the \code{future}
 framework. Set a parallel plan before calling \code{nomatch()}: e.g.
@@ -227,9 +232,9 @@ fit <- nomatch(..., boot_reps = 1000, seed = 42)
 future::plan(future::sequential)  # reset when done
 }\if{html}{\out{</div>}}
 
-If no plan is set, bootstraps run sequentially. \code{multisession} works on all operating systems
-and is recommended for most users. See the \href{https://future.futureverse.org}{future package documentation}
-for additional plans and details on setup.
+If no plan is set, bootstraps run sequentially. \code{multisession} works on all
+operating systems and is recommended for most users. See the \href{https://future.futureverse.org}{future package documentation} for additional plans and
+details on setup.
 }
 \examples{
 # Fit nomatch using simulated data

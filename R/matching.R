@@ -162,14 +162,13 @@ matching <- function(matched_data,
     # --------------------------------------------------------------------------
 
     # Helper returns NULL if boot_reps = 0
-    boot <- estimate_bootstrap_ci(
+    boot <- run_bootstrap_inference(
         one_boot_function  = one_boot_matching,
         one_boot_args      = estimation_args,
         ci_type            = ci_type,
         boot_reps          = boot_reps,
         pt_est             = original$pt_estimates,
         alpha              = alpha,
-        keep_boot_samples  = keep_boot_samples,
         seed               = seed
     )
     ci_est <- boot$ci_estimates
@@ -184,24 +183,18 @@ matching <- function(matched_data,
 
     }else{
         est <- lapply(names(ci_est), \(term){
-            #Add p-values
-            wald <- ci_type %in% c("wald", "both")
-            wald_pval <-       if(wald) compute_wald_pval(term, ci_est[[term]]) else NULL
-
-            x <- cbind(ci_est[[term]],
-                       wald_pval = wald_pval)
-
+            x <- cbind(ci_est[[term]])
             #Format column order
             col_order <- c("estimate",
-                           paste0("wald_", c("lower", "upper", "se", "pval", "n")),
-                           paste0("percentile_", c("lower", "upper", "pval", "n")))
-
+                           paste0("wald_", c("lower", "upper", "pval", "n")),
+                           paste0("percentile_", c("lower", "upper", "n")))
+            
             x[, intersect(col_order, colnames(x)), drop = FALSE]
-
+            
         })
         names(est) <- names(ci_est)
     }
-
+    
 
     # --------------------------------------------------------------------------
     # 4 - Return

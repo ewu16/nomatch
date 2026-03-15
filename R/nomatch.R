@@ -130,30 +130,32 @@
 #'   number of successful bootstrap replications per timepoint.}
 #'   \item{boot_samples}{(If `keep_boot_samples = TRUE`) Named list containing the `original` bootstrap
 #'   estimates and, if Wald confidence intervals are used, the `transformed` bootstrap draws, which are the same
-#'   bootstrap estimates on the scales used for inference. Both `original` and `transformed` are named lists 
+#'   bootstrap estimates on the scales used for inference. Both `original` and `transformed` are named lists
 #'   containing the bootstrap estimates for each term. The bootstrap estimates for each term are stored
 #'   as matrices, with rows indexing bootstrap replicates and columns indexing `timepoints`.}
-#' }
+#'}
 #'
-#' The `nomatchfit` object has methods for [print()], [summary()], and [plot()].
-#' Use [add_simultaneous_ci()] to add simultaneous confidence intervals.
+#'The `nomatchfit` object has methods for [print()], [summary()], and [plot()].
+#'Use [add_simultaneous_ci()] to add simultaneous confidence intervals.
 #'
 #'
 #'@details
 #'
 #' **Modeling.** Two Cox proportional hazards models are fit to estimate
-#' exposure-specific cumulative incidences. For the unexposed model, the outcome is modeled
-#' on the original time scale and includes all individuals, with exposed individuals
-#' censored at their time of exposure. For the exposed model, the outcome is modeled on the time scale
-#'  of time since exposure and includes individuals who were
-#' exposed and who remained at risk `immune_lag` days after exposure. By default, both models adjust for
-#' the specified covariates as linear, main-effect terms to help control for confounding. The second model
-#' also flexibly adjusts for exposure time (by default, as a natural cubic spline with 4
-#' degrees of freedom) to capture time-varying background risk. Custom formulas specifiying the 
-#' right hand side of the formulas to be used in these models can be provided through the optional arguments `formula_unexposed` and 
-#' `formula_exposed`. 
-#' Predicted risks from both models are then marginalized over the specified exposure-time and covariate weights to obtain G-computation style cumulative
-#' incidence estimates.
+#'exposure-specific cumulative incidences. For the unexposed model, the outcome
+#'is modeled on the original time scale and includes all individuals, with
+#'exposed individuals censored at their time of exposure. For the exposed model,
+#'the outcome is modeled on the time scale of time since exposure and includes
+#'individuals who were exposed and who remained at risk `immune_lag` days after
+#'exposure. By default, both models adjust for the specified covariates as
+#'linear, main-effect terms to help control for confounding. The second model
+#'also flexibly adjusts for exposure time (by default, as a natural cubic spline
+#'with 4 degrees of freedom) to capture time-varying background risk. Custom
+#'formulas specifiying the right hand side of the formulas to be used in these
+#'models can be provided through the optional arguments `formula_unexposed` and
+#'`formula_exposed`. Predicted risks from both models are then marginalized over
+#'the specified exposure-time and covariate weights to obtain G-computation
+#'style cumulative incidence estimates.
 #'
 #'
 #'**Marginalizing weights.** When `weights_source = "observed"`, the marginalizing weights
@@ -164,27 +166,31 @@
 #'
 #'
 #' **Confidence intervals.** Wald and percentile confidence intervals are constructed
-#' for cumulative incidence and effectiveness parameters at each timepoint. 
-#'  The Wald pointwise confidence intervals are constructed on transformed scales:
-#' \eqn{\text{logit}} for cumulative incidence; \eqn{\log{RR}} for risk ratios, and \eqn{\log{1 - RR}} for relative risk 
-#' reduction, using bootstrap standard errors. These confidence intervals are  
-#' then back-transformed to the original scale. Identity transformation is used for risk differences.
-#' To obtain simultaneous confidence intervals, use [add_simultaneous_ci()] after
-#' saving the original fit. 
-#' 
+#'for cumulative incidence and effectiveness parameters at each timepoint. The
+#'Wald pointwise confidence intervals are constructed on transformed scales:
+#'\eqn{\text{logit}} for cumulative incidence, identity transformation for risk
+#'differences, \eqn{\log{RR}} for risk ratios, and \eqn{\log{1 - RR}} for
+#'relative risk reduction using bootstrap standard errors of the transformed
+#'estimates. These confidence intervals are then back-transformed to the
+#'original scale. Wald p-values test the null of no effect (RD = 0, RR = 1, 1-RR
+#'= 0) on the same transformed scales used to construct the Wald confidence
+#'intervals. To obtain simultaneous confidence intervals, use
+#'[add_simultaneous_ci()] after saving the original fit.
 #'
-#' **Parallelization.** Bootstraps can be parallelized using the `future` 
-#' framework. Set a parallel plan before calling `nomatch()`: e.g.
-#' 
+#'
+#' **Parallelization.** Bootstraps can be parallelized using the `future`
+#'framework. Set a parallel plan before calling `nomatch()`: e.g.
+#'
 #' ```r
 #' future::plan(future::multisession, workers = 4)
 #' fit <- nomatch(..., boot_reps = 1000, seed = 42)
 #' future::plan(future::sequential)  # reset when done
 #' ```
-#' 
-#' If no plan is set, bootstraps run sequentially. `multisession` works on all operating systems 
-#' and is recommended for most users. See the [future package documentation](https://future.futureverse.org) 
-#' for additional plans and details on setup. 
+#'
+#'If no plan is set, bootstraps run sequentially. `multisession` works on all
+#'operating systems and is recommended for most users. See the [future package
+#'documentation](https://future.futureverse.org) for additional plans and
+#'details on setup.
 #'
 #'@export
 #'
@@ -315,14 +321,13 @@ nomatch <- function(data,
     # 2 - Add bootstrap confidence intervals to point estimates
     # --------------------------------------------------------------------------
     # Helper returns NULL if boot_reps = 0
-     boot <- estimate_bootstrap_ci(
+     boot <- run_bootstrap_inference(
          one_boot_function  = one_boot_nomatch,
          one_boot_args      = estimation_args,
          ci_type            = ci_type,
          boot_reps          = boot_reps,
          pt_est             = original$pt_estimates,
          alpha              = alpha,
-         keep_boot_samples  = keep_boot_samples,
          seed               = seed
      )
 
@@ -330,7 +335,7 @@ nomatch <- function(data,
      boot_samples <- boot$boot_samples
 
      # --------------------------------------------------------------------------
-     # 3 - Add p-values and format
+     # 3 - Format results
      # --------------------------------------------------------------------------
      if(is.null(ci_est)){
          pt_est  <- original$pt_estimates
@@ -339,17 +344,11 @@ nomatch <- function(data,
 
      }else{
          est <- lapply(names(ci_est), \(term){
-             #Add p-values
-             wald <- ci_type %in% c("wald", "both")
-             wald_pval <-       if(wald) compute_wald_pval(term, ci_est[[term]]) else NULL
-
-             x <- cbind(ci_est[[term]],
-                        wald_pval = wald_pval)
-
+             x <- cbind(ci_est[[term]])
              #Format column order
              col_order <- c("estimate",
-                            paste0("wald_", c("lower", "upper", "se", "pval", "n")),
-                            paste0("percentile_", c("lower", "upper", "pval", "n")))
+                            paste0("wald_", c("lower", "upper", "pval", "n")),
+                            paste0("percentile_", c("lower", "upper", "n")))
 
              x[, intersect(col_order, colnames(x)), drop = FALSE]
 

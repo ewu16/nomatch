@@ -91,6 +91,9 @@ compute_wald_ci <- function(x, boot_x,  alpha = .05, transform, z_star = NULL){
     # transform
     eta_x    <-  transform$fwd(x)
     eta_boot <-  transform$fwd(boot_x)
+    
+    #store transformed bootstrap samples 
+    transform$eta_boot <- eta_boot
 
     # bootstrap SDs/counts ignoring non-finite draws
     col_sd  <- apply(eta_boot, 2, function(col) stats::sd(col[is.finite(col)], na.rm = TRUE))
@@ -100,13 +103,32 @@ compute_wald_ci <- function(x, boot_x,  alpha = .05, transform, z_star = NULL){
     lower <- transform$lower(eta_x, col_sd, z)
     upper <- transform$upper(eta_x, col_sd, z)
 
-    transform$eta_boot <- eta_boot
-
-    ci_out <- cbind(wald_lower = lower, wald_upper = upper, wald_se = col_sd, wald_n = boot_n)
+   
+    ci_out <- cbind(wald_lower = lower, 
+                    wald_upper = upper, 
+                    transformed_est = eta_x,
+                    transformed_se = col_sd, 
+                    wald_n = boot_n)
 
     list(ci =  ci_out,
          transform = transform)
 }
+
+#' Compute Wald-style p-value based on bootstrap standard errors 
+#'
+#' @description Assumes null value for hypothesis testing is 0 
+#' @param ci_est_term A matrix containing the point estimate (`transformed_estimate`) and 
+#' and bootstrap standard error (`transformed_se`) usd to construct the Wald
+#' confidence intervals
+#'
+#' @return p-value 
+#' @keywords internal 
+#' @noRd
+compute_wald_pval <- function(ci_est_term){
+    z <- (ci_est_term[, "transformed_est"]/ci_est_term[, "transformed_se"])
+    2*(1 - stats::pnorm(abs(z)))
+}
+
 
 
 #' @rdname compute_boot_ci
