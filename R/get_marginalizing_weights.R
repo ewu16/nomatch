@@ -105,7 +105,7 @@ get_gp <- function(df, outcome_time, exposure, exposure_time, covariates, tau){
         group_lookup <- unique(gp_data[covariates])
         group_lookup <- group_lookup[do.call(order, group_lookup[covariates]), , drop = FALSE]
         group_lookup$group_id <- seq_len(nrow(group_lookup))
-        gp_data <- merge(gp_data, group_lookup, by = covariates, all.x = TRUE)
+        gp_data <- base::merge(gp_data, group_lookup, by = covariates, all.x = TRUE)
     }
    
     # Compute g_weights: P(time | covariates)
@@ -130,8 +130,8 @@ get_gp <- function(df, outcome_time, exposure, exposure_time, covariates, tau){
     key <- unique(gp_data[, c("group_id", covariates), drop = FALSE])
 
     # Single merge for each output
-    g_dist_clean <- merge(g_weights, key, by = "group_id")
-    p_dist_clean <- merge(p_weights, key, by = "group_id")
+    g_dist_clean <- base::merge(g_weights, key, by = "group_id")
+    p_dist_clean <- base::merge(p_weights, key, by = "group_id")
 
     list(g_weights = g_dist_clean[, c("group_id", covariates, exposure_time, "prob_g")],
          p_weights = p_dist_clean[, c("group_id", covariates, "prob_p")])

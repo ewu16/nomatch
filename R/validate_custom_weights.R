@@ -49,7 +49,10 @@ validate_marginalizing_weights <- function(custom_weights, exposure_time, covari
         if (abs(sum(g$prob) - 1) > 1e-6)
             stop("In 'g_weights', probabilities must sum to 1.", call. = FALSE)
     } else {
-        if (any(abs(tapply(g$prob, g[covariates], sum) - 1) > 1e-6))
+        # Sum within observed covariate groups only; tapply() over multiple
+        # factors returns the full cross-classification with NA for empty cells
+        group_sums <- tapply(g$prob, interaction(g[covariates], drop = TRUE), sum)
+        if (any(abs(group_sums - 1) > 1e-6))
             stop("In 'g_weights', probabilities must sum to 1 within each group.", call. = FALSE)
     }
 
