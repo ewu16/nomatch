@@ -22,6 +22,7 @@ estimators but can be more efficient.
 You can install the development version of `nomatch` with:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("ewu16/nomatch")
 ```
@@ -38,6 +39,7 @@ We use a simple simulated dataset based on an observational vaccine
 study, although data from other disease settings can be used.
 
 ``` r
+
 
 # Load package
 library(nomatch)
@@ -70,6 +72,7 @@ The dataset contains the following:
     censoring with values `1 = event, 0 = censored`.
 
 ``` r
+
 
 # Use nomatch to compute cumulative incidence and effect estimates 
 fit <- nomatch(data = simdata,

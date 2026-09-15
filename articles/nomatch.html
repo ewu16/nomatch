@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>nomatch • nomatch</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="nomatch">
 </head>
@@ -203,7 +203,7 @@ code without setting up a parallel backend.</p>
 <span>               timepoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>               boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Bootstrap completed in 3.68 secs</span></span></code></pre></div>
+<span><span class="co">#&gt; Bootstrap completed in 3.58 secs</span></span></code></pre></div>
 <p>The cumulative incidence estimates (<code>cuminc_0</code> for
 unexposed and <code>cuminc_1</code> for exposed) ) and other
 effectiveness measures are stored within the <code>$estimates</code>
@@ -343,7 +343,7 @@ object.</p>
 <span><span class="co">#&gt; 5       150    0.731              0.643              0.830     1.52e-06</span></span>
 <span><span class="co">#&gt; 6       180    0.828              0.710              0.965     1.59e-02</span></span>
 <span><span class="co">#&gt;   95% Simul CI: Lower 95% Simul CI: Upper</span></span>
-<span><span class="co">#&gt; 1               0.261               1.093</span></span>
+<span><span class="co">#&gt; 1               0.261               1.092</span></span>
 <span><span class="co">#&gt; 2               0.491               0.744</span></span>
 <span><span class="co">#&gt; 3               0.518               0.703</span></span>
 <span><span class="co">#&gt; 4               0.597               0.732</span></span>
@@ -441,7 +441,7 @@ large datasets.</p>
 <span>                        timepoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>                        boot_reps <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Bootstrapping 10 samples...</span></span>
-<span><span class="co">#&gt; Bootstrap completed in 1.46 secs</span></span>
+<span><span class="co">#&gt; Bootstrap completed in 1.73 secs</span></span>
 <span></span>
 <span><span class="va">fit_matching</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -502,9 +502,9 @@ large datasets.</p>
 <div class="section level2">
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
-<pre><code><span><span class="co">#&gt; R version 4.5.3 (2026-03-11)</span></span>
+<pre><code><span><span class="co">#&gt; R version 4.6.1 (2026-06-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.5 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -523,25 +523,25 @@ large datasets.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] purrr_1.2.1   future_1.70.0 nomatch_0.1.0 dplyr_1.2.0   ggplot2_4.0.2</span></span>
+<span><span class="co">#&gt; [1] purrr_1.2.2   future_1.75.0 nomatch_0.1.0 dplyr_1.2.1   ggplot2_4.0.3</span></span>
 <span><span class="co">#&gt; [6] tibble_3.3.1 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] utf8_1.2.6         sass_0.4.10        generics_0.1.4     lattice_0.22-9    </span></span>
-<span><span class="co">#&gt;  [5] listenv_0.10.1     digest_0.6.39      magrittr_2.0.4     evaluate_1.0.5    </span></span>
-<span><span class="co">#&gt;  [9] grid_4.5.3         RColorBrewer_1.1-3 fastmap_1.2.0      jsonlite_2.0.0    </span></span>
-<span><span class="co">#&gt; [13] Matrix_1.7-4       survival_3.8-6     scales_1.4.0       codetools_0.2-20  </span></span>
-<span><span class="co">#&gt; [17] textshaping_1.0.5  jquerylib_0.1.4    cli_3.6.5          rlang_1.1.7       </span></span>
-<span><span class="co">#&gt; [21] parallelly_1.46.1  splines_4.5.3      withr_3.0.2        cachem_1.1.0      </span></span>
-<span><span class="co">#&gt; [25] yaml_2.3.12        ggh4x_0.3.1        tools_4.5.3        parallel_4.5.3    </span></span>
-<span><span class="co">#&gt; [29] globals_0.19.1     vctrs_0.7.1        R6_2.6.1           lifecycle_1.0.5   </span></span>
-<span><span class="co">#&gt; [33] fs_1.6.7           MASS_7.3-65        ragg_1.5.1         furrr_0.3.1       </span></span>
-<span><span class="co">#&gt; [37] pkgconfig_2.0.3    desc_1.4.3         pkgdown_2.2.0      pillar_1.11.1     </span></span>
-<span><span class="co">#&gt; [41] bslib_0.10.0       gtable_0.3.6       glue_1.8.0         systemfonts_1.3.2 </span></span>
-<span><span class="co">#&gt; [45] xfun_0.56          tidyselect_1.2.1   knitr_1.51         farver_2.1.2      </span></span>
-<span><span class="co">#&gt; [49] htmltools_0.5.9    rmarkdown_2.30     labeling_0.4.3     compiler_4.5.3    </span></span>
-<span><span class="co">#&gt; [53] S7_0.2.1</span></span></code></pre>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<span><span class="co">#&gt;  [5] listenv_1.0.0      digest_0.6.39      magrittr_2.0.5     evaluate_1.0.5    </span></span>
+<span><span class="co">#&gt;  [9] grid_4.6.1         RColorBrewer_1.1-3 fastmap_1.2.0      jsonlite_2.0.0    </span></span>
+<span><span class="co">#&gt; [13] Matrix_1.7-5       survival_3.8-6     scales_1.4.0       codetools_0.2-20  </span></span>
+<span><span class="co">#&gt; [17] textshaping_1.0.5  jquerylib_0.1.4    cli_3.6.6          rlang_1.3.0       </span></span>
+<span><span class="co">#&gt; [21] parallelly_1.48.0  splines_4.6.1      withr_3.0.3        cachem_1.1.0      </span></span>
+<span><span class="co">#&gt; [25] yaml_2.3.12        otel_0.2.0         ggh4x_0.3.1        tools_4.6.1       </span></span>
+<span><span class="co">#&gt; [29] parallel_4.6.1     globals_0.19.1     vctrs_0.7.3        R6_2.6.1          </span></span>
+<span><span class="co">#&gt; [33] lifecycle_1.0.5    fs_2.1.0           MASS_7.3-65        ragg_1.5.2        </span></span>
+<span><span class="co">#&gt; [37] furrr_0.4.0        pkgconfig_2.0.3    desc_1.4.3         pkgdown_2.2.1     </span></span>
+<span><span class="co">#&gt; [41] pillar_1.11.1      bslib_0.12.0       gtable_0.3.6       glue_1.8.1        </span></span>
+<span><span class="co">#&gt; [45] systemfonts_1.3.2  xfun_0.60          tidyselect_1.2.1   knitr_1.52        </span></span>
+<span><span class="co">#&gt; [49] farver_2.1.2       htmltools_0.5.9    labeling_0.4.3     rmarkdown_2.32    </span></span>
+<span><span class="co">#&gt; [53] compiler_4.6.1     S7_0.2.2</span></span></code></pre>
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-hernan2016_using" class="csl-entry">
 Hernán, Miguel A., and James M. Robins. 2016. <span>“Using Big Data to
 Emulate a Target Trial When a Randomized Trial Is Not Available.”</span>
@@ -560,7 +560,7 @@ Emulate a Target Trial When a Randomized Trial Is Not Available.”</span>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

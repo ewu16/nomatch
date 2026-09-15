@@ -1,9 +1,9 @@
-pandoc: 3.1.11
-pkgdown: 2.2.0
+pandoc: 3.8.3
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   nomatch: nomatch.html
-last_built: 2026-03-15T21:01Z
+last_built: 2026-09-15T14:34Z
 urls:
   reference: https://ewu16.github.io/nomatch/reference
   article: https://ewu16.github.io/nomatch/articles

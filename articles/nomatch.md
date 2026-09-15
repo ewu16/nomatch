@@ -46,6 +46,7 @@ We use `nomatch` to estimate the effectiveness of a binary exposure in
 an observational cohort study. The package can be loaded as follows:
 
 ``` r
+
 library(nomatch)
 ```
 
@@ -56,6 +57,7 @@ practice, data from other disease settings can be used as well. The
 first few rows of `simdata` can be viewed as follows:
 
 ``` r
+
 simdata <- as_tibble(simdata) #for prettier printing
 
 # View data
@@ -113,6 +115,7 @@ incidences. The main types of arguments are:
   framework. Simply set a parallel plan before calling nomatch(): e.g.
 
 ``` r
+
 # Set parallel plan before calling nomatch(): 
 # - multisession is recommended as it runs multiple parallel processes 
 #   in the background  and is supported by all operating systems
@@ -128,6 +131,7 @@ code without setting up a parallel backend.
 
 ``` r
 
+
 # Compute cumulative incidence 
 fit <- nomatch(data = simdata,
                outcome_time = "Y",
@@ -139,7 +143,7 @@ fit <- nomatch(data = simdata,
                timepoints = seq(30, 180, by = 30),
                boot_reps = 10)
 #> Bootstrapping 10 samples...
-#> Bootstrap completed in 3.68 secs
+#> Bootstrap completed in 3.58 secs
 ```
 
 The cumulative incidence estimates (`cuminc_0` for unexposed and
@@ -147,6 +151,7 @@ The cumulative incidence estimates (`cuminc_0` for unexposed and
 within the `$estimates` component of the fitted object.
 
 ``` r
+
 str(fit$estimates, give.attr = FALSE)
 #> List of 5
 #>  $ cuminc_0               : num [1:6, 1:5] 0.0116 0.0379 0.0586 0.0669 0.0755 ...
@@ -160,6 +165,7 @@ We can thus preview the relative risk reduction estimates (i.e. vaccine
 effectiveness) using
 
 ``` r
+
 head(fit$estimates$relative_risk_reduction) 
 #>      estimate wald_lower wald_upper    wald_pval wald_n
 #> 30  0.4655914 0.06415232  0.6948301 2.838690e-02     10
@@ -203,6 +209,7 @@ A summary of the estimation approach and fitted models can be obtained
 by
 
 ``` r
+
 summary(fit)
 #> 
 #> ====================================================================== 
@@ -255,6 +262,7 @@ dense grid of timepoints. Our example plot appears somewhat coarse
 because we evaluated the estimates at only six timepoints.
 
 ``` r
+
 plot(fit, effect = "relative_risk_reduction")
 ```
 
@@ -272,6 +280,7 @@ intervals, provided bootstrap samples were retained (keep_boot_samples =
 TRUE, the default). The updated fit should be saved as a new object.
 
 ``` r
+
 #Compute simultaneous CI
 fit_with_simul <- add_simultaneous_ci(fit, seed = 1234)
 ```
@@ -280,6 +289,7 @@ The simultaneous confidence intervals are now stored in the fitted
 object.
 
 ``` r
+
 fit_with_simul
 #> 
 #>  Risk Ratio Estimates 
@@ -298,7 +308,7 @@ fit_with_simul
 #> 5       150    0.731              0.643              0.830     1.52e-06
 #> 6       180    0.828              0.710              0.965     1.59e-02
 #>   95% Simul CI: Lower 95% Simul CI: Upper
-#> 1               0.261               1.093
+#> 1               0.261               1.092
 #> 2               0.491               0.744
 #> 3               0.518               0.703
 #> 4               0.597               0.732
@@ -316,6 +326,7 @@ The fitted object must already contain the simultaneous confidence
 intervals; otherwise, the call will return an error.
 
 ``` r
+
 #Plot simultaneous confidence bands 
 plot(fit_with_simul , effect = "relative_risk_reduction", ci_type = "simul") 
 ```
@@ -334,6 +345,7 @@ takes the estimates component of the fitted object and reformats it into
 a long dataset suitable for plotting.
 
 ``` r
+
 plot_data <- estimates_to_df(fit)
 
 head(as_tibble(plot_data))
@@ -352,6 +364,7 @@ For example, we can create a plot that overlays the cumulative incidence
 estimates for the two exposure types as follows:
 
 ``` r
+
 plot_data |> 
   filter(term %in% c("cuminc_0", "cuminc_1")) |> 
   ggplot(aes(x = t0, y = estimate, color = term, fill = term)) + 
@@ -384,6 +397,7 @@ to compute marginal cumulative incidences. These matching functions are
 intentionally limited in scope and may be slow on large datasets.
 
 ``` r
+
 # ------------------------------------------------------------------------------
 # 3. Compare results with matching estimator
 
@@ -407,7 +421,7 @@ fit_matching <-matching(matched_data = matched_data,
                         timepoints = seq(30, 180, by = 30),
                         boot_reps = 10) 
 #> Bootstrapping 10 samples...
-#> Bootstrap completed in 1.46 secs
+#> Bootstrap completed in 1.73 secs
 
 fit_matching
 #> 
@@ -468,9 +482,9 @@ comparison |>
 
 ## Session Information
 
-    #> R version 4.5.3 (2026-03-11)
+    #> R version 4.6.1 (2026-06-24)
     #> Platform: x86_64-pc-linux-gnu
-    #> Running under: Ubuntu 24.04.3 LTS
+    #> Running under: Ubuntu 24.04.5 LTS
     #> 
     #> Matrix products: default
     #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -489,24 +503,24 @@ comparison |>
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #> [1] purrr_1.2.1   future_1.70.0 nomatch_0.1.0 dplyr_1.2.0   ggplot2_4.0.2
+    #> [1] purrr_1.2.2   future_1.75.0 nomatch_0.1.0 dplyr_1.2.1   ggplot2_4.0.3
     #> [6] tibble_3.3.1 
     #> 
     #> loaded via a namespace (and not attached):
     #>  [1] utf8_1.2.6         sass_0.4.10        generics_0.1.4     lattice_0.22-9    
-    #>  [5] listenv_0.10.1     digest_0.6.39      magrittr_2.0.4     evaluate_1.0.5    
-    #>  [9] grid_4.5.3         RColorBrewer_1.1-3 fastmap_1.2.0      jsonlite_2.0.0    
-    #> [13] Matrix_1.7-4       survival_3.8-6     scales_1.4.0       codetools_0.2-20  
-    #> [17] textshaping_1.0.5  jquerylib_0.1.4    cli_3.6.5          rlang_1.1.7       
-    #> [21] parallelly_1.46.1  splines_4.5.3      withr_3.0.2        cachem_1.1.0      
-    #> [25] yaml_2.3.12        ggh4x_0.3.1        tools_4.5.3        parallel_4.5.3    
-    #> [29] globals_0.19.1     vctrs_0.7.1        R6_2.6.1           lifecycle_1.0.5   
-    #> [33] fs_1.6.7           MASS_7.3-65        ragg_1.5.1         furrr_0.3.1       
-    #> [37] pkgconfig_2.0.3    desc_1.4.3         pkgdown_2.2.0      pillar_1.11.1     
-    #> [41] bslib_0.10.0       gtable_0.3.6       glue_1.8.0         systemfonts_1.3.2 
-    #> [45] xfun_0.56          tidyselect_1.2.1   knitr_1.51         farver_2.1.2      
-    #> [49] htmltools_0.5.9    rmarkdown_2.30     labeling_0.4.3     compiler_4.5.3    
-    #> [53] S7_0.2.1
+    #>  [5] listenv_1.0.0      digest_0.6.39      magrittr_2.0.5     evaluate_1.0.5    
+    #>  [9] grid_4.6.1         RColorBrewer_1.1-3 fastmap_1.2.0      jsonlite_2.0.0    
+    #> [13] Matrix_1.7-5       survival_3.8-6     scales_1.4.0       codetools_0.2-20  
+    #> [17] textshaping_1.0.5  jquerylib_0.1.4    cli_3.6.6          rlang_1.3.0       
+    #> [21] parallelly_1.48.0  splines_4.6.1      withr_3.0.3        cachem_1.1.0      
+    #> [25] yaml_2.3.12        otel_0.2.0         ggh4x_0.3.1        tools_4.6.1       
+    #> [29] parallel_4.6.1     globals_0.19.1     vctrs_0.7.3        R6_2.6.1          
+    #> [33] lifecycle_1.0.5    fs_2.1.0           MASS_7.3-65        ragg_1.5.2        
+    #> [37] furrr_0.4.0        pkgconfig_2.0.3    desc_1.4.3         pkgdown_2.2.1     
+    #> [41] pillar_1.11.1      bslib_0.12.0       gtable_0.3.6       glue_1.8.1        
+    #> [45] systemfonts_1.3.2  xfun_0.60          tidyselect_1.2.1   knitr_1.52        
+    #> [49] farver_2.1.2       htmltools_0.5.9    labeling_0.4.3     rmarkdown_2.32    
+    #> [53] compiler_4.6.1     S7_0.2.2
 
 Hernán, Miguel A., and James M. Robins. 2016. “Using Big Data to Emulate
 a Target Trial When a Randomized Trial Is Not Available.” *American
